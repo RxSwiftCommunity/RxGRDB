@@ -9,33 +9,59 @@ ReactiveGRDB
 
 ----
 
-A set of reactive extensions for GRDB.swift.
+A set of reactive extensions for [GRDB.swift](http://github.com/groue/GRDB.swift).
+
+Open a database connection first:
 
 ```swift
 let dbQueue = try DatabaseQueue(...) // or DatabasePool
+```
 
-// Emits an optional record immediately on subscription, and after each
-// committed database transaction that has modified the tables and columns
-// fetched by the Request.
-Person.filter(Column("id") == 1).rx
+Given a request, you can fetch a record, or register for all changes to the fetched record:
+
+```swift
+let request = Person.filter(Column("email") == "arthur@example.com")
+
+// Non reactive:
+let arthur = try dbQueue.inDatabase { request.fetchOne($0) }
+
+// Reactive: an optional record is immediately emitted on subscription, and
+// after each committed database transaction that has modified the tables and
+// columns fetched by the request:
+request.rx
     .fetchOne(in: dbQueue)
     .subscribe(onNext: { person: Person? in
         // On the main queue
     })
+```
 
-// Emits an array of records immediately on subscription, and after each
-// committed database transaction that has modified the tables and columns
-// fetched by the Request.
-Person.order(Column("name")).rx
+Given a request, you can fetch an array of records, or register for all changes to the fetched records:
+
+```swift
+let request = Person.order(Column("name"))
+
+// Non reactive:
+let persons = try dbQueue.inDatabase { request.fetchAll($0) }
+
+// Reactive: an array of records is immediately emitted on subscription, and
+// after each committed database transaction that has modified the tables and
+// columns fetched by the request.
+request.rx
     .fetchAll(in: dbQueue)
     .subscribe(onNext: { persons: [Person] in
         // On the main queue
     })
+```
 
-// Emits an array of records and an "event" immediately on subscription, and
-// after each committed database transaction that has modified the tables and
-// columns fetched by the Request.
-Person.order(Column("name")).rx
+Given a request, you can drive a UITableView or a UICollectionView:
+
+```swift
+let request = Person.order(Column("name"))
+
+// Reactive: an array of records and an "event" are immediately emitted on
+// subscription, and after each committed database transaction that has modified
+// the tables and columns fetched by the request:
+request.rx
     .diff(in: dbQueue)
     .subscribe(onNext: { (persons, event) in
         // On the main queue
