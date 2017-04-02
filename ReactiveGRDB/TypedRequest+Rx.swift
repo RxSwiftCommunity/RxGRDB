@@ -9,25 +9,25 @@ extension AnyTypedRequest : ReactiveCompatible { }
 extension SelectStatement.SelectionInfo : ReactiveCompatible { }
 
 extension Reactive where Base == SelectStatement.SelectionInfo {
-    public func selection(in writer: DatabaseWriter) -> Observable<Void> {
+    public func selection(in writer: DatabaseWriter) -> Observable<Database> {
         return SelectionInfoObservable(writer: writer, selectionInfo: base).asObservable()
     }
 }
 
 extension Reactive where Base: Request {
-    public func selection(in writer: DatabaseWriter) -> Observable<Void> {
+    public func selection(in writer: DatabaseWriter) -> Observable<Database> {
         return RequestSelectionObservable(writer: writer, request: base).asObservable()
     }
 }
 
 extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
-    public func fetchAll(in writer: DatabaseWriter) -> Observable<[Base.Fetched]> {
-        return FetchedAllRowConvertibleObservable(writer: writer, request: base).asObservable()
+    public func fetchAll(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.Fetched]> {
+        return FetchAllRowConvertibleObservable(writer: writer, request: base, resultQueue: resultQueue).asObservable()
     }
 }
 
 final class SelectionInfoObservable: ObservableType {
-    typealias E = Void
+    typealias E = Database
     
     let writer: DatabaseWriter
     let selectionInfo: SelectStatement.SelectionInfo
@@ -37,13 +37,13 @@ final class SelectionInfoObservable: ObservableType {
         self.selectionInfo = selectionInfo
     }
     
-    func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == Void {
-        let transactionObserver = Observer(selectionInfo: selectionInfo) {
-            observer.onNext()
+    func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
+        let transactionObserver = Observer(selectionInfo: selectionInfo) { db in
+            observer.onNext(db)
         }
         writer.write { db in
             db.add(transactionObserver: transactionObserver)
-            observer.onNext()
+            observer.onNext(db)
         }
         return Disposables.create {
             self.writer.remove(transactionObserver: transactionObserver)
@@ -52,10 +52,10 @@ final class SelectionInfoObservable: ObservableType {
     
     private final class Observer : TransactionObserver {
         var didChange = false
-        let callback: () -> ()
+        let callback: (Database) -> ()
         let selectionInfo: SelectStatement.SelectionInfo
         
-        init(selectionInfo: SelectStatement.SelectionInfo, callback: @escaping () -> ()) {
+        init(selectionInfo: SelectStatement.SelectionInfo, callback: @escaping (Database) -> ()) {
             self.selectionInfo = selectionInfo
             self.callback = callback
         }
@@ -74,7 +74,7 @@ final class SelectionInfoObservable: ObservableType {
             let needsCallback = didChange
             didChange = false
             if needsCallback {
-                callback()
+                callback(db)
             }
         }
         
@@ -90,7 +90,7 @@ final class SelectionInfoObservable: ObservableType {
 }
 
 final class RequestSelectionObservable<R: Request>: ObservableType {
-    typealias E = Void
+    typealias E = Database
     
     let writer: DatabaseWriter
     let request: R
@@ -100,7 +100,7 @@ final class RequestSelectionObservable<R: Request>: ObservableType {
         self.request = request
     }
     
-    func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == Void {
+    func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
         let selectionInfo: SelectStatement.SelectionInfo
         do {
             selectionInfo = try writer.unsafeRead { db -> SelectStatement.SelectionInfo in
@@ -117,42 +117,63 @@ final class RequestSelectionObservable<R: Request>: ObservableType {
     }
 }
 
-final class FetchedAllRowConvertibleObservable<R: TypedRequest>: ObservableType where R.Fetched: RowConvertible {
+final class FetchAllRowConvertibleObservable<R: TypedRequest>: ObservableType where R.Fetched: RowConvertible {
     typealias E = [R.Fetched]
     
     let writer: DatabaseWriter
     let request: R
+    let resultQueue: DispatchQueue?
     
-    init(writer: DatabaseWriter, request: R) {
+    init(writer: DatabaseWriter, request: R, resultQueue: DispatchQueue? = nil) {
         self.writer = writer
         self.request = request
+        self.resultQueue = resultQueue
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
-        let queue = DispatchQueue(label: "ReactiveGRDB.results")
+        let orderingQueue = DispatchQueue(label: "ReactiveGRDB.results")
         
-        return RequestSelectionObservable(writer: writer, request: request).subscribe { event in
+        var initial = true
+        let disposable = RequestSelectionObservable(writer: writer, request: request).subscribe { event in
             switch event {
-            case .next:
-                let semaphore = DispatchSemaphore(value: 0)
-                var result: Result<E>? = nil
-                do {
-                    try self.writer.readFromCurrentState { db in
-                        result = Result.wrap { try self.request.fetchAll(db) }
+            case .next(let db):
+                if initial {
+                    initial = false
+                    do {
+                        try observer.onNext(self.request.fetchAll(db))
+                    } catch {
+                        observer.onError(error)
+                    }
+                } else {
+                    let semaphore = DispatchSemaphore(value: 0)
+                    var result: Result<E>? = nil
+                    do {
+                        try self.writer.readFromCurrentState { db in
+                            result = Result.wrap { try self.request.fetchAll(db) }
+                            semaphore.signal()
+                        }
+                    } catch {
+                        result = .failure(error)
                         semaphore.signal()
                     }
-                } catch {
-                    result = .failure(error)
-                    semaphore.signal()
-                }
-                
-                queue.async {
-                    _ = semaphore.wait(timeout: .distantFuture)
-                    switch result! {
-                    case .success(let results):
-                        observer.onNext(results)
-                    case .failure(let error):
-                        observer.onError(error)
+                    
+                    orderingQueue.async {
+                        _ = semaphore.wait(timeout: .distantFuture)
+                        
+                        func notify() {
+                            switch result! {
+                            case .success(let results):
+                                observer.onNext(results)
+                            case .failure(let error):
+                                observer.onError(error)
+                            }
+                        }
+                        
+                        if let resultQueue = self.resultQueue {
+                            resultQueue.async(execute: notify)
+                        } else {
+                            notify()
+                        }
                     }
                 }
             case .error(let error):
@@ -161,6 +182,8 @@ final class FetchedAllRowConvertibleObservable<R: TypedRequest>: ObservableType 
                 observer.onCompleted()
             }
         }
+        
+        return disposable
     }
 }
 
