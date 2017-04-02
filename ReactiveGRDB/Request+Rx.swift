@@ -18,7 +18,7 @@ extension Reactive where Base: Request {
     }
 }
 
-final class RequestChangesObservable<R: Request>: ObservableType {
+final class RequestChangesObservable<R: Request> : ObservableType {
     typealias E = Database
     
     let writer: DatabaseWriter

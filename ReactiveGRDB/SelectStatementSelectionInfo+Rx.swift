@@ -15,7 +15,7 @@ extension Reactive where Base == SelectStatement.SelectionInfo {
     }
 }
 
-final class SelectionInfoChangesObservable: ObservableType {
+final class SelectionInfoChangesObservable : ObservableType {
     typealias E = Database
     
     let writer: DatabaseWriter

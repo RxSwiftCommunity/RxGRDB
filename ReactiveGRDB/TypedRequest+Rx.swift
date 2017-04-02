@@ -10,20 +10,41 @@ extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
     public func fetchAll(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.Fetched]> {
-        return FetchAllRowConvertibleObservable(writer: writer, request: base, resultQueue: resultQueue).asObservable()
+        return RequestFetchObservable(
+            writer: writer,
+            request: base,
+            fetch: { try self.base.fetchAll($0) },
+            resultQueue: resultQueue).asObservable()
+    }
+    
+    /// Returns an Observable that emits a single option record immediately on
+    /// subscription, and later, on resultQueue, after each committed database
+    /// transaction that has modified the tables and columns fetched by
+    /// the Request.
+    ///
+    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    public func fetchOne(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.Fetched?> {
+        return RequestFetchObservable(
+            writer: writer,
+            request: base,
+            fetch: { try self.base.fetchOne($0) },
+            resultQueue: resultQueue).asObservable()
     }
 }
 
-final class FetchAllRowConvertibleObservable<R: TypedRequest>: ObservableType where R.Fetched: RowConvertible {
-    typealias E = [R.Fetched]
+final class RequestFetchObservable<R: Request, ResultType> : ObservableType {
+    typealias E = ResultType
     
     let writer: DatabaseWriter
     let request: R
     let resultQueue: DispatchQueue?
+    let fetch: (Database) throws -> ResultType
     
-    init(writer: DatabaseWriter, request: R, resultQueue: DispatchQueue? = nil) {
+    init(writer: DatabaseWriter, request: R, fetch: @escaping (Database) throws -> ResultType, resultQueue: DispatchQueue? = nil) {
         self.writer = writer
         self.request = request
+        self.fetch = fetch
         self.resultQueue = resultQueue
     }
     
@@ -37,7 +58,7 @@ final class FetchAllRowConvertibleObservable<R: TypedRequest>: ObservableType wh
                 if initial {
                     initial = false
                     do {
-                        try observer.onNext(self.request.fetchAll(db))
+                        try observer.onNext(self.fetch(db))
                     } catch {
                         observer.onError(error)
                     }
@@ -46,7 +67,7 @@ final class FetchAllRowConvertibleObservable<R: TypedRequest>: ObservableType wh
                     var result: Result<E>? = nil
                     do {
                         try self.writer.readFromCurrentState { db in
-                            result = Result.wrap { try self.request.fetchAll(db) }
+                            result = Result.wrap { try self.fetch(db) }
                             semaphore.signal()
                         }
                     } catch {
