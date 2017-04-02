@@ -35,7 +35,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
 }
 
 extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible & TableMapping {
-    public func diff(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<(RequestResults<Base.Fetched>, RequestDiff<Base.Fetched>)> {
+    public func diff(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<(RequestResults<Base.Fetched>, RequestEvent<Base.Fetched>)> {
         let diffQueue = DispatchQueue(label: "ReactiveGRDB.diff")
         let items = base.bound(to: Item<Base.Fetched>.self).rx.fetchAll(in: writer, resultQueue: diffQueue)
         return Diff(reader: writer, items: items.asObservable(), resultQueue: resultQueue).asObservable()
@@ -62,7 +62,7 @@ public struct RequestResults<Fetched: RowConvertible> {
     }
 }
 
-public enum RequestDiff<Fetched: RowConvertible> {
+public enum RequestEvent<Fetched: RowConvertible> {
     case snapshot
     case changes([Change])
     
@@ -114,7 +114,7 @@ final class Item<Fetched: RowConvertible> : RowConvertible, Equatable {
 }
 
 final class Diff<Fetched> : ObservableType where Fetched: RowConvertible & TableMapping {
-    typealias E = (RequestResults<Fetched>, RequestDiff<Fetched>)
+    typealias E = (RequestResults<Fetched>, RequestEvent<Fetched>)
     
     let reader: DatabaseReader
     let items: Observable<[Item<Fetched>]>
@@ -137,7 +137,7 @@ final class Diff<Fetched> : ObservableType where Fetched: RowConvertible & Table
                 case .next(let new):
                     if let last = lastItems {
                         let changes = computeChanges(from: last, to: new, itemsAreIdentical: itemsAreIdentical)
-                        guard changes.isEmpty else { return }
+                        if changes.isEmpty { return }
                         let result: E = (RequestResults(items: new), .changes(changes))
                         lastItems = new
                         self.resultQueue.async {
@@ -168,15 +168,15 @@ final class Diff<Fetched> : ObservableType where Fetched: RowConvertible & Table
 
 fileprivate typealias ItemComparator<Fetched: RowConvertible> = (Item<Fetched>, Item<Fetched>) -> Bool
 
-fileprivate func computeChanges<Fetched>(from s: [Item<Fetched>], to t: [Item<Fetched>], itemsAreIdentical: ItemComparator<Fetched>) -> [RequestDiff<Fetched>.Change] {
-    typealias Change = RequestDiff<Fetched>.Change
+fileprivate func computeChanges<Fetched>(from s: [Item<Fetched>], to t: [Item<Fetched>], itemsAreIdentical: ItemComparator<Fetched>) -> [RequestEvent<Fetched>.Change] {
+    typealias Change = RequestEvent<Fetched>.Change
     
     let m = s.count
     let n = t.count
     
     // Fill first row and column of insertions and deletions.
     
-    var d: [[[RequestDiff<Fetched>.Change]]] = Array(repeating: Array(repeating: [], count: n + 1), count: m + 1)
+    var d: [[[RequestEvent<Fetched>.Change]]] = Array(repeating: Array(repeating: [], count: n + 1), count: m + 1)
     
     var changes = [Change]()
     for (row, item) in s.enumerated() {
@@ -229,13 +229,13 @@ fileprivate func computeChanges<Fetched>(from s: [Item<Fetched>], to t: [Item<Fe
     }
     
     /// Returns an array where deletion/insertion pairs of the same element are replaced by `.move` change.
-    func standardize(changes: [RequestDiff<Fetched>.Change], itemsAreIdentical: ItemComparator<Fetched>) -> [RequestDiff<Fetched>.Change] {
+    func standardize(changes: [RequestEvent<Fetched>.Change], itemsAreIdentical: ItemComparator<Fetched>) -> [RequestEvent<Fetched>.Change] {
         
         /// Returns a potential .move or .update if *change* has a matching change in *changes*:
         /// If *change* is a deletion or an insertion, and there is a matching inverse
         /// insertion/deletion with the same value in *changes*, a corresponding .move or .update is returned.
         /// As a convenience, the index of the matched change is returned as well.
-        func merge(change: RequestDiff<Fetched>.Change, in changes: [RequestDiff<Fetched>.Change], itemsAreIdentical: ItemComparator<Fetched>) -> (mergedChange: RequestDiff<Fetched>.Change, mergedIndex: Int)? {
+        func merge(change: RequestEvent<Fetched>.Change, in changes: [RequestEvent<Fetched>.Change], itemsAreIdentical: ItemComparator<Fetched>) -> (mergedChange: RequestEvent<Fetched>.Change, mergedIndex: Int)? {
             
             /// Returns the changes between two rows: a dictionary [key: oldValue]
             /// Precondition: both rows have the same columns
@@ -289,8 +289,8 @@ fileprivate func computeChanges<Fetched>(from s: [Item<Fetched>], to t: [Item<Fe
         }
         
         // Updates must be pushed at the end
-        var mergedChanges: [RequestDiff<Fetched>.Change] = []
-        var updateChanges: [RequestDiff<Fetched>.Change] = []
+        var mergedChanges: [RequestEvent<Fetched>.Change] = []
+        var updateChanges: [RequestEvent<Fetched>.Change] = []
         for change in changes {
             if let (mergedChange, mergedIndex) = merge(change: change, in: mergedChanges, itemsAreIdentical: itemsAreIdentical) {
                 mergedChanges.remove(at: mergedIndex)

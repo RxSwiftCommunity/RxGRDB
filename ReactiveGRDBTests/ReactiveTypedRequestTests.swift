@@ -41,13 +41,11 @@ extension ReactiveTypedRequestTests {
         // Subscription immediately triggers an event
         XCTAssertEqual(records.map({ $0.name }), ["Arthur", "Barbara"])
         
-        try writer.write { db in
-            // Transaction triggers an asynchronous event
-            try Person(id: nil, name: "Craig").insert(db)
-            waitForExpectations(timeout: 1, handler: nil)
-            
-            XCTAssertEqual(records.map({ $0.name }), ["Arthur", "Barbara", "Craig"])
-        }
+        // Transaction triggers an asynchronous event
+        try writer.write { try Person(id: nil, name: "Craig").insert($0) }
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertEqual(records.map({ $0.name }), ["Arthur", "Barbara", "Craig"])
     }
 }
 
@@ -86,13 +84,11 @@ extension ReactiveTypedRequestTests {
         // Subscription immediately triggers an event
         XCTAssertEqual(record!.name, "Arthur")
         
-        try writer.write { db in
-            // Transaction triggers an asynchronous event
-            try db.execute("UPDATE persons SET name = ?", arguments: ["Barbara"])
-            waitForExpectations(timeout: 1, handler: nil)
-            
-            XCTAssertEqual(record!.name, "Barbara")
-        }
+        // Transaction triggers an asynchronous event
+        try writer.write { try $0.execute("UPDATE persons SET name = ?", arguments: ["Barbara"]) }
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertEqual(record!.name, "Barbara")
     }
 }
 
@@ -118,14 +114,15 @@ extension ReactiveTypedRequestTests {
         // Subscribe to a request
         let request = Person.all()
         var persons: RequestResults<Person>? = nil
-        var diff: RequestDiff<Person>? = nil
+        var event: RequestEvent<Person>? = nil
         request.rx
             .diff(in: writer)
-            .subscribe(onNext: { (newPersons, newDiff) in
+            .subscribe(onNext: { (newPersons, newEvent) in
                 // events are expected to be delivered on the main thread
                 XCTAssertTrue(Thread.isMainThread)
                 persons = newPersons
-                diff = newDiff
+                event = newEvent
+                print("blah")
                 expectation.fulfill()
             })
             .addDisposableTo(disposeBag)
@@ -133,34 +130,32 @@ extension ReactiveTypedRequestTests {
         // Subscription immediately triggers an event
         XCTAssertEqual(persons!.count, 1)
         XCTAssertEqual(persons![0].name, "Arthur")
-        switch diff! {
+        switch event! {
         case .snapshot:
             break
         default:
-            XCTFail("Unexpected diff")
+            XCTFail("Unexpected event")
         }
         
-        try writer.write { db in
-            // Transaction triggers an asynchronous event
-            try db.execute("UPDATE persons SET name = ?", arguments: ["Barbara"])
-            waitForExpectations(timeout: 1, handler: nil)
-            
-            XCTAssertEqual(persons!.count, 1)
-            XCTAssertEqual(persons![0].name, "Barbara")
-            switch diff! {
-            case .changes(let changes):
-                XCTAssertEqual(changes.count, 1)
-                XCTAssertEqual(changes[0].record.name, "Barbara")
-                switch changes[0].kind {
-                case .update(let indexPath, let changes):
-                    XCTAssertEqual(indexPath, IndexPath(indexes: [0, 0]))
-                    XCTAssertEqual(changes, ["name": "Arthur".databaseValue])
-                default:
-                    XCTFail("Unexpected diff")
-                }
+        // Transaction triggers an asynchronous event
+        try writer.write { try $0.execute("UPDATE persons SET name = ?", arguments: ["Barbara"]) }
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertEqual(persons!.count, 1)
+        XCTAssertEqual(persons![0].name, "Barbara")
+        switch event! {
+        case .changes(let changes):
+            XCTAssertEqual(changes.count, 1)
+            XCTAssertEqual(changes[0].record.name, "Barbara")
+            switch changes[0].kind {
+            case .update(let indexPath, let changes):
+                XCTAssertEqual(indexPath, IndexPath(indexes: [0, 0]))
+                XCTAssertEqual(changes, ["name": "Arthur".databaseValue])
             default:
-                XCTFail("Unexpected diff")
+                XCTFail("Unexpected change")
             }
+        default:
+            XCTFail("Unexpected event")
         }
     }
 }
