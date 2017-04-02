@@ -1,6 +1,8 @@
 ReactiveGRDB
 ============
 
+### A set of reactive extensions for [GRDB.swift](http://github.com/groue/GRDB.swift)
+
 ----
 
 <p align="center">
@@ -8,8 +10,6 @@ ReactiveGRDB
 </p>
 
 ----
-
-A set of reactive extensions for [GRDB.swift](http://github.com/groue/GRDB.swift).
 
 Open a database connection first:
 
