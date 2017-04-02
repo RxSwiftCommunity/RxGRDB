@@ -15,8 +15,6 @@
 		565029B31E8FE12C00615A2C /* TypedRequest+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */; };
 		565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */; };
 		565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
-		565029BC1E912CC000615A2C /* Observable+Pairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029BB1E912CC000615A2C /* Observable+Pairs.swift */; };
-		565029BE1E912D1B00615A2C /* ObservablePairsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029BD1E912D1B00615A2C /* ObservablePairsTests.swift */; };
 		565029C01E91308D00615A2C /* TestDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029BF1E91308D00615A2C /* TestDatabase.swift */; };
 		565029C21E9130D000615A2C /* ReactiveSelectStatementSelectionInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C11E9130D000615A2C /* ReactiveSelectStatementSelectionInfoTests.swift */; };
 		565029C41E9130F600615A2C /* ReactiveTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* ReactiveTestCase.swift */; };
@@ -325,8 +323,6 @@
 		565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TypedRequest+Rx.swift"; sourceTree = "<group>"; };
 		565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SelectStatementSelectionInfo+Rx.swift"; sourceTree = "<group>"; };
 		565029B91E91265A00615A2C /* Request+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Request+Rx.swift"; sourceTree = "<group>"; };
-		565029BB1E912CC000615A2C /* Observable+Pairs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Observable+Pairs.swift"; sourceTree = "<group>"; };
-		565029BD1E912D1B00615A2C /* ObservablePairsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObservablePairsTests.swift; sourceTree = "<group>"; };
 		565029BF1E91308D00615A2C /* TestDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDatabase.swift; sourceTree = "<group>"; };
 		565029C11E9130D000615A2C /* ReactiveSelectStatementSelectionInfoTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactiveSelectStatementSelectionInfoTests.swift; sourceTree = "<group>"; };
 		565029C31E9130F600615A2C /* ReactiveTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactiveTestCase.swift; sourceTree = "<group>"; };
@@ -378,7 +374,6 @@
 			children = (
 				565029181E8FDF5600615A2C /* ReactiveGRDB.h */,
 				565029191E8FDF5600615A2C /* Info.plist */,
-				565029BB1E912CC000615A2C /* Observable+Pairs.swift */,
 				565029B91E91265A00615A2C /* Request+Rx.swift */,
 				565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */,
 				565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */,
@@ -390,7 +385,6 @@
 			isa = PBXGroup;
 			children = (
 				565029C31E9130F600615A2C /* ReactiveTestCase.swift */,
-				565029BD1E912D1B00615A2C /* ObservablePairsTests.swift */,
 				565029231E8FDF5600615A2C /* ReactiveRequestTests.swift */,
 				565029C11E9130D000615A2C /* ReactiveSelectStatementSelectionInfoTests.swift */,
 				565029C51E91318F00615A2C /* ReactiveTypedRequestTests.swift */,
@@ -856,7 +850,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				565029BC1E912CC000615A2C /* Observable+Pairs.swift in Sources */,
 				565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */,
 				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
 				565029B31E8FE12C00615A2C /* TypedRequest+Rx.swift in Sources */,
@@ -867,7 +860,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				565029BE1E912D1B00615A2C /* ObservablePairsTests.swift in Sources */,
 				565029C41E9130F600615A2C /* ReactiveTestCase.swift in Sources */,
 				565029C01E91308D00615A2C /* TestDatabase.swift in Sources */,
 				565029C61E91318F00615A2C /* ReactiveTypedRequestTests.swift in Sources */,
