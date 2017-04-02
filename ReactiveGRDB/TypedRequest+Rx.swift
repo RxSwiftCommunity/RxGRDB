@@ -1,119 +1,16 @@
-
 import GRDB
 import RxSwift
 
-extension QueryInterfaceRequest : ReactiveCompatible { }
-extension SQLRequest : ReactiveCompatible { }
-extension AnyRequest : ReactiveCompatible { }
-extension AnyTypedRequest : ReactiveCompatible { }
-extension SelectStatement.SelectionInfo : ReactiveCompatible { }
-
-extension Reactive where Base == SelectStatement.SelectionInfo {
-    public func selection(in writer: DatabaseWriter) -> Observable<Database> {
-        return SelectionInfoObservable(writer: writer, selectionInfo: base).asObservable()
-    }
-}
-
-extension Reactive where Base: Request {
-    public func selection(in writer: DatabaseWriter) -> Observable<Database> {
-        return RequestSelectionObservable(writer: writer, request: base).asObservable()
-    }
-}
-
 extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
+    /// Returns an Observable that emits a array of records immediately on
+    /// subscription, and later, on resultQueue, after each committed database
+    /// transaction that has modified the tables and columns fetched by
+    /// the Request.
+    ///
+    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
     public func fetchAll(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.Fetched]> {
         return FetchAllRowConvertibleObservable(writer: writer, request: base, resultQueue: resultQueue).asObservable()
-    }
-}
-
-final class SelectionInfoObservable: ObservableType {
-    typealias E = Database
-    
-    let writer: DatabaseWriter
-    let selectionInfo: SelectStatement.SelectionInfo
-    
-    init(writer: DatabaseWriter, selectionInfo: SelectStatement.SelectionInfo) {
-        self.writer = writer
-        self.selectionInfo = selectionInfo
-    }
-    
-    func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
-        let transactionObserver = Observer(selectionInfo: selectionInfo) { db in
-            observer.onNext(db)
-        }
-        writer.write { db in
-            db.add(transactionObserver: transactionObserver)
-            observer.onNext(db)
-        }
-        return Disposables.create {
-            self.writer.remove(transactionObserver: transactionObserver)
-        }
-    }
-    
-    private final class Observer : TransactionObserver {
-        var didChange = false
-        let callback: (Database) -> ()
-        let selectionInfo: SelectStatement.SelectionInfo
-        
-        init(selectionInfo: SelectStatement.SelectionInfo, callback: @escaping (Database) -> ()) {
-            self.selectionInfo = selectionInfo
-            self.callback = callback
-        }
-        
-        func observes(eventsOfKind eventKind: DatabaseEventKind) -> Bool {
-            return eventKind.impacts(selectionInfo)
-        }
-        
-        func databaseDidChange(with event: DatabaseEvent) {
-            didChange = true
-        }
-        
-        func databaseWillCommit() throws { }
-        
-        func databaseDidCommit(_ db: Database) {
-            let needsCallback = didChange
-            didChange = false
-            if needsCallback {
-                callback(db)
-            }
-        }
-        
-        func databaseDidRollback(_ db: Database) {
-            didChange = false
-        }
-        
-        #if SQLITE_ENABLE_PREUPDATE_HOOK
-        func databaseWillChange(with event: DatabasePreUpdateEvent) { }
-        #endif
-    }
-    
-}
-
-final class RequestSelectionObservable<R: Request>: ObservableType {
-    typealias E = Database
-    
-    let writer: DatabaseWriter
-    let request: R
-    
-    init(writer: DatabaseWriter, request: R) {
-        self.writer = writer
-        self.request = request
-    }
-    
-    func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
-        let selectionInfo: SelectStatement.SelectionInfo
-        do {
-            selectionInfo = try writer.unsafeRead { db -> SelectStatement.SelectionInfo in
-                let (statement, _) = try request.prepare(db)
-                return statement.selectionInfo
-            }
-        } catch {
-            observer.onError(error)
-            observer.onCompleted()
-            return Disposables.create()
-        }
-        
-        return SelectionInfoObservable(writer: writer, selectionInfo: selectionInfo).subscribe(observer)
     }
 }
 
@@ -134,7 +31,7 @@ final class FetchAllRowConvertibleObservable<R: TypedRequest>: ObservableType wh
         let orderingQueue = DispatchQueue(label: "ReactiveGRDB.results")
         
         var initial = true
-        let disposable = RequestSelectionObservable(writer: writer, request: request).subscribe { event in
+        let disposable = AnyRequest(request).rx.changes(in: writer).subscribe { event in
             switch event {
             case .next(let db):
                 if initial {

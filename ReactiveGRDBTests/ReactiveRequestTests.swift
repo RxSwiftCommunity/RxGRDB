@@ -65,7 +65,7 @@ extension ReactiveRequestTests {
         var changes = selectionInfos.map { _ in false }
         for (index, selectionInfo) in selectionInfos.enumerated() {
             selectionInfo.rx
-                .selection(in: writer)
+                .changes(in: writer)
                 .subscribe(onNext: { _ in changes[index] = true })
                 .addDisposableTo(disposeBag)
         }
@@ -141,7 +141,7 @@ extension ReactiveRequestTests {
         var changes = requests.map { _ in false }
         for (index, request) in requests.enumerated() {
             request.rx
-                .selection(in: writer)
+                .changes(in: writer)
                 .subscribe(onNext: { _ in changes[index] = true })
                 .addDisposableTo(disposeBag)
         }

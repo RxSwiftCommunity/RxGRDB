@@ -13,6 +13,8 @@
 		565029B01E8FE0FD00615A2C /* GRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650299D1E8FE0D200615A2C /* GRDB.framework */; };
 		565029B11E8FE10800615A2C /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294A1E8FE05600615A2C /* RxSwift.framework */; };
 		565029B31E8FE12C00615A2C /* TypedRequest+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */; };
+		565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */; };
+		565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -315,6 +317,8 @@
 		565029311E8FE05600615A2C /* Rx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Rx.xcodeproj; path = RxSwift/Rx.xcodeproj; sourceTree = "<group>"; };
 		565029731E8FE0D200615A2C /* GRDB.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GRDB.xcodeproj; path = GRDB.swift/GRDB.xcodeproj; sourceTree = "<group>"; };
 		565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TypedRequest+Rx.swift"; sourceTree = "<group>"; };
+		565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SelectStatementSelectionInfo+Rx.swift"; sourceTree = "<group>"; };
+		565029B91E91265A00615A2C /* Request+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Request+Rx.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -362,6 +366,8 @@
 			children = (
 				565029181E8FDF5600615A2C /* ReactiveGRDB.h */,
 				565029191E8FDF5600615A2C /* Info.plist */,
+				565029B91E91265A00615A2C /* Request+Rx.swift */,
+				565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */,
 				565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */,
 			);
 			path = ReactiveGRDB;
@@ -832,6 +838,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */,
+				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
 				565029B31E8FE12C00615A2C /* TypedRequest+Rx.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
