@@ -23,7 +23,7 @@ Given a request, you can fetch a record, or register for all changes to the fetc
 let request = Person.filter(Column("email") == "arthur@example.com")
 
 // Non reactive:
-let arthur = try dbQueue.inDatabase { request.fetchOne($0) }
+let arthur = try dbQueue.inDatabase { try request.fetchOne($0) }
 
 // Reactive: an optional record is immediately emitted on subscription, and
 // after each committed database transaction that has modified the tables and
@@ -41,7 +41,7 @@ Given a request, you can fetch an array of records, or register for all changes 
 let request = Person.order(Column("name"))
 
 // Non reactive:
-let persons = try dbQueue.inDatabase { request.fetchAll($0) }
+let persons = try dbQueue.inDatabase { try request.fetchAll($0) }
 
 // Reactive: an array of records is immediately emitted on subscription, and
 // after each committed database transaction that has modified the tables and
