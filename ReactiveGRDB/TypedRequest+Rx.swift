@@ -137,6 +137,7 @@ final class Diff<Fetched> : ObservableType where Fetched: RowConvertible & Table
                 case .next(let new):
                     if let last = lastItems {
                         let changes = computeChanges(from: last, to: new, itemsAreIdentical: itemsAreIdentical)
+                        guard changes.isEmpty else { return }
                         let result: E = (RequestResults(items: new), .changes(changes))
                         lastItems = new
                         self.resultQueue.async {
