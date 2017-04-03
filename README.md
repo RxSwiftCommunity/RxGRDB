@@ -1,5 +1,5 @@
-ReactiveGRDB
-============
+RxGRDB
+======
 
 ### A set of reactive extensions for [GRDB.swift](http://github.com/groue/GRDB.swift)
 
