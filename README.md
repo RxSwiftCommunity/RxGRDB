@@ -38,7 +38,7 @@ try dbQueue.inDatabase { db in
 
 ##### `Request.rx.changes(in:synchronizedStart:)`
 
-Emits a database connection after each transaction that has updated the table and columns fetched by the request:
+Emits a database connection after each database transaction that has updated the table and columns fetched by the request:
 
 ```swift
 let request = Person.all()
@@ -46,6 +46,9 @@ request.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Persons table has changed.")
     })
+
+try dbQueue.inDatabase { try Person.deleteAll($0) }
+// Prints "Persons table has changed."
 ```
 
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
@@ -65,7 +68,7 @@ request.rx.changes(in: dbQueue)
 
 ##### `Request.rx.fetchCount(in:synchronizedStart:resultQueue:)`
 
-Emits a count after each transaction that has updated the table and columns fetched by the request:
+Emits a count after each database transaction that has updated the table and columns fetched by the request:
 
 ```swift
 let request = Person.all()
@@ -73,6 +76,9 @@ request.rx.fetchCount(in: dbQueue)
     .subscribe(onNext: { count: Int in
         print("Number of persons: \(count)")
     })
+
+try dbQueue.inDatabase { try Person(name: "Arthur").insert($0) }
+// Eventually prints "Number of persons: 1"
 ```
 
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
@@ -82,14 +88,22 @@ Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.ma
 
 ##### `TypedRequest.rx.fetchOne(in:synchronizedStart:resultQueue:)`
 
-Emits a value after each transaction that has updated the table and columns fetched by the request:
+Emits a value after each database transaction that has updated the table and columns fetched by the request:
 
 ```swift
 let request = Person.filter(Column("email") == "arthur@example.com")
 request.rx.fetchOne(in: dbQueue)
     .subscribe(onNext: { person: Person? in
-        print(person)
+        print(person?.name ?? "nil")
     })
+
+try dbQueue.inDatabase { db in
+    try Person.deleteAll(db)
+    // Eventually prints "nil"
+    
+    try Person(name: "Arthur", email: "arthur@example.com").insert(db)
+    // Eventually prints "Arthur"
+}
 ```
 
 A variant, with SQL and an alternative fetched type:
@@ -105,14 +119,22 @@ request.rx.fetchOne(in: dbQueue)
 
 ##### `TypedRequest.rx.fetchAll(in:synchronizedStart:resultQueue:)`
 
-Emits an array of values after each transaction that has updated the table and columns fetched by the request:
+Emits an array of values after each database transaction that has updated the table and columns fetched by the request:
 
 ```swift
-let request = Person.all()
+let request = Person.order(Column("name")).all()
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { persons: [Person] in
-        print(persons)
+        print(persons.map { $0.name })
     })
+
+try dbQueue.inTransaction { db in
+    try Person.deleteAll(db)
+    try Person(name: "Arthur").insert(db)
+    try Person(name: "Barbara").insert(db)
+    return .commit
+    // Eventually prints "[Arthur, Barbara]"
+}
 ```
 
 A variant, with SQL and an alternative fetched type:
