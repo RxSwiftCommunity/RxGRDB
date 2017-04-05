@@ -110,7 +110,7 @@ request.rx
 
 ##### `TypedRequest.rx.fetchAll(in:synchronizedStart:resultQueue:)`
 
-Emits a array of values after each transaction that has updated the table and columns fetched by the request:
+Emits an array of values after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
 let request = Person.all()
