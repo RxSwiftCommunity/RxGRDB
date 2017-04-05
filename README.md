@@ -1,4 +1,4 @@
-RxGRDB
+RxGRDB [![Swift](https://img.shields.io/badge/swift-3-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/groue/RxGRDB.svg?maxAge=2592000)](/LICENSE)
 ======
 
 ### A set of reactive extensions for [GRDB.swift](http://github.com/groue/GRDB.swift)
@@ -11,114 +11,88 @@ RxGRDB
 
 ----
 
-Open a database connection first:
+
+RxGRDB produces observables from [GRDB's requests](https://github.com/groue/GRDB.swift#requests).
+
+Requests can be written as SQL, or with the query interface:
+
+```swift
+let request = SQLRequest("SELECT * FROM persons")
+let request = Person.all()
+```
+
+Some requests are bound to a fetched type, these are "typed requests":
+
+```swift
+// Person request
+let persons = Person.all()
+
+// Row request
+let rows = persons.bound(to: Row.self)
+
+// String request
+let names = SQLRequest("SELECT name FROM persons").bound(to: String.self)
+```
+
+
+##### `Request.rx.changes(in:synchronizedStart:)`
+
+Emits a database connection after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
 let dbQueue = try DatabaseQueue(...) // or DatabasePool
-```
-
-- [Observe Transactions that Impact a Request](#observe-transactions-that-impact-a-request):
-    
-    ```swift
-    request.rx.changes(in:)     // Observable<Database>
-    ```
-    
-- [Observe the Results of a Request](#observe-the-results-of-a-request)
-    
-    ```swift
-    request.rx.fetchOne(in:)    // Observable<T>
-    request.rx.fetchAll(in:)    // Observable<T>
-    request.rx.fetchCount(in:)  // Observable<Int>
-    ```
-
-
-### Observe Transactions that Impact a Request
-
-Given a request, you can observe all transactions that have an impact on the tables and columns queried by the request:
-
-```swift
-let request = SQLRequest("SELECT * FROM persons") // Using SQL
-let request = Person.all()                        // Using the query interface
-
-// A database connection is immediately emitted on subscription, and later
-// after each committed database transaction that has modified the tables and
-// columns fetched by the request:
-request.rx
+Person.all().rx
     .changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         let count = try! request.fetchCount(db)
         print("Number of persons: \(count)")
     })
-// Prints "Number of persons: 0"
-
-try dbQueue.inDatabase { db in
-    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
-    // Prints "Number of persons: 1"
-    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
-    // Prints "Number of persons: 2"
-}
-
-try dbQueue.inTransaction { db in
-    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
-    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
-    return .commit
-}
-// Prints "Number of persons: 4"
 ```
 
+If you set `synchronizedStart` to true (the default value), the first element will be emitted synchronously.
 
-### Observe the Results of a Request
 
-Given a request, you can fetch a record, or register for all changes to the fetched record:
+##### `Request.rx.fetchCount(in:synchronizedStart:resultQueue:)`
 
-```swift
-let request = Person.filter(Column("email") == "arthur@example.com")
-
-// Non reactive:
-let arthur = try dbQueue.inDatabase { try request.fetchOne($0) }
-
-// Reactive: an optional record is immediately emitted on subscription, and
-// after each committed database transaction that has modified the tables and
-// columns fetched by the request:
-request.rx
-    .fetchOne(in: dbQueue)
-    .subscribe(onNext: { person: Person? in
-        // On the main queue
-    })
-```
-
-Given a request, you can fetch an array of records, or register for all changes to the fetched records:
+Emits a count after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
-let request = Person.order(Column("name"))
-
-// Non reactive:
-let persons = try dbQueue.inDatabase { try request.fetchAll($0) }
-
-// Reactive: an array of records is immediately emitted on subscription, and
-// after each committed database transaction that has modified the tables and
-// columns fetched by the request.
-request.rx
-    .fetchAll(in: dbQueue)
-    .subscribe(onNext: { persons: [Person] in
-        // On the main queue
-    })
-```
-
-Given a request, you can count its results, or register for all changes to that count:
-
-```swift
-let request = Person.all()
-
-// Non reactive:
-let count = try dbQueue.inDatabase { try request.fetchCount($0) }
-
-// Reactive: the count is immediately emitted on subscription, and
-// after each committed database transaction that has modified the tables and
-// columns fetched by the request.
-request.rx
+let dbQueue = try DatabaseQueue(...) // or DatabasePool
+Person.all().rx
     .fetchCount(in: dbQueue)
     .subscribe(onNext: { count: Int in
-        // On the main queue
+        print("Number of persons: \(count)")
+    })
+```
+
+If you set `synchronizedStart` to true (the default value), the first element will be emitted synchronously.
+
+Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.main`.
+
+
+##### `TypedRequest.rx.fetchOne(in:synchronizedStart:resultQueue:)`
+
+Emits a value after each transaction that has updated the table and columns fetched by the request:
+
+```swift
+let dbQueue = try DatabaseQueue(...) // or DatabasePool
+Person.filter(Column("email") == "arthur@example.com").rx
+    .fetchOne(in: dbQueue)
+    .subscribe(onNext: { person: Person? in
+        print(person)
+    })
+```
+
+
+##### `TypedRequest.rx.fetchAll(in:synchronizedStart:resultQueue:)`
+
+Emits a array of values after each transaction that has updated the table and columns fetched by the request:
+
+```swift
+let dbQueue = try DatabaseQueue(...) // or DatabasePool
+Person.all().rx
+    .fetchAll(in: dbQueue)
+    .subscribe(onNext: { person: Person? in
+        print(person)
     })
 ```
