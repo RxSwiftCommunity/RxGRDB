@@ -6,7 +6,7 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-3-orange.svg?style=flat)](ht
 ----
 
 <p align="center">
-<strong>THIS IS AN EXPERIMENTAL REPOSITORY</strong>
+<strong>This is an alpha repository which is not yet ready for production.</strong>
 </p>
 
 ----
