@@ -20,7 +20,7 @@ As a reminder, those requests are usually built from the [query interface](https
 let request = Person.all()
 ```
 
-Requests offer four fetching methods that load values from the database: `fetchCount`, `fetchOne`, `fetchAll`, and `fetchCursor`:
+Requests offer four fetching methods that load values from the database:
 
 ```swift
 let dbQueue = try DatabaseQueue(...) // or DatabasePool
