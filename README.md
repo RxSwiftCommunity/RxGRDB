@@ -12,15 +12,13 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-3-orange.svg?style=flat)](ht
 ----
 
 
-RxGRDB produces observables from [GRDB's requests](https://github.com/groue/GRDB.swift#requests).
-
-As a reminder, those requests are usually built from the [query interface](https://github.com/groue/GRDB.swift#the-query-interface):
+The [GRDB query interface](https://github.com/groue/GRDB.swift#the-query-interface) lets you define *requests*:
 
 ```swift
-let request = Person.all()
+let request = Person.filter(emailColumn != nil).order(nameColumn)
 ```
 
-Requests offer four fetching methods that load values from the database:
+All requests come with four fetching methods that load values from the database:
 
 ```swift
 let dbQueue = try DatabaseQueue(...) // or DatabasePool
@@ -32,6 +30,8 @@ try dbQueue.inDatabase { db in
     try request.fetchCursor(db) // DatabaseCursor<Person>
 }
 ```
+
+**RxGRDB produces RxSwift observables from GRDB requests.**
 
 
 ### Observing Requests
