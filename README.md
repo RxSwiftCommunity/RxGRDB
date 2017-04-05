@@ -86,7 +86,7 @@ Emits a array of values after each transaction that has updated the table and co
 let request = Person.all()
 request.rx
     .fetchAll(in: dbQueue)
-    .subscribe(onNext: { person: Person? in
-        print(person)
+    .subscribe(onNext: { persons: [Person] in
+        print(persons)
     })
 ```
