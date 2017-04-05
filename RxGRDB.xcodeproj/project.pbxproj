@@ -388,6 +388,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		560F92D91E9509990077EADF /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				565029181E8FDF5600615A2C /* RxGRDB.h */,
+				565029191E8FDF5600615A2C /* Info.plist */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
 		5650290B1E8FDF5600615A2C = {
 			isa = PBXGroup;
 			children = (
@@ -411,13 +420,12 @@
 		565029171E8FDF5600615A2C /* RxGRDB */ = {
 			isa = PBXGroup;
 			children = (
-				565029181E8FDF5600615A2C /* RxGRDB.h */,
-				565029191E8FDF5600615A2C /* Info.plist */,
 				565029B91E91265A00615A2C /* Request+Rx.swift */,
 				560F92891E94DADA0077EADF /* Result.swift */,
 				565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */,
 				565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */,
 				560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */,
+				560F92D91E9509990077EADF /* Support */,
 			);
 			path = RxGRDB;
 			sourceTree = "<group>";

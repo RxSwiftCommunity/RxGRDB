@@ -4,14 +4,18 @@ import RxSwift
 extension SelectStatement.SelectionInfo : ReactiveCompatible { }
 
 extension Reactive where Base == SelectStatement.SelectionInfo {
-    /// Returns an Observable that emits a writer database connection
-    /// immediately on subscription, and later after each committed database
+    /// Returns an Observable that emits after each committed database
     /// transaction that has modified the tables and columns described by
     /// the SelectionInfo.
     ///
+    /// If you set `synchronizedStart` to true (the default), the first element
+    /// is emitted synchronously, on subscription.
+    ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
-    public func changes(in writer: DatabaseWriter) -> Observable<Database> {
-        return SelectionInfoChangesObservable(writer: writer, selectionInfo: base).asObservable()
+    /// - parameter synchronizedStart: Whether the first element should be
+    ///   emitted synchronously, on subscription.
+    public func changes(in writer: DatabaseWriter, synchronizedStart: Bool = true) -> Observable<Database> {
+        return SelectionInfoChangesObservable(writer: writer, synchronizedStart: synchronizedStart, selectionInfo: base).asObservable()
     }
 }
 
@@ -19,23 +23,27 @@ final class SelectionInfoChangesObservable : ObservableType {
     typealias E = Database
     
     let writer: DatabaseWriter
+    let synchronizedStart: Bool
     let selectionInfo: SelectStatement.SelectionInfo
     
-    init(writer: DatabaseWriter, selectionInfo: SelectStatement.SelectionInfo) {
+    init(writer: DatabaseWriter, synchronizedStart: Bool, selectionInfo: SelectStatement.SelectionInfo) {
         self.writer = writer
+        self.synchronizedStart = synchronizedStart
         self.selectionInfo = selectionInfo
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
-        // Observes transactions that change tracked selection
+        // A transaction observer that tracks changes in the selection
         let selectionInfoObserver = SelectionInfoObserver(selectionInfo, onChange: { db in
             observer.onNext(db)
         })
         
-        // Install transction observer and immediately notify from the writer queue
         writer.write { db in
+            // Install transaction observer and immediately notify if requested to do so
             db.add(transactionObserver: selectionInfoObserver)
-            observer.onNext(db)
+            if synchronizedStart {
+                observer.onNext(db)
+            }
         }
         
         return Disposables.create {
@@ -43,7 +51,7 @@ final class SelectionInfoChangesObservable : ObservableType {
         }
     }
     
-    private final class SelectionInfoObserver : GRDB.TransactionObserver {
+    private class SelectionInfoObserver : GRDB.TransactionObserver {
         var didChange = false
         let onChange: (Database) -> ()
         let selectionInfo: SelectStatement.SelectionInfo
