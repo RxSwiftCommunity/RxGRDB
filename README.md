@@ -77,8 +77,12 @@ request.rx.fetchCount(in: dbQueue)
         print("Number of persons: \(count)")
     })
 
-try dbQueue.inDatabase { try Person(name: "Arthur").insert($0) }
-// Eventually prints "Number of persons: 1"
+try dbQueue.inTransaction { db in
+    try Person.deleteAll(db)
+    try Person(name: "Arthur").insert(db)
+    return .commit
+    // Eventually prints "Number of persons: 1"
+}
 ```
 
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
