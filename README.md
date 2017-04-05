@@ -26,12 +26,6 @@ Some requests are bound to a fetched type, these are "typed requests":
 ```swift
 // Person request
 let persons = Person.all()
-
-// Row request
-let rows = persons.bound(to: Row.self)
-
-// String request
-let names = SQLRequest("SELECT name FROM persons").bound(to: String.self)
 ```
 
 
@@ -41,11 +35,11 @@ Emits a database connection after each transaction that has updated the table an
 
 ```swift
 let dbQueue = try DatabaseQueue(...) // or DatabasePool
-Person.all().rx
+let request = Person.all()
+request.rx
     .changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
-        let count = try! request.fetchCount(db)
-        print("Number of persons: \(count)")
+        print("Persons table has changed.")
     })
 ```
 
@@ -57,7 +51,8 @@ If you set `synchronizedStart` to true (the default value), the first element wi
 Emits a count after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
-Person.all().rx
+let request = Person.all()
+request.rx
     .fetchCount(in: dbQueue)
     .subscribe(onNext: { count: Int in
         print("Number of persons: \(count)")
@@ -74,7 +69,8 @@ Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.ma
 Emits a value after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
-Person.filter(Column("email") == "arthur@example.com").rx
+let request = Person.filter(Column("email") == "arthur@example.com")
+request.rx
     .fetchOne(in: dbQueue)
     .subscribe(onNext: { person: Person? in
         print(person)
@@ -87,7 +83,8 @@ Person.filter(Column("email") == "arthur@example.com").rx
 Emits a array of values after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
-Person.all().rx
+let request = Person.all()
+request.rx
     .fetchAll(in: dbQueue)
     .subscribe(onNext: { person: Person? in
         print(person)
