@@ -14,27 +14,33 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-3-orange.svg?style=flat)](ht
 
 RxGRDB produces observables from [GRDB's requests](https://github.com/groue/GRDB.swift#requests).
 
-Requests can be written as SQL, or with the query interface:
+As a reminder, those requests are usually built from the [query interface](https://github.com/groue/GRDB.swift#the-query-interface):
 
 ```swift
-let request = SQLRequest("SELECT * FROM persons")
 let request = Person.all()
 ```
 
-Some requests are bound to a fetched type, these are "typed requests":
+Requests offer four fetching methods that load values from the database: `fetchCount`, `fetchOne`, `fetchAll`, and `fetchCursor`:
 
 ```swift
-// Person request
-let persons = Person.all()
+let dbQueue = try DatabaseQueue(...) // or DatabasePool
+dbQueue.inDatabase { db in
+    let request = Person.all()
+    try request.fetchCount(db)  // Int
+    try request.fetchOne(db)    // Person?
+    try request.fetchAll(db)    // [Person]
+    try request.fetchCursor(db) // DatabaseCursor<Person>
+}
 ```
 
+
+### Observing Requests
 
 ##### `Request.rx.changes(in:synchronizedStart:)`
 
 Emits a database connection after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
-let dbQueue = try DatabaseQueue(...) // or DatabasePool
 let request = Person.all()
 request.rx
     .changes(in: dbQueue)
