@@ -53,7 +53,7 @@ try dbQueue.inDatabase { try Person.deleteAll($0) }
 
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
 
-All elements are emitted on the database writer dispatch queue, serialized with all database updates.
+Other elements are emitted on the database writer dispatch queue, serialized with all database updates.
 
 A variant, with SQL:
 
