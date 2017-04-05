@@ -17,8 +17,19 @@ Open a database connection first:
 let dbQueue = try DatabaseQueue(...) // or DatabasePool
 ```
 
-- [Observe Transactions that Impact a Request](#observe-transactions-that-impact-a-request)
+- [Observe Transactions that Impact a Request](#observe-transactions-that-impact-a-request):
+    
+    ```swift
+    request.rx.changes(in:)     // Observable<Database>
+    ```
+    
 - [Observe the Results of a Request](#observe-the-results-of-a-request)
+    
+    ```swift
+    request.rx.fetchOne(in:)    // Observable<T>
+    request.rx.fetchAll(in:)    // Observable<T>
+    request.rx.fetchCount(in:)  // Observable<Int>
+    ```
 
 
 ### Observe Transactions that Impact a Request
@@ -34,7 +45,7 @@ let request = Person.all()                        // Using the query interface
 // columns fetched by the request:
 request.rx
     .changes(in: dbQueue)
-    .subscribe(onNext: { db in
+    .subscribe(onNext: { db: Database in
         let count = try! request.fetchCount(db)
         print("Number of persons: \(count)")
     })
@@ -90,6 +101,24 @@ let persons = try dbQueue.inDatabase { try request.fetchAll($0) }
 request.rx
     .fetchAll(in: dbQueue)
     .subscribe(onNext: { persons: [Person] in
+        // On the main queue
+    })
+```
+
+Given a request, you can count its results, or register for all changes to that count:
+
+```swift
+let request = Person.all()
+
+// Non reactive:
+let count = try dbQueue.inDatabase { try request.fetchCount($0) }
+
+// Reactive: the count is immediately emitted on subscription, and
+// after each committed database transaction that has modified the tables and
+// columns fetched by the request.
+request.rx
+    .fetchCount(in: dbQueue)
+    .subscribe(onNext: { count: Int in
         // On the main queue
     })
 ```

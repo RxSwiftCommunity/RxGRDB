@@ -5,7 +5,7 @@ import RxSwift
 
 class ReactiveTypedRequestTests: ReactiveTestCase { }
 
-// Mark: - RowConvertible
+// MARK: - RowConvertible
 
 extension ReactiveTypedRequestTests {
     func testRxFetchAllRecords() throws {
@@ -94,7 +94,7 @@ extension ReactiveTypedRequestTests {
     }
 }
 
-// Mark: - Row
+// MARK: - Row
 
 extension ReactiveTypedRequestTests {
     func testRxFetchAllRows() throws {
@@ -266,10 +266,56 @@ extension ReactiveTypedRequestTests {
         XCTAssertEqual(count!, 1)
         
         // Transaction triggers an asynchronous event
-        try writer.write { try Person(id: nil, name: "Craig").insert($0) }
+        try writer.write { try Person(id: nil, name: "Barbara").insert($0) }
         waitForExpectations(timeout: 1, handler: nil)
         
         XCTAssertEqual(count!, 2)
+    }
+}
+
+
+// MARK: - Count
+
+extension ReactiveTypedRequestTests {
+    func testRxFetchCount() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchCount)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchCount)
+    }
+    
+    func testRxFetchCount(writer: DatabaseWriter) throws {
+        try writer.write { db in
+            try db.create(table: "persons") { t in
+                t.column("id", .integer).primaryKey()
+                t.column("name", .text)
+            }
+            try Person(id: nil, name: "Arthur").insert(db)
+        }
+        
+        // Expectation for later transaction
+        let expectation = self.expectation(description: "1")
+        expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second on transaction.
+        
+        // Subscribe to a request
+        let request = Person.all()
+        var count: Int = 0xdeadbeef
+        request.rx
+            .fetchCount(in: writer)
+            .subscribe(onNext: {
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                count = $0
+                expectation.fulfill()
+            })
+            .addDisposableTo(disposeBag)
+        
+        // Subscription immediately triggers an event
+        XCTAssertEqual(count, 1)
+        
+        // Transaction triggers an asynchronous event
+        try writer.write { try Person(id: nil, name: "Barbara").insert($0) }
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertEqual(count, 2)
     }
 }
 
