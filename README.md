@@ -36,8 +36,8 @@ try dbQueue.inDatabase { db in
 let request = SQLRequest("SELECT * FROM persons")
 
 // A database connection is immediately emitted on subscription, and later
-// after each committed database that has modified the tables and columns
-// fetched by:
+// after each committed database transaction that has modified the tables and
+// columns fetched by the request:
 request.rx
     .changes(in: dbQueue)
     .subscribe(onNext: { db in
