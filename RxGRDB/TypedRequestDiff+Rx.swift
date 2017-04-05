@@ -2,41 +2,9 @@ import Foundation
 import GRDB
 import RxSwift
 
-extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
-    /// Returns an Observable that emits a array of records immediately on
-    /// subscription, and later, on resultQueue, after each committed database
-    /// transaction that has modified the tables and columns fetched by
-    /// the Request.
-    ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.Fetched]> {
-        return RequestFetchObservable(
-            writer: writer,
-            request: base,
-            fetch: { try self.base.fetchAll($0) },
-            resultQueue: resultQueue).asObservable()
-    }
-    
-    /// Returns an Observable that emits a single option record immediately on
-    /// subscription, and later, on resultQueue, after each committed database
-    /// transaction that has modified the tables and columns fetched by
-    /// the Request.
-    ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchOne(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.Fetched?> {
-        return RequestFetchObservable(
-            writer: writer,
-            request: base,
-            fetch: { try self.base.fetchOne($0) },
-            resultQueue: resultQueue).asObservable()
-    }
-}
-
 extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible & TableMapping {
     public func diff(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<(RequestResults<Base.Fetched>, RequestEvent<Base.Fetched>)> {
-        let diffQueue = DispatchQueue(label: "ReactiveGRDB.diff")
+        let diffQueue = DispatchQueue(label: "RxGRDB.diff")
         let items = base.bound(to: Item<Base.Fetched>.self).rx.fetchAll(in: writer, resultQueue: diffQueue)
         return Diff(reader: writer, items: items.asObservable(), resultQueue: resultQueue).asObservable()
     }
@@ -91,7 +59,7 @@ public enum RequestEvent<Fetched: RowConvertible> {
         }
     }
     
-
+    
 }
 
 final class Item<Fetched: RowConvertible> : RowConvertible, Equatable {

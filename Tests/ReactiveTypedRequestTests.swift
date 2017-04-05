@@ -1,7 +1,7 @@
 import XCTest
 import GRDB
 import RxSwift
-@testable import ReactiveGRDB
+@testable import RxGRDB
 
 class ReactiveTypedRequestTests: ReactiveTestCase { }
 

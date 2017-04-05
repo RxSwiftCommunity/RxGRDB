@@ -17,6 +17,53 @@ Open a database connection first:
 let dbQueue = try DatabaseQueue(...) // or DatabasePool
 ```
 
+- [Observe Transactions that Impact a Request](#observe-transactions-that-impact-a-request)
+- [Observe the Results of a Request](#observe-the-results-of-a-request)
+
+
+### Observe Transactions that Impact a Request
+
+Given a request, you can observe all transactions that have an impact on the tables and columns queried by the request:
+
+```swift
+try dbQueue.inDatabase { db in
+    try db.create(table: "persons") { t in
+        t.column("id", .integer).primaryKey()
+        t.column("name", .text)
+    }
+}
+
+let request = SQLRequest("SELECT * FROM persons")
+
+// A database connection is immediately emitted on subscription, and later
+// after each committed database that has modified the tables and columns
+// fetched by:
+request.rx
+    .changes(in: dbQueue)
+    .subscribe(onNext: { db in
+        let count = try! request.fetchCount(db)
+        print("Number of persons: \(count)")
+    })
+// Prints "Number of persons: 0"
+
+try dbQueue.inDatabase { db in
+    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
+    // Prints "Number of persons: 1"
+    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
+    // Prints "Number of persons: 2"
+}
+
+try dbQueue.inTransaction { db in
+    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
+    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
+    return .commit
+}
+// Prints "Number of persons: 4"
+```
+
+
+### Observe the Results of a Request
+
 Given a request, you can fetch a record, or register for all changes to the fetched record:
 
 ```swift
@@ -50,47 +97,5 @@ request.rx
     .fetchAll(in: dbQueue)
     .subscribe(onNext: { persons: [Person] in
         // On the main queue
-    })
-```
-
-Given a request, you can drive a UITableView or a UICollectionView:
-
-```swift
-let request = Person.order(Column("name"))
-
-// Reactive: an array of records and an "event" are immediately emitted on
-// subscription, and after each committed database transaction that has modified
-// the tables and columns fetched by the request:
-request.rx
-    .diff(in: dbQueue)
-    .subscribe(onNext: { (persons, event) in
-        // On the main queue
-        self.persons = persons
-        switch event {
-        case .snapshot:
-            self.tableView.reloadData()
-        case .diff(let changes):
-            self.tableView.beginUpdates()
-            for change in changes {
-                switch change.kind {
-                case .insertion(let indexPath):
-                    self.tableView.insertRows(at: [indexPath], with: .fade)
-                    
-                case .deletion(let indexPath):
-                    self.tableView.deleteRows(at: [indexPath], with: .fade)
-                    
-                case .update(let indexPath, _):
-                    if let cell = self.tableView.cellForRow(at: indexPath) {
-                        self.configure(cell, at: indexPath)
-                    }
-                    
-                case .move(let indexPath, let newIndexPath, _):
-                    self.tableView.deleteRows(at: [indexPath], with: .fade)
-                    self.tableView.insertRows(at: [newIndexPath], with: .fade)
-                }
-                
-            }
-            self.tableView.endUpdates()
-        }
     })
 ```

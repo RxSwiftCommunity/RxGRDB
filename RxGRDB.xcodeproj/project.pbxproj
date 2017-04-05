@@ -7,12 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5650291F1E8FDF5600615A2C /* ReactiveGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565029151E8FDF5600615A2C /* ReactiveGRDB.framework */; };
+		560F92881E94D9260077EADF /* TypedRequestDiff+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */; };
+		560F928A1E94DADA0077EADF /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92891E94DADA0077EADF /* Result.swift */; };
+		560F92CB1E94DF7E0077EADF /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
+		560F92CD1E94DF830077EADF /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92891E94DADA0077EADF /* Result.swift */; };
+		560F92CE1E94DF830077EADF /* SelectStatementSelectionInfo+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */; };
+		560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */; };
+		560F92D01E94DF830077EADF /* TypedRequestDiff+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */; };
+		560F92D51E94DFCE0077EADF /* GRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650298B1E8FE0D200615A2C /* GRDB.framework */; };
+		560F92D61E94DFD50077EADF /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294C1E8FE05600615A2C /* RxSwift.framework */; };
+		5650291F1E8FDF5600615A2C /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565029151E8FDF5600615A2C /* RxGRDB.framework */; };
 		565029241E8FDF5600615A2C /* ReactiveRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* ReactiveRequestTests.swift */; };
-		565029261E8FDF5600615A2C /* ReactiveGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* ReactiveGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		565029261E8FDF5600615A2C /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		565029B01E8FE0FD00615A2C /* GRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650299D1E8FE0D200615A2C /* GRDB.framework */; };
 		565029B11E8FE10800615A2C /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294A1E8FE05600615A2C /* RxSwift.framework */; };
-		565029B31E8FE12C00615A2C /* TypedRequest+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */; };
+		565029B31E8FE12C00615A2C /* TypedRequestFetch+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */; };
 		565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */; };
 		565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
 		565029C01E91308D00615A2C /* TestDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029BF1E91308D00615A2C /* TestDatabase.swift */; };
@@ -22,12 +32,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		560F92D11E94DFAA0077EADF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 565029731E8FE0D200615A2C /* GRDB.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = DC3773F219C8CBB3004FCF85;
+			remoteInfo = GRDBOSX;
+		};
+		560F92D31E94DFB10077EADF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 565029311E8FE05600615A2C /* Rx.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = C88BB81A1B07E5ED0064D411;
+			remoteInfo = "RxSwift-macOS";
+		};
 		565029201E8FDF5600615A2C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5650290C1E8FDF5600615A2C /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 565029141E8FDF5600615A2C;
-			remoteInfo = ReactiveGRDB;
+			remoteInfo = RxGRDB;
 		};
 		565029491E8FE05600615A2C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -312,15 +336,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		565029151E8FDF5600615A2C /* ReactiveGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ReactiveGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		565029181E8FDF5600615A2C /* ReactiveGRDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReactiveGRDB.h; sourceTree = "<group>"; };
+		560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TypedRequestDiff+Rx.swift"; sourceTree = "<group>"; };
+		560F92891E94DADA0077EADF /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		560F92C31E94DF280077EADF /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		565029151E8FDF5600615A2C /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		565029181E8FDF5600615A2C /* RxGRDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RxGRDB.h; sourceTree = "<group>"; };
 		565029191E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5650291E1E8FDF5600615A2C /* ReactiveGRDBTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReactiveGRDBTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5650291E1E8FDF5600615A2C /* RxGRDBiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		565029231E8FDF5600615A2C /* ReactiveRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactiveRequestTests.swift; sourceTree = "<group>"; };
 		565029251E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		565029311E8FE05600615A2C /* Rx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Rx.xcodeproj; path = RxSwift/Rx.xcodeproj; sourceTree = "<group>"; };
 		565029731E8FE0D200615A2C /* GRDB.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GRDB.xcodeproj; path = GRDB.swift/GRDB.xcodeproj; sourceTree = "<group>"; };
-		565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TypedRequest+Rx.swift"; sourceTree = "<group>"; };
+		565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TypedRequestFetch+Rx.swift"; sourceTree = "<group>"; };
 		565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SelectStatementSelectionInfo+Rx.swift"; sourceTree = "<group>"; };
 		565029B91E91265A00615A2C /* Request+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Request+Rx.swift"; sourceTree = "<group>"; };
 		565029BF1E91308D00615A2C /* TestDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDatabase.swift; sourceTree = "<group>"; };
@@ -330,6 +357,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		560F92BF1E94DF280077EADF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				560F92D61E94DFD50077EADF /* RxSwift.framework in Frameworks */,
+				560F92D51E94DFCE0077EADF /* GRDB.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		565029111E8FDF5600615A2C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -343,7 +379,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5650291F1E8FDF5600615A2C /* ReactiveGRDB.framework in Frameworks */,
+				5650291F1E8FDF5600615A2C /* RxGRDB.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,8 +390,8 @@
 			isa = PBXGroup;
 			children = (
 				5650292F1E8FE02500615A2C /* Vendor */,
-				565029171E8FDF5600615A2C /* ReactiveGRDB */,
-				565029221E8FDF5600615A2C /* ReactiveGRDBTests */,
+				565029171E8FDF5600615A2C /* RxGRDB */,
+				565029221E8FDF5600615A2C /* Tests */,
 				565029161E8FDF5600615A2C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -363,25 +399,28 @@
 		565029161E8FDF5600615A2C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				565029151E8FDF5600615A2C /* ReactiveGRDB.framework */,
-				5650291E1E8FDF5600615A2C /* ReactiveGRDBTests.xctest */,
+				565029151E8FDF5600615A2C /* RxGRDB.framework */,
+				5650291E1E8FDF5600615A2C /* RxGRDBiOSTests.xctest */,
+				560F92C31E94DF280077EADF /* RxGRDB.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		565029171E8FDF5600615A2C /* ReactiveGRDB */ = {
+		565029171E8FDF5600615A2C /* RxGRDB */ = {
 			isa = PBXGroup;
 			children = (
-				565029181E8FDF5600615A2C /* ReactiveGRDB.h */,
+				565029181E8FDF5600615A2C /* RxGRDB.h */,
 				565029191E8FDF5600615A2C /* Info.plist */,
 				565029B91E91265A00615A2C /* Request+Rx.swift */,
+				560F92891E94DADA0077EADF /* Result.swift */,
 				565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */,
-				565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */,
+				565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */,
+				560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */,
 			);
-			path = ReactiveGRDB;
+			path = RxGRDB;
 			sourceTree = "<group>";
 		};
-		565029221E8FDF5600615A2C /* ReactiveGRDBTests */ = {
+		565029221E8FDF5600615A2C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				565029C31E9130F600615A2C /* ReactiveTestCase.swift */,
@@ -391,7 +430,7 @@
 				565029BF1E91308D00615A2C /* TestDatabase.swift */,
 				565029251E8FDF5600615A2C /* Info.plist */,
 			);
-			path = ReactiveGRDBTests;
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		5650292F1E8FE02500615A2C /* Vendor */ = {
@@ -435,19 +474,19 @@
 			isa = PBXGroup;
 			children = (
 				5650298B1E8FE0D200615A2C /* GRDB.framework */,
-				5650298D1E8FE0D200615A2C /* GRDBTests.xctest */,
+				5650298D1E8FE0D200615A2C /* GRDBOSXTests.xctest */,
 				5650298F1E8FE0D200615A2C /* GRDBOSXPerformanceTests.xctest */,
 				565029911E8FE0D200615A2C /* GRDBOSXCrashTests.xctest */,
 				565029931E8FE0D200615A2C /* GRDBCipher.framework */,
-				565029951E8FE0D200615A2C /* GRDBTests.xctest */,
+				565029951E8FE0D200615A2C /* GRDBCipherOSXTests.xctest */,
 				565029971E8FE0D200615A2C /* GRDBCipherOSXEncryptedTests.xctest */,
 				565029991E8FE0D200615A2C /* GRDBCustomSQLite.framework */,
 				5650299B1E8FE0D200615A2C /* GRDBCustomSQLiteOSXTests.xctest */,
 				5650299D1E8FE0D200615A2C /* GRDB.framework */,
-				5650299F1E8FE0D200615A2C /* GRDBTests.xctest */,
+				5650299F1E8FE0D200615A2C /* GRDBiOSTests.xctest */,
 				565029A11E8FE0D200615A2C /* GRDBCipher.framework */,
-				565029A31E8FE0D200615A2C /* GRDBTests.xctest */,
-				565029A51E8FE0D200615A2C /* GRDBTests.xctest */,
+				565029A31E8FE0D200615A2C /* GRDBCipheriOSTests.xctest */,
+				565029A51E8FE0D200615A2C /* GRDBCipheriOSEncryptedTests.xctest */,
 				565029A71E8FE0D200615A2C /* GRDBCustomSQLite.framework */,
 				565029A91E8FE0D200615A2C /* GRDBCustomSQLiteiOSTests.xctest */,
 				565029AB1E8FE0D200615A2C /* GRDB.framework */,
@@ -458,20 +497,48 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		560F92C01E94DF280077EADF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				560F92CB1E94DF7E0077EADF /* RxGRDB.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		565029121E8FDF5600615A2C /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				565029261E8FDF5600615A2C /* ReactiveGRDB.h in Headers */,
+				565029261E8FDF5600615A2C /* RxGRDB.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		565029141E8FDF5600615A2C /* ReactiveGRDB */ = {
+		560F92C21E94DF280077EADF /* RxGRDBmacOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 565029291E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "ReactiveGRDB" */;
+			buildConfigurationList = 560F92C81E94DF290077EADF /* Build configuration list for PBXNativeTarget "RxGRDBmacOS" */;
+			buildPhases = (
+				560F92BE1E94DF280077EADF /* Sources */,
+				560F92BF1E94DF280077EADF /* Frameworks */,
+				560F92C01E94DF280077EADF /* Headers */,
+				560F92C11E94DF280077EADF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				560F92D41E94DFB10077EADF /* PBXTargetDependency */,
+				560F92D21E94DFAA0077EADF /* PBXTargetDependency */,
+			);
+			name = RxGRDBmacOS;
+			productName = RxGRDB;
+			productReference = 560F92C31E94DF280077EADF /* RxGRDB.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		565029141E8FDF5600615A2C /* RxGRDBiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 565029291E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "RxGRDBiOS" */;
 			buildPhases = (
 				565029101E8FDF5600615A2C /* Sources */,
 				565029111E8FDF5600615A2C /* Frameworks */,
@@ -484,14 +551,14 @@
 				565029AF1E8FE0F200615A2C /* PBXTargetDependency */,
 				565029AD1E8FE0E400615A2C /* PBXTargetDependency */,
 			);
-			name = ReactiveGRDB;
-			productName = ReactiveGRDB;
-			productReference = 565029151E8FDF5600615A2C /* ReactiveGRDB.framework */;
+			name = RxGRDBiOS;
+			productName = RxGRDB;
+			productReference = 565029151E8FDF5600615A2C /* RxGRDB.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		5650291D1E8FDF5600615A2C /* ReactiveGRDBTests */ = {
+		5650291D1E8FDF5600615A2C /* RxGRDBiOSTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5650292C1E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "ReactiveGRDBTests" */;
+			buildConfigurationList = 5650292C1E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "RxGRDBiOSTests" */;
 			buildPhases = (
 				5650291A1E8FDF5600615A2C /* Sources */,
 				5650291B1E8FDF5600615A2C /* Frameworks */,
@@ -502,9 +569,9 @@
 			dependencies = (
 				565029211E8FDF5600615A2C /* PBXTargetDependency */,
 			);
-			name = ReactiveGRDBTests;
-			productName = ReactiveGRDBTests;
-			productReference = 5650291E1E8FDF5600615A2C /* ReactiveGRDBTests.xctest */;
+			name = RxGRDBiOSTests;
+			productName = RxGRDBTests;
+			productReference = 5650291E1E8FDF5600615A2C /* RxGRDBiOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -517,6 +584,10 @@
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Gwendal Roué";
 				TargetAttributes = {
+					560F92C21E94DF280077EADF = {
+						CreatedOnToolsVersion = 8.3;
+						ProvisioningStyle = Automatic;
+					};
 					565029141E8FDF5600615A2C = {
 						CreatedOnToolsVersion = 8.3;
 						DevelopmentTeam = AMD8W895CT;
@@ -530,7 +601,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 5650290F1E8FDF5600615A2C /* Build configuration list for PBXProject "ReactiveGRDB" */;
+			buildConfigurationList = 5650290F1E8FDF5600615A2C /* Build configuration list for PBXProject "RxGRDB" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -552,8 +623,9 @@
 			);
 			projectRoot = "";
 			targets = (
-				565029141E8FDF5600615A2C /* ReactiveGRDB */,
-				5650291D1E8FDF5600615A2C /* ReactiveGRDBTests */,
+				565029141E8FDF5600615A2C /* RxGRDBiOS */,
+				5650291D1E8FDF5600615A2C /* RxGRDBiOSTests */,
+				560F92C21E94DF280077EADF /* RxGRDBmacOS */,
 			);
 		};
 /* End PBXProject section */
@@ -714,10 +786,10 @@
 			remoteRef = 5650298A1E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		5650298D1E8FE0D200615A2C /* GRDBTests.xctest */ = {
+		5650298D1E8FE0D200615A2C /* GRDBOSXTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GRDBTests.xctest;
+			path = GRDBOSXTests.xctest;
 			remoteRef = 5650298C1E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -742,10 +814,10 @@
 			remoteRef = 565029921E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		565029951E8FE0D200615A2C /* GRDBTests.xctest */ = {
+		565029951E8FE0D200615A2C /* GRDBCipherOSXTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GRDBTests.xctest;
+			path = GRDBCipherOSXTests.xctest;
 			remoteRef = 565029941E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -777,10 +849,10 @@
 			remoteRef = 5650299C1E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		5650299F1E8FE0D200615A2C /* GRDBTests.xctest */ = {
+		5650299F1E8FE0D200615A2C /* GRDBiOSTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GRDBTests.xctest;
+			path = GRDBiOSTests.xctest;
 			remoteRef = 5650299E1E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -791,17 +863,17 @@
 			remoteRef = 565029A01E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		565029A31E8FE0D200615A2C /* GRDBTests.xctest */ = {
+		565029A31E8FE0D200615A2C /* GRDBCipheriOSTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GRDBTests.xctest;
+			path = GRDBCipheriOSTests.xctest;
 			remoteRef = 565029A21E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		565029A51E8FE0D200615A2C /* GRDBTests.xctest */ = {
+		565029A51E8FE0D200615A2C /* GRDBCipheriOSEncryptedTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GRDBTests.xctest;
+			path = GRDBCipheriOSEncryptedTests.xctest;
 			remoteRef = 565029A41E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -829,6 +901,13 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		560F92C11E94DF280077EADF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		565029131E8FDF5600615A2C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -846,13 +925,27 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		560F92BE1E94DF280077EADF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				560F92CD1E94DF830077EADF /* Result.swift in Sources */,
+				560F92CE1E94DF830077EADF /* SelectStatementSelectionInfo+Rx.swift in Sources */,
+				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
+				560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */,
+				560F92D01E94DF830077EADF /* TypedRequestDiff+Rx.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		565029101E8FDF5600615A2C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */,
+				560F928A1E94DADA0077EADF /* Result.swift in Sources */,
+				560F92881E94D9260077EADF /* TypedRequestDiff+Rx.swift in Sources */,
 				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
-				565029B31E8FE12C00615A2C /* TypedRequest+Rx.swift in Sources */,
+				565029B31E8FE12C00615A2C /* TypedRequestFetch+Rx.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -871,9 +964,19 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		560F92D21E94DFAA0077EADF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = GRDBOSX;
+			targetProxy = 560F92D11E94DFAA0077EADF /* PBXContainerItemProxy */;
+		};
+		560F92D41E94DFB10077EADF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "RxSwift-macOS";
+			targetProxy = 560F92D31E94DFB10077EADF /* PBXContainerItemProxy */;
+		};
 		565029211E8FDF5600615A2C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 565029141E8FDF5600615A2C /* ReactiveGRDB */;
+			target = 565029141E8FDF5600615A2C /* RxGRDBiOS */;
 			targetProxy = 565029201E8FDF5600615A2C /* PBXContainerItemProxy */;
 		};
 		565029AD1E8FE0E400615A2C /* PBXTargetDependency */ = {
@@ -889,6 +992,50 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		560F92C91E94DF290077EADF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = RxGRDB/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDB;
+				PRODUCT_NAME = RxGRDB;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		560F92CA1E94DF290077EADF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = RxGRDB/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDB;
+				PRODUCT_NAME = RxGRDB;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
 		565029271E8FDF5600615A2C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1000,11 +1147,11 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = ReactiveGRDB/Info.plist;
+				INFOPLIST_FILE = RxGRDB/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.ReactiveGRDB;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDB;
+				PRODUCT_NAME = RxGRDB;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -1021,11 +1168,11 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = ReactiveGRDB/Info.plist;
+				INFOPLIST_FILE = RxGRDB/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.ReactiveGRDB;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDB;
+				PRODUCT_NAME = RxGRDB;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
 			};
@@ -1036,9 +1183,9 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				DEVELOPMENT_TEAM = AMD8W895CT;
-				INFOPLIST_FILE = ReactiveGRDBTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.ReactiveGRDBTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -1049,9 +1196,9 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				DEVELOPMENT_TEAM = AMD8W895CT;
-				INFOPLIST_FILE = ReactiveGRDBTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.ReactiveGRDBTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -1060,7 +1207,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5650290F1E8FDF5600615A2C /* Build configuration list for PBXProject "ReactiveGRDB" */ = {
+		560F92C81E94DF290077EADF /* Build configuration list for PBXNativeTarget "RxGRDBmacOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				560F92C91E94DF290077EADF /* Debug */,
+				560F92CA1E94DF290077EADF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		5650290F1E8FDF5600615A2C /* Build configuration list for PBXProject "RxGRDB" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				565029271E8FDF5600615A2C /* Debug */,
@@ -1069,21 +1224,23 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		565029291E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "ReactiveGRDB" */ = {
+		565029291E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "RxGRDBiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5650292A1E8FDF5600615A2C /* Debug */,
 				5650292B1E8FDF5600615A2C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		5650292C1E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "ReactiveGRDBTests" */ = {
+		5650292C1E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "RxGRDBiOSTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5650292D1E8FDF5600615A2C /* Debug */,
 				5650292E1E8FDF5600615A2C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
