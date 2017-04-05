@@ -57,7 +57,6 @@ If you set `synchronizedStart` to true (the default value), the first element wi
 Emits a count after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
-let dbQueue = try DatabaseQueue(...) // or DatabasePool
 Person.all().rx
     .fetchCount(in: dbQueue)
     .subscribe(onNext: { count: Int in
@@ -75,7 +74,6 @@ Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.ma
 Emits a value after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
-let dbQueue = try DatabaseQueue(...) // or DatabasePool
 Person.filter(Column("email") == "arthur@example.com").rx
     .fetchOne(in: dbQueue)
     .subscribe(onNext: { person: Person? in
@@ -89,7 +87,6 @@ Person.filter(Column("email") == "arthur@example.com").rx
 Emits a array of values after each transaction that has updated the table and columns fetched by the request:
 
 ```swift
-let dbQueue = try DatabaseQueue(...) // or DatabasePool
 Person.all().rx
     .fetchAll(in: dbQueue)
     .subscribe(onNext: { person: Person? in
