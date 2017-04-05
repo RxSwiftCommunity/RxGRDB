@@ -24,7 +24,7 @@ Requests offer four fetching methods that load values from the database: `fetchC
 
 ```swift
 let dbQueue = try DatabaseQueue(...) // or DatabasePool
-dbQueue.inDatabase { db in
+try dbQueue.inDatabase { db in
     let request = Person.all()
     try request.fetchCount(db)  // Int
     try request.fetchOne(db)    // Person?
