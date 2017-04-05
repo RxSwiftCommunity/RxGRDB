@@ -42,8 +42,7 @@ Emits a database connection after each transaction that has updated the table an
 
 ```swift
 let request = Person.all()
-request.rx
-    .changes(in: dbQueue)
+request.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Persons table has changed.")
     })
@@ -57,8 +56,7 @@ A variant, with SQL:
 
 ```swift
 let request = SQLRequest("SELECT * FROM persons")
-request.rx
-    .changes(in: dbQueue)
+request.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Persons table has changed.")
     })
@@ -71,8 +69,7 @@ Emits a count after each transaction that has updated the table and columns fetc
 
 ```swift
 let request = Person.all()
-request.rx
-    .fetchCount(in: dbQueue)
+request.rx.fetchCount(in: dbQueue)
     .subscribe(onNext: { count: Int in
         print("Number of persons: \(count)")
     })
@@ -89,8 +86,7 @@ Emits a value after each transaction that has updated the table and columns fetc
 
 ```swift
 let request = Person.filter(Column("email") == "arthur@example.com")
-request.rx
-    .fetchOne(in: dbQueue)
+request.rx.fetchOne(in: dbQueue)
     .subscribe(onNext: { person: Person? in
         print(person)
     })
@@ -100,8 +96,7 @@ A variant, with SQL and an alternative fetched type:
 
 ```swift
 let request = SQLRequest("SELECT MAX(score) FROM rounds").bound(to: Int.self)
-request.rx
-    .fetchOne(in: dbQueue)
+request.rx.fetchOne(in: dbQueue)
     .subscribe(onNext: { maxScore: Int? in
         print(maxScore)
     })
@@ -114,8 +109,7 @@ Emits an array of values after each transaction that has updated the table and c
 
 ```swift
 let request = Person.all()
-request.rx
-    .fetchAll(in: dbQueue)
+request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { persons: [Person] in
         print(persons)
     })
@@ -125,8 +119,7 @@ A variant, with SQL and an alternative fetched type:
 
 ```swift
 let request = SQLRequest("SELECT urls FROM links").bound(to: URL.self)
-request.rx
-    .fetchAll(in: dbQueue)
+request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { urls: [URL] in
         print(urls)
     })
