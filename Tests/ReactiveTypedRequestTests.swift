@@ -5,13 +5,15 @@ import RxSwift
 
 class ReactiveTypedRequestTests: ReactiveTestCase { }
 
+// Mark: - RowConvertible
+
 extension ReactiveTypedRequestTests {
-    func testRxFetchAll() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAll)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAll)
+    func testRxFetchAllRecords() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllRecords)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllRecords)
     }
     
-    func testRxFetchAll(writer: DatabaseWriter) throws {
+    func testRxFetchAllRecords(writer: DatabaseWriter) throws {
         try writer.write { db in
             try db.create(table: "persons") { t in
                 t.column("id", .integer).primaryKey()
@@ -50,12 +52,12 @@ extension ReactiveTypedRequestTests {
 }
 
 extension ReactiveTypedRequestTests {
-    func testRxFetchOne() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOne)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOne)
+    func testRxFetchOneRecord() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneRecord)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneRecord)
     }
     
-    func testRxFetchOne(writer: DatabaseWriter) throws {
+    func testRxFetchOneRecord(writer: DatabaseWriter) throws {
         try writer.write { db in
             try db.create(table: "persons") { t in
                 t.column("id", .integer).primaryKey()
@@ -92,13 +94,59 @@ extension ReactiveTypedRequestTests {
     }
 }
 
+// Mark: - Row
+
 extension ReactiveTypedRequestTests {
-    func testRxDiff() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxDiff)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxDiff)
+    func testRxFetchAllRows() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllRows)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllRows)
     }
     
-    func testRxDiff(writer: DatabaseWriter) throws {
+    func testRxFetchAllRows(writer: DatabaseWriter) throws {
+        try writer.write { db in
+            try db.create(table: "persons") { t in
+                t.column("id", .integer).primaryKey()
+                t.column("name", .text)
+            }
+            try Person(id: nil, name: "Arthur").insert(db)
+            try Person(id: nil, name: "Barbara").insert(db)
+        }
+        
+        // Expectation for later transaction
+        let expectation = self.expectation(description: "1")
+        expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second on transaction.
+        
+        // Subscribe to a request
+        let request = SQLRequest("SELECT * FROM persons ORDER BY name").bound(to: Row.self)
+        var rows: [Row] = []
+        request.rx
+            .fetchAll(in: writer)
+            .subscribe(onNext: {
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                rows = $0
+                expectation.fulfill()
+            })
+            .addDisposableTo(disposeBag)
+        
+        // Subscription immediately triggers an event
+        XCTAssertEqual(rows.map({ $0.value(named: "name") as String }), ["Arthur", "Barbara"])
+        
+        // Transaction triggers an asynchronous event
+        try writer.write { try Person(id: nil, name: "Craig").insert($0) }
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertEqual(rows.map({ $0.value(named: "name") as String }), ["Arthur", "Barbara", "Craig"])
+    }
+}
+
+extension ReactiveTypedRequestTests {
+    func testRxFetchOneRow() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneRow)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneRow)
+    }
+    
+    func testRxFetchOneRow(writer: DatabaseWriter) throws {
         try writer.write { db in
             try db.create(table: "persons") { t in
                 t.column("id", .integer).primaryKey()
@@ -112,53 +160,119 @@ extension ReactiveTypedRequestTests {
         expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second on transaction.
         
         // Subscribe to a request
-        let request = Person.all()
-        var persons: RequestResults<Person>? = nil
-        var event: RequestEvent<Person>? = nil
+        let request = SQLRequest("SELECT * FROM persons").bound(to: Row.self)
+        var row: Row? = nil
         request.rx
-            .diff(in: writer)
-            .subscribe(onNext: { (newPersons, newEvent) in
+            .fetchOne(in: writer)
+            .subscribe(onNext: {
                 // events are expected to be delivered on the main thread
                 XCTAssertTrue(Thread.isMainThread)
-                persons = newPersons
-                event = newEvent
-                print("blah")
+                row = $0
                 expectation.fulfill()
             })
             .addDisposableTo(disposeBag)
         
         // Subscription immediately triggers an event
-        XCTAssertEqual(persons!.count, 1)
-        XCTAssertEqual(persons![0].name, "Arthur")
-        switch event! {
-        case .snapshot:
-            break
-        default:
-            XCTFail("Unexpected event")
-        }
+        XCTAssertEqual(row!.value(named: "name") as String, "Arthur")
         
         // Transaction triggers an asynchronous event
         try writer.write { try $0.execute("UPDATE persons SET name = ?", arguments: ["Barbara"]) }
         waitForExpectations(timeout: 1, handler: nil)
         
-        XCTAssertEqual(persons!.count, 1)
-        XCTAssertEqual(persons![0].name, "Barbara")
-        switch event! {
-        case .changes(let changes):
-            XCTAssertEqual(changes.count, 1)
-            XCTAssertEqual(changes[0].record.name, "Barbara")
-            switch changes[0].kind {
-            case .update(let indexPath, let changes):
-                XCTAssertEqual(indexPath, IndexPath(indexes: [0, 0]))
-                XCTAssertEqual(changes, ["name": "Arthur".databaseValue])
-            default:
-                XCTFail("Unexpected change")
-            }
-        default:
-            XCTFail("Unexpected event")
-        }
+        XCTAssertEqual(row!.value(named: "name") as String, "Barbara")
     }
 }
+
+
+// MARK: - DatabaseValue
+
+extension ReactiveTypedRequestTests {
+    func testRxFetchAllDatabaseValues() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllDatabaseValues)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllDatabaseValues)
+    }
+    
+    func testRxFetchAllDatabaseValues(writer: DatabaseWriter) throws {
+        try writer.write { db in
+            try db.create(table: "persons") { t in
+                t.column("id", .integer).primaryKey()
+                t.column("name", .text)
+            }
+            try Person(id: nil, name: "Arthur").insert(db)
+            try Person(id: nil, name: "Barbara").insert(db)
+        }
+        
+        // Expectation for later transaction
+        let expectation = self.expectation(description: "1")
+        expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second on transaction.
+        
+        // Subscribe to a request
+        let request = SQLRequest("SELECT name FROM persons ORDER BY name").bound(to: String.self)
+        var names: [String] = []
+        request.rx
+            .fetchAll(in: writer)
+            .subscribe(onNext: {
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                names = $0
+                expectation.fulfill()
+            })
+            .addDisposableTo(disposeBag)
+        
+        // Subscription immediately triggers an event
+        XCTAssertEqual(names, ["Arthur", "Barbara"])
+        
+        // Transaction triggers an asynchronous event
+        try writer.write { try Person(id: nil, name: "Craig").insert($0) }
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertEqual(names, ["Arthur", "Barbara", "Craig"])
+    }
+}
+
+extension ReactiveTypedRequestTests {
+    func testRxFetchOneDatabaseValue() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneDatabaseValue)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneDatabaseValue)
+    }
+    
+    func testRxFetchOneDatabaseValue(writer: DatabaseWriter) throws {
+        try writer.write { db in
+            try db.create(table: "persons") { t in
+                t.column("id", .integer).primaryKey()
+                t.column("name", .text)
+            }
+            try Person(id: nil, name: "Arthur").insert(db)
+        }
+        
+        // Expectation for later transaction
+        let expectation = self.expectation(description: "1")
+        expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second on transaction.
+        
+        // Subscribe to a request
+        let request = SQLRequest("SELECT COUNT(*) FROM persons").bound(to: Int.self)
+        var count: Int? = nil
+        request.rx
+            .fetchOne(in: writer)
+            .subscribe(onNext: {
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                count = $0
+                expectation.fulfill()
+            })
+            .addDisposableTo(disposeBag)
+        
+        // Subscription immediately triggers an event
+        XCTAssertEqual(count!, 1)
+        
+        // Transaction triggers an asynchronous event
+        try writer.write { try Person(id: nil, name: "Craig").insert($0) }
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertEqual(count!, 2)
+    }
+}
+
 
 private class Person: Record {
     var id: Int64?
