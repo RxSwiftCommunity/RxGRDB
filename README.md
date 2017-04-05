@@ -49,7 +49,9 @@ request.rx
     })
 ```
 
-If you set `synchronizedStart` to true (the default value), the first element will be emitted synchronously.
+If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
+
+All elements are emitted on the database writer dispatch queue, serialized with all database updates.
 
 
 ##### `Request.rx.fetchCount(in:synchronizedStart:resultQueue:)`
@@ -65,7 +67,7 @@ request.rx
     })
 ```
 
-If you set `synchronizedStart` to true (the default value), the first element will be emitted synchronously.
+If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
 
 Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.main`.
 
