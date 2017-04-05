@@ -26,14 +26,8 @@ let dbQueue = try DatabaseQueue(...) // or DatabasePool
 Given a request, you can observe all transactions that have an impact on the tables and columns queried by the request:
 
 ```swift
-try dbQueue.inDatabase { db in
-    try db.create(table: "persons") { t in
-        t.column("id", .integer).primaryKey()
-        t.column("name", .text)
-    }
-}
-
-let request = SQLRequest("SELECT * FROM persons")
+let request = SQLRequest("SELECT * FROM persons") // Using SQL
+let request = Person.all()                        // Using the query interface
 
 // A database connection is immediately emitted on subscription, and later
 // after each committed database transaction that has modified the tables and
