@@ -53,6 +53,17 @@ If you set `synchronizedStart` to true (the default value), the first element is
 
 All elements are emitted on the database writer dispatch queue, serialized with all database updates.
 
+A variant, with SQL:
+
+```swift
+let request = SQLRequest("SELECT * FROM persons")
+request.rx
+    .changes(in: dbQueue)
+    .subscribe(onNext: { db: Database in
+        print("Persons table has changed.")
+    })
+```
+
 
 ##### `Request.rx.fetchCount(in:synchronizedStart:resultQueue:)`
 
@@ -85,6 +96,17 @@ request.rx
     })
 ```
 
+A variant, with SQL and an alternative fetched type:
+
+```swift
+let request = SQLRequest("SELECT MAX(score) FROM rounds").bound(to: Int.self)
+request.rx
+    .fetchOne(in: dbQueue)
+    .subscribe(onNext: { maxScore: Int? in
+        print(maxScore)
+    })
+```
+
 
 ##### `TypedRequest.rx.fetchAll(in:synchronizedStart:resultQueue:)`
 
@@ -96,5 +118,16 @@ request.rx
     .fetchAll(in: dbQueue)
     .subscribe(onNext: { persons: [Person] in
         print(persons)
+    })
+```
+
+A variant, with SQL and an alternative fetched type:
+
+```swift
+let request = SQLRequest("SELECT urls FROM links").bound(to: URL.self)
+request.rx
+    .fetchAll(in: dbQueue)
+    .subscribe(onNext: { urls: [URL] in
+        print(urls)
     })
 ```
