@@ -62,7 +62,8 @@ final class SelectionInfoChangesObservable : ObservableType {
         }
         
         func observes(eventsOfKind eventKind: DatabaseEventKind) -> Bool {
-            return eventKind.impacts(selectionInfo)
+            // When in doubt, assume impact
+            return eventKind.impacts(selectionInfo) ?? true
         }
         
         func databaseDidChange(with event: DatabaseEvent) {
