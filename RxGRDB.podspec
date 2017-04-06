@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name     = 'RxGRDB'
-	s.version  = '0.1.1'
+	s.version  = '0.1.2'
 	
 	s.license  = { :type => 'MIT', :file => 'LICENSE' }
 	s.summary  = 'Reactive extensions for GRDB.swift.'
@@ -15,6 +15,6 @@ Pod::Spec.new do |s|
 	
 	s.source_files = 'RxGRDB/**/*.{h,swift}'
 	
-	s.dependency "GRDB.swift", "~> 0.104.0"
+	s.dependency "GRDB.swift", "~> 0.105.0"
 	s.dependency "RxSwift", "~> 3.3.1"
 end
