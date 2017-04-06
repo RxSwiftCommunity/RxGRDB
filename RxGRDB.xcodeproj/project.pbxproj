@@ -18,6 +18,15 @@
 		560F92D51E94DFCE0077EADF /* GRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650298B1E8FE0D200615A2C /* GRDB.framework */; };
 		560F92D61E94DFD50077EADF /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294C1E8FE05600615A2C /* RxSwift.framework */; };
 		560F92D81E94F43F0077EADF /* ReactiveTypedRequestDiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92D71E94F43F0077EADF /* ReactiveTypedRequestDiffTests.swift */; };
+		562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 560F92C31E94DF280077EADF /* RxGRDB.framework */; };
+		562756041E962C5B0035B653 /* ReactiveRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* ReactiveRequestTests.swift */; };
+		562756051E962C5B0035B653 /* ReactiveSelectStatementSelectionInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C11E9130D000615A2C /* ReactiveSelectStatementSelectionInfoTests.swift */; };
+		562756061E962C5B0035B653 /* ReactiveTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* ReactiveTestCase.swift */; };
+		562756071E962C5B0035B653 /* ReactiveTypedRequestDiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92D71E94F43F0077EADF /* ReactiveTypedRequestDiffTests.swift */; };
+		562756081E962C5B0035B653 /* ReactiveTypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* ReactiveTypedRequestTests.swift */; };
+		562756091E962C5B0035B653 /* TestDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029BF1E91308D00615A2C /* TestDatabase.swift */; };
+		562756581E963C1B0035B653 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* DatabaseWriter+Rx.swift */; };
+		562756591E963C1B0035B653 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* DatabaseWriter+Rx.swift */; };
 		5650291F1E8FDF5600615A2C /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565029151E8FDF5600615A2C /* RxGRDB.framework */; };
 		565029241E8FDF5600615A2C /* ReactiveRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* ReactiveRequestTests.swift */; };
 		565029261E8FDF5600615A2C /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -46,6 +55,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C88BB81A1B07E5ED0064D411;
 			remoteInfo = "RxSwift-macOS";
+		};
+		562755DD1E962BFD0035B653 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5650290C1E8FDF5600615A2C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 560F92C21E94DF280077EADF;
+			remoteInfo = RxGRDBmacOS;
 		};
 		565029201E8FDF5600615A2C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -341,6 +357,8 @@
 		560F92891E94DADA0077EADF /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		560F92C31E94DF280077EADF /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		560F92D71E94F43F0077EADF /* ReactiveTypedRequestDiffTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactiveTypedRequestDiffTests.swift; sourceTree = "<group>"; };
+		562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBmacOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		562756571E963C1B0035B653 /* DatabaseWriter+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseWriter+Rx.swift"; sourceTree = "<group>"; };
 		565029151E8FDF5600615A2C /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		565029181E8FDF5600615A2C /* RxGRDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RxGRDB.h; sourceTree = "<group>"; };
 		565029191E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -365,6 +383,14 @@
 			files = (
 				560F92D61E94DFD50077EADF /* RxSwift.framework in Frameworks */,
 				560F92D51E94DFCE0077EADF /* GRDB.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		562755D41E962BFD0035B653 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +439,7 @@
 				565029151E8FDF5600615A2C /* RxGRDB.framework */,
 				5650291E1E8FDF5600615A2C /* RxGRDBiOSTests.xctest */,
 				560F92C31E94DF280077EADF /* RxGRDB.framework */,
+				562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -420,6 +447,7 @@
 		565029171E8FDF5600615A2C /* RxGRDB */ = {
 			isa = PBXGroup;
 			children = (
+				562756571E963C1B0035B653 /* DatabaseWriter+Rx.swift */,
 				565029B91E91265A00615A2C /* Request+Rx.swift */,
 				560F92891E94DADA0077EADF /* Result.swift */,
 				565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */,
@@ -547,6 +575,24 @@
 			productReference = 560F92C31E94DF280077EADF /* RxGRDB.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		562755D61E962BFD0035B653 /* RxGRDBmacOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 562756031E962BFD0035B653 /* Build configuration list for PBXNativeTarget "RxGRDBmacOSTests" */;
+			buildPhases = (
+				562755D31E962BFD0035B653 /* Sources */,
+				562755D41E962BFD0035B653 /* Frameworks */,
+				562755D51E962BFD0035B653 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				562755DE1E962BFD0035B653 /* PBXTargetDependency */,
+			);
+			name = RxGRDBmacOSTests;
+			productName = RxGRDBTests;
+			productReference = 562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		565029141E8FDF5600615A2C /* RxGRDBiOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 565029291E8FDF5600615A2C /* Build configuration list for PBXNativeTarget "RxGRDBiOS" */;
@@ -599,6 +645,10 @@
 						CreatedOnToolsVersion = 8.3;
 						ProvisioningStyle = Automatic;
 					};
+					562755D61E962BFD0035B653 = {
+						CreatedOnToolsVersion = 8.3;
+						ProvisioningStyle = Automatic;
+					};
 					565029141E8FDF5600615A2C = {
 						CreatedOnToolsVersion = 8.3;
 						DevelopmentTeam = AMD8W895CT;
@@ -637,6 +687,7 @@
 				565029141E8FDF5600615A2C /* RxGRDBiOS */,
 				5650291D1E8FDF5600615A2C /* RxGRDBiOSTests */,
 				560F92C21E94DF280077EADF /* RxGRDBmacOS */,
+				562755D61E962BFD0035B653 /* RxGRDBmacOSTests */,
 			);
 		};
 /* End PBXProject section */
@@ -919,6 +970,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		562755D51E962BFD0035B653 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		565029131E8FDF5600615A2C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -943,8 +1001,22 @@
 				560F92CD1E94DF830077EADF /* Result.swift in Sources */,
 				560F92CE1E94DF830077EADF /* SelectStatementSelectionInfo+Rx.swift in Sources */,
 				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
+				562756591E963C1B0035B653 /* DatabaseWriter+Rx.swift in Sources */,
 				560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */,
 				560F92D01E94DF830077EADF /* TypedRequestDiff+Rx.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		562755D31E962BFD0035B653 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				562756071E962C5B0035B653 /* ReactiveTypedRequestDiffTests.swift in Sources */,
+				562756081E962C5B0035B653 /* ReactiveTypedRequestTests.swift in Sources */,
+				562756041E962C5B0035B653 /* ReactiveRequestTests.swift in Sources */,
+				562756061E962C5B0035B653 /* ReactiveTestCase.swift in Sources */,
+				562756091E962C5B0035B653 /* TestDatabase.swift in Sources */,
+				562756051E962C5B0035B653 /* ReactiveSelectStatementSelectionInfoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -955,6 +1027,7 @@
 				565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */,
 				560F928A1E94DADA0077EADF /* Result.swift in Sources */,
 				560F92881E94D9260077EADF /* TypedRequestDiff+Rx.swift in Sources */,
+				562756581E963C1B0035B653 /* DatabaseWriter+Rx.swift in Sources */,
 				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
 				565029B31E8FE12C00615A2C /* TypedRequestFetch+Rx.swift in Sources */,
 			);
@@ -985,6 +1058,11 @@
 			isa = PBXTargetDependency;
 			name = "RxSwift-macOS";
 			targetProxy = 560F92D31E94DFB10077EADF /* PBXContainerItemProxy */;
+		};
+		562755DE1E962BFD0035B653 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 560F92C21E94DF280077EADF /* RxGRDBmacOS */;
+			targetProxy = 562755DD1E962BFD0035B653 /* PBXContainerItemProxy */;
 		};
 		565029211E8FDF5600615A2C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1044,6 +1122,36 @@
 				PRODUCT_NAME = RxGRDB;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		562755DF1E962BFD0035B653 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		562755E01E962BFD0035B653 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -1224,6 +1332,15 @@
 			buildConfigurations = (
 				560F92C91E94DF290077EADF /* Debug */,
 				560F92CA1E94DF290077EADF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		562756031E962BFD0035B653 /* Build configuration list for PBXNativeTarget "RxGRDBmacOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				562755DF1E962BFD0035B653 /* Debug */,
+				562755E01E962BFD0035B653 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

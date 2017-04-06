@@ -1,34 +1,17 @@
-RxGRDB [![Swift](https://img.shields.io/badge/swift-3-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/groue/RxGRDB.svg?maxAge=2592000)](/LICENSE)
+RxGRDB [![Swift](https://img.shields.io/badge/swift-3-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE)
 ======
 
 ### A set of reactive extensions for [GRDB.swift](http://github.com/groue/GRDB.swift)
 
-----
+**Latest release**: April 6, 2017 &bull; version 0.1.2 &bull; [CHANGELOG](CHANGELOG.md)
 
-<p align="center">
-<strong>This is an alpha repository which is not yet ready for production.</strong>
-</p>
-
-----
+---
 
 
 The [GRDB query interface](https://github.com/groue/GRDB.swift#the-query-interface) lets you define *requests*:
 
 ```swift
 let request = Person.filter(emailColumn != nil).order(nameColumn)
-```
-
-All requests come with four fetching methods that load values from the database:
-
-```swift
-let dbQueue = try DatabaseQueue(...) // or DatabasePool
-try dbQueue.inDatabase { db in
-    let request = Person.all()
-    try request.fetchCount(db)  // Int
-    try request.fetchOne(db)    // Person?
-    try request.fetchAll(db)    // [Person]
-    try request.fetchCursor(db) // DatabaseCursor<Person>
-}
 ```
 
 **RxGRDB produces RxSwift observables from GRDB requests.**
@@ -63,6 +46,9 @@ request.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Persons table has changed.")
     })
+
+try dbQueue.inDatabase { try $0.execute("DELETE FROM persons") }
+// Prints "Persons table has changed."
 ```
 
 

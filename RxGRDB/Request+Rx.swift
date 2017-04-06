@@ -112,7 +112,9 @@ final class RequestChangesObservable<R: Request> : ObservableType {
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
         let selectionInfo: SelectStatement.SelectionInfo
         do {
-            selectionInfo = try writer.unsafeRead { db -> SelectStatement.SelectionInfo in
+            // Use GRDB in a reentrant way in order to support retries from
+            // errors that happen in a database dispatch queue.
+            selectionInfo = try writer.reentrantWrite { db -> SelectStatement.SelectionInfo in
                 let (statement, _) = try request.prepare(db)
                 return statement.selectionInfo
             }
