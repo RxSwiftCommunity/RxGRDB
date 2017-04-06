@@ -97,12 +97,19 @@ extension ReactiveSelectStatementSelectionInfoTests {
         }
         
         var changesCount = 0
-        var shouldThrow = false
+        var needsThrow = false
         selectionInfo.rx
             .changes(in: writer)
-            .map { db in if shouldThrow { throw NSError(domain: "RxGRDB", code: 0) } }
+            .map { db in
+                if needsThrow {
+                    needsThrow = false
+                    throw NSError(domain: "RxGRDB", code: 0)
+                }
+            }
             .retry()
-            .subscribe(onNext: { _ in changesCount += 1 })
+            .subscribe(onNext: { _ in
+                changesCount += 1
+            })
             .addDisposableTo(disposeBag)
         
         XCTAssertEqual(changesCount, 1)
@@ -111,16 +118,16 @@ extension ReactiveSelectStatementSelectionInfoTests {
             try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
             XCTAssertEqual(changesCount, 2)
             
-            shouldThrow = true
-            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
-            XCTAssertEqual(changesCount, 2)
-            
-            shouldThrow = false
+            needsThrow = true
             try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
             XCTAssertEqual(changesCount, 3)
             
+            needsThrow = false
             try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
             XCTAssertEqual(changesCount, 4)
+            
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 5)
         }
     }
 }

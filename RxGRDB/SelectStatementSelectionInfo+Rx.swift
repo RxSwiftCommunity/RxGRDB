@@ -38,7 +38,9 @@ final class SelectionInfoChangesObservable : ObservableType {
             observer.on(.next(db))
         })
         
-        writer.write { db in
+        // Use GRDB in a reentrant way in order to support retries from errors
+        // that happen in a database dispatch queue.
+        writer.reentrantWrite { db in
             // Install transaction observer and immediately notify if requested to do so
             db.add(transactionObserver: selectionInfoObserver)
             if synchronizedStart {
@@ -47,7 +49,11 @@ final class SelectionInfoChangesObservable : ObservableType {
         }
         
         return Disposables.create {
-            self.writer.remove(transactionObserver: selectionInfoObserver)
+            // Use GRDB in a reentrant way in order to support disposals that
+            // happen in a database dispatch queue.
+            self.writer.reentrantWrite { db in
+                db.remove(transactionObserver: selectionInfoObserver)
+            }
         }
     }
     
