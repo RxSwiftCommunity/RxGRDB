@@ -4,9 +4,9 @@ Pod::Spec.new do |s|
 	
 	s.license  = { :type => 'MIT', :file => 'LICENSE' }
 	s.summary  = 'Reactive extensions for GRDB.swift.'
-	s.homepage = 'https://github.com/groue/RxGRDB'
+	s.homepage = 'https://github.com/RxSwiftCommunity/RxGRDB'
 	s.author   = { 'Gwendal Roué' => 'gr@pierlis.com' }
-	s.source   = { :git => 'https://github.com/groue/RxGRDB.git', :tag => "v#{s.version}" }
+	s.source   = { :git => 'https://github.com/RxSwiftCommunity/RxGRDB.git', :tag => "v#{s.version}" }
 	s.module_name = 'RxGRDB'
 	
 	s.ios.deployment_target = '8.0'
