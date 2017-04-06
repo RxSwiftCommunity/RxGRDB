@@ -6,12 +6,12 @@ import RxSwift
 class ReactiveSelectStatementSelectionInfoTests: ReactiveTestCase { }
 
 extension ReactiveSelectStatementSelectionInfoTests {
-    func testRxSelection() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxSelection)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxSelection)
+    func testChanges() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testChanges)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testChanges)
     }
     
-    func testRxSelection(writer: DatabaseWriter) throws {
+    func testChanges(writer: DatabaseWriter) throws {
         var selectionInfos: [SelectStatement.SelectionInfo] = []
         try writer.write { db in
             try db.create(table: "table1") { t in
@@ -77,6 +77,50 @@ extension ReactiveSelectStatementSelectionInfoTests {
             reset()
             try db.execute("UPDATE table2 SET b = 1")
             XCTAssertEqual(changes, [false, false, false])
+        }
+    }
+}
+
+extension ReactiveSelectStatementSelectionInfoTests {
+    func testChangesRetry() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testChangesRetry)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testChangesRetry)
+    }
+    
+    func testChangesRetry(writer: DatabaseWriter) throws {
+        var selectionInfo: SelectStatement.SelectionInfo! = nil
+        try writer.write { db in
+            try db.create(table: "table1") { t in
+                t.column("id", .integer).primaryKey()
+            }
+            selectionInfo = try db.makeSelectStatement("SELECT * FROM table1").selectionInfo
+        }
+        
+        var changesCount = 0
+        var shouldThrow = false
+        selectionInfo.rx
+            .changes(in: writer)
+            .map { db in if shouldThrow { throw NSError(domain: "RxGRDB", code: 0) } }
+            .retry()
+            .subscribe(onNext: { _ in changesCount += 1 })
+            .addDisposableTo(disposeBag)
+        
+        XCTAssertEqual(changesCount, 1)
+        
+        try writer.write { db in
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 2)
+            
+            shouldThrow = true
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 2)
+            
+            shouldThrow = false
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 3)
+            
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 4)
         }
     }
 }
