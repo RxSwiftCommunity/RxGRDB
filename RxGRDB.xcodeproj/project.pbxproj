@@ -1226,6 +1226,7 @@
 				560F92CA1E94DF290077EADF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5650290F1E8FDF5600615A2C /* Build configuration list for PBXProject "RxGRDB" */ = {
 			isa = XCConfigurationList;

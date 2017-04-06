@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "560F92C21E94DF280077EADF"
-               BuildableName = "RxGRDBmacOS.framework"
+               BuildableName = "RxGRDB.framework"
                BlueprintName = "RxGRDBmacOS"
                ReferencedContainer = "container:RxGRDB.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "560F92C21E94DF280077EADF"
-            BuildableName = "RxGRDBmacOS.framework"
+            BuildableName = "RxGRDB.framework"
             BlueprintName = "RxGRDBmacOS"
             ReferencedContainer = "container:RxGRDB.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "560F92C21E94DF280077EADF"
-            BuildableName = "RxGRDBmacOS.framework"
+            BuildableName = "RxGRDB.framework"
             BlueprintName = "RxGRDBmacOS"
             ReferencedContainer = "container:RxGRDB.xcodeproj">
          </BuildableReference>
