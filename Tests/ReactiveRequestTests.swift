@@ -5,6 +5,9 @@ import RxSwift
 
 class ReactiveRequestTests: ReactiveTestCase { }
 
+
+// MARK: - Changes
+
 extension ReactiveRequestTests {
     func testRxChanges() throws {
         try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxChanges)
@@ -128,5 +131,51 @@ extension ReactiveRequestTests {
             try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
             XCTAssertEqual(changesCount, 5)
         }
+    }
+}
+
+
+// MARK: - Count
+
+extension ReactiveTypedRequestTests {
+    func testRxFetchCount() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchCount)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchCount)
+    }
+    
+    func testRxFetchCount(writer: DatabaseWriter) throws {
+        try writer.write { db in
+            try db.create(table: "table1") { t in
+                t.column("id", .integer).primaryKey()
+            }
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+        }
+        
+        // Expectation for later transaction
+        let expectation = self.expectation(description: "1")
+        expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second on transaction.
+        
+        // Subscribe to a request
+        struct Record : TableMapping { static let databaseTableName = "table1" }
+        let request = Record.all()
+        var count: Int = 0xdeadbeef
+        request.rx
+            .fetchCount(in: writer)
+            .subscribe(onNext: {
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                count = $0
+                expectation.fulfill()
+            })
+            .addDisposableTo(disposeBag)
+        
+        // Subscription immediately triggers an event
+        XCTAssertEqual(count, 1)
+        
+        // Transaction triggers an asynchronous event
+        try writer.write { try $0.execute("INSERT INTO table1 (id) VALUES (NULL)") }
+        waitForExpectations(timeout: 1, handler: nil)
+        
+        XCTAssertEqual(count, 2)
     }
 }
