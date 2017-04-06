@@ -28,7 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "562755D61E962BFD0035B653"
+               BuildableName = "RxGRDBmacOSTests.xctest"
+               BlueprintName = "RxGRDBmacOSTests"
+               ReferencedContainer = "container:RxGRDB.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "560F92C21E94DF280077EADF"
+            BuildableName = "RxGRDB.framework"
+            BlueprintName = "RxGRDBmacOS"
+            ReferencedContainer = "container:RxGRDB.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
