@@ -6,12 +6,12 @@ import RxSwift
 class ReactiveRequestTests: ReactiveTestCase { }
 
 extension ReactiveRequestTests {
-    func testRxSelection() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxSelection)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxSelection)
+    func testRxChanges() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxChanges)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxChanges)
     }
     
-    func testRxSelection(writer: DatabaseWriter) throws {
+    func testRxChanges(writer: DatabaseWriter) throws {
         try writer.write { db in
             try db.create(table: "table1") { t in
                 t.column("id", .integer).primaryKey()
@@ -77,6 +77,56 @@ extension ReactiveRequestTests {
             reset()
             try db.execute("UPDATE table2 SET b = 1")
             XCTAssertEqual(changes, [false, false, false])
+        }
+    }
+}
+
+extension ReactiveRequestTests {
+    func testChangesRetry() throws {
+        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testChangesRetry)
+        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testChangesRetry)
+    }
+    
+    func testChangesRetry(writer: DatabaseWriter) throws {
+        try writer.write { db in
+            try db.create(table: "table1") { t in
+                t.column("id", .integer).primaryKey()
+            }
+        }
+        
+        let request = SQLRequest("SELECT * FROM table1")
+        var changesCount = 0
+        var needsThrow = false
+        request.rx
+            .changes(in: writer)
+            .map { db in
+                if needsThrow {
+                    needsThrow = false
+                    throw NSError(domain: "RxGRDB", code: 0)
+                }
+            }
+            .retry()
+            .subscribe(onNext: { _ in
+                changesCount += 1
+            })
+            .addDisposableTo(disposeBag)
+        
+        XCTAssertEqual(changesCount, 1)
+        
+        try writer.write { db in
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 2)
+            
+            needsThrow = true
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 3)
+            
+            needsThrow = false
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 4)
+            
+            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+            XCTAssertEqual(changesCount, 5)
         }
     }
 }
