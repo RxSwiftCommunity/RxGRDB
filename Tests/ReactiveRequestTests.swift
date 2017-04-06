@@ -169,13 +169,13 @@ extension ReactiveTypedRequestTests {
             .addDisposableTo(disposeBag)
         
         // Subscription immediately triggers an event
-        XCTAssertEqual(count, 1)
+        XCTAssertEqual(count, 0)
         
         // Transaction triggers an asynchronous event
         try writer.write { try $0.execute("INSERT INTO table1 (id) VALUES (NULL)") }
         waitForExpectations(timeout: 1, handler: nil)
         
-        XCTAssertEqual(count, 2)
+        XCTAssertEqual(count, 1)
     }
 }
 
