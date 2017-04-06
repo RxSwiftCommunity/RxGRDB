@@ -109,26 +109,25 @@ final class Diff<Fetched> : ObservableType where Fetched: RowConvertible & Table
                         let result: E = (RequestResults(items: new), .changes(changes))
                         lastItems = new
                         self.resultQueue.async {
-                            observer.onNext(result)
+                            observer.on(.next(result))
                         }
                     } else {
                         // Emit immediately on subscription
                         lastItems = new
-                        observer.onNext((RequestResults(items: new), .snapshot))
+                        observer.on(.next((RequestResults(items: new), .snapshot)))
                     }
                 case .error(let error):
                     self.resultQueue.async {
-                        observer.onError(error)
+                        observer.on(.error(error))
                     }
                 case .completed:
                     self.resultQueue.async {
-                        observer.onCompleted()
+                        observer.on(.completed)
                     }
                 }
             }
         } catch {
-            observer.onError(error)
-            observer.onCompleted()
+            observer.on(.error(error))
             return Disposables.create()
         }
     }

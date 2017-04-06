@@ -117,8 +117,7 @@ final class RequestChangesObservable<R: Request> : ObservableType {
                 return statement.selectionInfo
             }
         } catch {
-            observer.onError(error)
-            observer.onCompleted()
+            observer.on(.error(error))
             return Disposables.create()
         }
         
@@ -150,16 +149,16 @@ final class RequestFetchObservable<R: Request, ResultType> : ObservableType {
             .changes(in: writer, synchronizedStart: synchronizedStart)
             .subscribe { event in
                 switch event {
-                case .error(let error): observer.onError(error)
-                case .completed: observer.onCompleted()
+                case .error(let error): observer.on(.error(error))
+                case .completed: observer.on(.completed)
                 case .next(let db):
                     if start {
                         // Synchronized start
                         start = false
                         do {
-                            try observer.onNext(self.fetch(db))
+                            try observer.on(.next(self.fetch(db)))
                         } catch {
-                            observer.onError(error)
+                            observer.on(.error(error))
                         }
                         return
                     } else {
@@ -187,9 +186,9 @@ final class RequestFetchObservable<R: Request, ResultType> : ObservableType {
                             self.resultQueue.async {
                                 switch result! {
                                 case .success(let results):
-                                    observer.onNext(results)
+                                    observer.on(.next(results))
                                 case .failure(let error):
-                                    observer.onError(error)
+                                    observer.on(.error(error))
                                 }
                             }
                         }

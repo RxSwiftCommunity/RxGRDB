@@ -35,14 +35,14 @@ final class SelectionInfoChangesObservable : ObservableType {
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
         // A transaction observer that tracks changes in the selection
         let selectionInfoObserver = SelectionInfoObserver(selectionInfo, onChange: { db in
-            observer.onNext(db)
+            observer.on(.next(db))
         })
         
         writer.write { db in
             // Install transaction observer and immediately notify if requested to do so
             db.add(transactionObserver: selectionInfoObserver)
             if synchronizedStart {
-                observer.onNext(db)
+                observer.on(.next(db))
             }
         }
         
