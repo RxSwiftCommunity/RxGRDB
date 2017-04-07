@@ -1,27 +1,72 @@
-RxGRDB [![Swift](https://img.shields.io/badge/swift-3-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE)
+RxGRDB [![Swift](https://img.shields.io/badge/swift-3.1-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE)
 ======
 
-### A set of reactive extensions for [GRDB.swift](http://github.com/groue/GRDB.swift)
+### A set of reactive extensions for SQLite and [GRDB.swift](http://github.com/groue/GRDB.swift)
 
-**Latest release**: April 6, 2017 &bull; version 0.1.2 &bull; [CHANGELOG](CHANGELOG.md)
+**Latest release**: April 6, 2017 &bull; version 0.1.2 &bull; [Release Notes](CHANGELOG.md)
+
+**Requirements**: iOS 8.0+ / OSX 10.10+ / watchOS 2.0+ • Xcode 8.3+ • Swift 3.1
 
 ---
 
+## Usage
 
-The [GRDB query interface](https://github.com/groue/GRDB.swift#the-query-interface) lets you define *requests*:
+**RxGRDB produces RxSwift observables from GRDB requests.**
+
+GRDB requests are built with the [query interface](https://github.com/groue/GRDB.swift#the-query-interface). For example:
 
 ```swift
 let request = Person.filter(emailColumn != nil).order(nameColumn)
 ```
 
-**RxGRDB produces RxSwift observables from GRDB requests.**
+You can fetch values from those requests, or track them in a reactive way with RxGRDB:
+
+```swift
+// Non-reactive
+dbQueue.inDatabase { db in
+    let persons = request.fetchAll(db) // [Person]
+}
+
+// Reactive:
+let persons = request.rx.fetchAll(in: dbQueue)
+persons.subscribe(onNext: { persons: [Person] in
+    ...
+})
+```
+
+
+## Documentation
+
+- [Installation](#installation)
+- [Observing Requests](#observing-requests)
+
+
+### Installation
+
+You can install RxGRDB with [CocoaPods](http://cocoapods.org/):
+
+1. Install cocoapods version 1.1 or higher
+
+2. Specify in your Podfile:
+
+    ```ruby
+    use_frameworks!
+    pod 'RxGRDB'
+    ```
 
 
 ### Observing Requests
 
+RxGRBD can track all database transactions that have modified the database tables and columns fetched by a request. Modifications on other tables or columns are ignored.
+
+If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [`rx.fetchCount`](#requestrxfetchcountinsynchronizedstartresultqueue), [`rx.fetchOne`](#typedrequestrxfetchoneinsynchronizedstartresultqueue), and [`rx.fetchAll`](#typedrequestrxfetchallinsynchronizedstartresultqueue) methods, depending on whether you want to track the number of results, the first one, or all of them.
+
+Some applications need to be synchronously notified right after any impactful transaction has been committed, and before any other thread has the opportunity to further modify the database. This feature is provided by the [`rx.changes`](#requestrxchangesinsynchronizedstart) method.
+
+
 ##### `Request.rx.changes(in:synchronizedStart:)`
 
-Emits a database connection after each database transaction that has updated the table and columns fetched by the request:
+Emits a database connection after each impactful database transaction:
 
 ```swift
 let request = Person.all()
@@ -30,8 +75,17 @@ request.rx.changes(in: dbQueue)
         print("Persons table has changed.")
     })
 
-try dbQueue.inDatabase { try Person.deleteAll($0) }
-// Prints "Persons table has changed."
+try dbQueue.inDatabase { db in
+    try Person.deleteAll(db)
+    // Prints "Persons table has changed."
+}
+
+try dbQueue.inTransaction { db in
+    try Person(name: "Arthur").insert(db)
+    try Person(name: "Barbara").insert(db)
+    return .commit
+    // Prints "Persons table has changed."
+}
 ```
 
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
@@ -47,14 +101,16 @@ request.rx.changes(in: dbQueue)
         print("Persons table has changed.")
     })
 
-try dbQueue.inDatabase { try $0.execute("DELETE FROM persons") }
-// Prints "Persons table has changed."
+try dbQueue.inDatabase { db in
+    try db.execute("DELETE FROM persons")
+    // Prints "Persons table has changed."
+}
 ```
 
 
 ##### `Request.rx.fetchCount(in:synchronizedStart:resultQueue:)`
 
-Emits a count after each database transaction that has updated the table and columns fetched by the request:
+Emits a count after each impactful database transaction:
 
 ```swift
 let request = Person.all()
@@ -78,7 +134,7 @@ Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.ma
 
 ##### `TypedRequest.rx.fetchOne(in:synchronizedStart:resultQueue:)`
 
-Emits a value after each database transaction that has updated the table and columns fetched by the request:
+Emits a value after each impactful database transaction:
 
 ```swift
 let request = Person.filter(Column("email") == "arthur@example.com")
@@ -96,6 +152,10 @@ try dbQueue.inDatabase { db in
 }
 ```
 
+If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
+
+Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.main`.
+
 A variant, with SQL and an alternative fetched type:
 
 ```swift
@@ -109,10 +169,10 @@ request.rx.fetchOne(in: dbQueue)
 
 ##### `TypedRequest.rx.fetchAll(in:synchronizedStart:resultQueue:)`
 
-Emits an array of values after each database transaction that has updated the table and columns fetched by the request:
+Emits an array of values after each impactful database transaction:
 
 ```swift
-let request = Person.order(Column("name")).all()
+let request = Person.order(Column("name"))
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { persons: [Person] in
         print(persons.map { $0.name })
@@ -126,6 +186,10 @@ try dbQueue.inTransaction { db in
     // Eventually prints "[Arthur, Barbara]"
 }
 ```
+
+If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
+
+Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.main`.
 
 A variant, with SQL and an alternative fetched type:
 
