@@ -23,8 +23,8 @@ You can fetch values from those requests, or track them in a reactive way with R
 
 ```swift
 // Non-reactive
-dbQueue.inDatabase { db in
-    let persons = request.fetchAll(db) // [Person]
+try dbQueue.inDatabase { db in
+    let persons = try request.fetchAll(db) // [Person]
 }
 
 // Reactive:
