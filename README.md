@@ -203,21 +203,20 @@ request.rx.fetchAll(in: dbQueue)
 
 ### What Exactly is a Request Change?
 
-What exactly are the "request changes" tracked by RxGRDB? Is there an opportunity for missed changes? Can change notifications happen even when there the request results are the same?
+What exactly are the "request changes" tracked by RxGRDB? Is there an opportunity for missed changes? Can change notifications happen even when the request results are the same?
 
-**No change should ever be missed, ever.** No matter how complex is the tracked request, or if the change is performed via a direct modification, a foreign key cascade, or an SQL trigger. If you notice a change that is not notified, then this is a bug: please open a [issue](https://github.com/RxSwiftCommunity/RxGRDB/issues).
+**First things first**: to perform reliably, RxGRDB requires a unique instance of GRDB [database queue](https://github.com/groue/GRDB.swift#database-queues) or [database pool](https://github.com/groue/GRDB.swift#database-pools) connected to the database file. This is the 1st rule of [GRBD concurrency](https://github.com/groue/GRDB.swift#concurrency).
 
-**However, some change notifications happen even though the request results are the same.** RxGRDB notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement that modifies the tracked tables and columns:
+**No change should ever be missed, ever.** No matter how complex is the tracked request, or if the change is performed via a direct modification, a foreign key cascade, or even an SQL trigger. That is because RxGRDB is based on fast and reliable SQLite APIs such as [Compile-Time Authorization Callbacks](https://sqlite.org/c3ref/set_authorizer.html), [Commit And Rollback Notification Callbacks](https://www.sqlite.org/c3ref/commit_hook.html), and [Data Change Notification Callbacks](https://www.sqlite.org/c3ref/update_hook.html). If you notice a change that is not notified, then this is a bug: please open an [issue](https://github.com/RxSwiftCommunity/RxGRDB/issues).
 
-1. has been executed, and not rollbacked (by the entire transaction or a savepoint).
-2. has inserted, updated, or deleted a row.
+**Some change notifications happen even though the request results are the same.** RxGRDB notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement that modifies the tracked tables and columns has been executed, has actually inserted, updated, or deleted a row, and has not been rollbacked along with the transaction or a savepoint.
 
-For example, if you track `Player.select(max(score))` (SQL: `SELECT MAX(score) FROM players`), then you'll get a notification:
+For example, if you track `Player.select(max(score))` (SQL: `SELECT MAX(score) FROM players`), then you'll get a notification for all the changes below, even if they do not modify the value of the maximum score:
 
-- for all insertions in the `players` table, even if they do not change the maximum score.
-- for all deletions in the `players` table, even if they do not change the maximum score.
-- for all updates to the `score` column of the `players` table, even if they do not change the maximum score.
-- for all other changes that indirectly touch the `score` column of the `players` table through foreign key cascades or SQL triggers, even if they do not change the maximum score.
+- insertions in the `players` table.
+- deletions in the `players` table.
+- updates to the `score` column of the `players` table.
+- other changes that indirectly touch the `score` column of the `players` table, through foreign key cascades or SQL triggers.
 
 However, you will not get any notification:
 
