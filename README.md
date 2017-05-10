@@ -57,7 +57,7 @@ You can install RxGRDB with [CocoaPods](http://cocoapods.org/):
 
 ### Observing Requests
 
-RxGRBD can track all database transactions that have modified the database tables and columns fetched by a request. Modifications on other tables or columns are ignored.
+RxGRBD can track all database transactions that have [modified](#what-exactly-is-a-request-change) the database tables and columns fetched by a request. Modifications on other tables or columns are ignored.
 
 If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [`rx.fetchCount`](#requestrxfetchcountinsynchronizedstartresultqueue), [`rx.fetchOne`](#typedrequestrxfetchoneinsynchronizedstartresultqueue), and [`rx.fetchAll`](#typedrequestrxfetchallinsynchronizedstartresultqueue) methods, depending on whether you want to track the number of results, the first one, or all of them.
 
@@ -200,3 +200,27 @@ request.rx.fetchAll(in: dbQueue)
         print(urls)
     })
 ```
+
+### What Exactly is a Request Change?
+
+What exactly are the "request changes" tracked by RxGRDB? Is there an opportunity for missed changes? Can change notifications happen even when there the request results are the same?
+
+**No change should ever be missed, ever.** No matter how complex is the tracked request, or if the change is performed via a direct modification, a foreign key cascade, or an SQL trigger. If you notice a change that is not notified, then this is a bug: please open a [issue](https://github.com/RxSwiftCommunity/RxGRDB/issues).
+
+**However, some change notifications happen even though the request results are the same.** RxGRDB notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement that modifies the tracked tables and columns:
+
+1. has been executed, and not rollbacked (by the entire transaction or a savepoint).
+2. has inserted, updated, or deleted a row.
+
+For example, if you track `Player.select(max(score))` (SQL: `SELECT MAX(score) FROM players`), then you'll get a notification:
+
+- for all insertions in the `players` table, even if they do not change the maximum score.
+- for all deletions in the `players` table, even if they do not change the maximum score.
+- for all updates to the `score` column of the `players` table, even if they do not change the maximum score.
+- for all other changes that indirectly touch the `score` column of the `players` table through foreign key cascades or SQL triggers, even if they do not change the maximum score.
+
+However, you will not get any notification:
+
+- for changes performed on other database tables.
+- for updates to the columns of the `players` table which are not `score`.
+
