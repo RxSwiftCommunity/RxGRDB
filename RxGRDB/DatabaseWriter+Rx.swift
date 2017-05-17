@@ -1,4 +1,8 @@
-import GRDB
+#if USING_SQLCIPHER
+    import GRDBCipher
+#else
+    import GRDB
+#endif
 
 extension DatabaseWriter {
     
