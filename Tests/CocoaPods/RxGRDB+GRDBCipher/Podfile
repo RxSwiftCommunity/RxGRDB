@@ -1,4 +1,4 @@
 target "DemoApp" do
   use_frameworks!
-  pod 'RxGRDB/GRDBCipher', :git => 'https://github.com/groue/RxGRDB.git', :branch => 'GRDBCipher'
+  pod 'RxGRDB/GRDBCipher'
 end
