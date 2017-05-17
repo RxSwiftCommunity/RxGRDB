@@ -70,3 +70,7 @@ playground.xcworkspace
 # Packages/
 # Package.pins
 .build/
+
+##
+Podfile.lock
+Pods/
