@@ -39,6 +39,7 @@ persons.subscribe(onNext: { persons: [Person] in
 
 - [Installation](#installation)
 - [Observing Requests](#observing-requests)
+- [What Exactly is a Request Change?](#what-exactly-is-a-request-change)
 
 
 ### Installation
@@ -52,6 +53,33 @@ You can install RxGRDB with [CocoaPods](http://cocoapods.org/):
     ```ruby
     use_frameworks!
     pod 'RxGRDB'
+    ```
+
+3. In your application files, import the modules you need:
+    
+    ```swift
+    import RxSwift
+    import RxGRDB
+    import GRDB
+    ```
+
+In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sqlcipher/), do instead:
+
+1. Install cocoapods version 1.1 or higher
+
+2. Specify in your Podfile:
+
+    ```ruby
+    use_frameworks!
+    pod 'RxGRDB/GRDBCipher'
+    ```
+
+3. In your application files, import the modules you need:
+    
+    ```swift
+    import RxSwift
+    import RxGRDB
+    import GRDBCipher
     ```
 
 
