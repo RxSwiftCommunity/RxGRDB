@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+## v0.2.0
+
+Released May 17, 2017
+
+**New**
+
+- Support for SQLCipher.
+
+
 ## v0.1.2
 
 Released April 6, 2017

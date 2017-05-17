@@ -1,4 +1,8 @@
-import GRDB
+#if USING_SQLCIPHER
+    import GRDBCipher
+#else
+    import GRDB
+#endif
 import RxSwift
 
 extension SelectStatement.SelectionInfo : ReactiveCompatible { }
@@ -57,7 +61,7 @@ final class SelectionInfoChangesObservable : ObservableType {
         }
     }
     
-    private class SelectionInfoObserver : GRDB.TransactionObserver {
+    private class SelectionInfoObserver : TransactionObserver {
         var didChange = false
         let onChange: (Database) -> ()
         let selectionInfo: SelectStatement.SelectionInfo

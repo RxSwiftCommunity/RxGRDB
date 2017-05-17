@@ -1,5 +1,9 @@
 import Foundation
-import GRDB
+#if USING_SQLCIPHER
+    import GRDBCipher
+#else
+    import GRDB
+#endif
 import RxSwift
 
 extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible & TableMapping {
@@ -66,11 +70,7 @@ final class Item<Fetched: RowConvertible> : RowConvertible, Equatable {
     let row: Row
     
     // Records are lazily loaded
-    lazy var record: Fetched = {
-        var record = Fetched(row: self.row)
-        record.awakeFromFetch(row: self.row)
-        return record
-    }()
+    lazy var record: Fetched = Fetched(row: self.row)
     
     public init(row: Row) {
         self.row = row.copy()

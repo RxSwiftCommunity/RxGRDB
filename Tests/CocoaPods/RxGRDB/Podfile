@@ -1,0 +1,4 @@
+target "DemoApp" do
+  use_frameworks!
+  pod 'RxGRDB'
+end

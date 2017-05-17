@@ -1,5 +1,9 @@
 import Foundation
-import GRDB
+#if USING_SQLCIPHER
+    import GRDBCipher
+#else
+    import GRDB
+#endif
 import RxSwift
 
 extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
