@@ -223,7 +223,7 @@ Other elements are asynchronously emitted on `resultQueue`, in chronological ord
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift#row-queries), plain [value](https://github.com/groue/GRDB.swift#values), custom [record](https://github.com/groue/GRDB.swift#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest("SELECT MAX(score) FROM rounds").bound(to: Int.self)
+let request = SQLRequest("SELECT MAX(score) FROM rounds").asRequest(of: Int.self)
 request.rx.fetchOne(in: dbQueue)
     .subscribe(onNext: { maxScore: Int? in
         print(maxScore)
@@ -272,7 +272,7 @@ Other elements are asynchronously emitted on `resultQueue`, in chronological ord
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift#row-queries), plain [value](https://github.com/groue/GRDB.swift#values), custom [record](https://github.com/groue/GRDB.swift#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest("SELECT url FROM links").bound(to: URL.self)
+let request = SQLRequest("SELECT url FROM links").asRequest(of: URL.self)
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { urls: [URL] in
         print(urls)
@@ -282,7 +282,7 @@ request.rx.fetchAll(in: dbQueue)
 When tracking *values*, make sure to ask for optionals when database may contain NULL:
 
 ```swift
-let request = SQLRequest("SELECT email FROM persons").bound(to: Optional<String>.self)
+let request = SQLRequest("SELECT email FROM persons").asRequest(of: Optional<String>.self)
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { emails: [String?] in
         print(urls)
