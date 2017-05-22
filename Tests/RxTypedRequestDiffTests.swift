@@ -3,9 +3,9 @@ import GRDB
 import RxSwift
 @testable import RxGRDB
 
-class ReactiveTypedRequestDiffTests: ReactiveTestCase { }
+class RxTypedRequestDiffTests: RxGRDBTestCase { }
 
-extension ReactiveTypedRequestTests {
+extension RxTypedRequestDiffTests {
     func testRxDiff() throws {
         try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxDiff)
         try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxDiff)

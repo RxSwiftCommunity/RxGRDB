@@ -118,7 +118,7 @@ final class RequestChangesObservable<R: Request> : ObservableType {
         do {
             // Use GRDB in a reentrant way in order to support retries from
             // errors that happen in a database dispatch queue.
-            selectionInfo = try writer.reentrantWrite { db -> SelectStatement.SelectionInfo in
+            selectionInfo = try writer.unsafeReentrantWrite { db -> SelectStatement.SelectionInfo in
                 let (statement, _) = try request.prepare(db)
                 return statement.selectionInfo
             }
@@ -150,7 +150,7 @@ final class RequestFetchObservable<R: Request, ResultType> : ObservableType {
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
         let orderingQueue = DispatchQueue(label: "RxGRDB.results")
-        var start = synchronizedStart
+        var synchronizedStart = self.synchronizedStart
         return AnyRequest(request).rx
             .changes(in: writer, synchronizedStart: synchronizedStart)
             .subscribe { event in
@@ -158,11 +158,11 @@ final class RequestFetchObservable<R: Request, ResultType> : ObservableType {
                 case .error(let error): observer.on(.error(error))
                 case .completed: observer.on(.completed)
                 case .next(let db):
-                    if start {
-                        // Synchronized start
-                        start = false
+                    if synchronizedStart {
+                        synchronizedStart = false
                         do {
-                            try observer.on(.next(self.fetch(db)))
+                            let element = try self.fetch(db)
+                            observer.on(.next(element))
                         } catch {
                             observer.on(.error(error))
                         }

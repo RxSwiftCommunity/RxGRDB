@@ -3,9 +3,9 @@ import GRDB
 import RxSwift
 @testable import RxGRDB
 
-class ReactiveSelectStatementSelectionInfoTests: ReactiveTestCase { }
+class RxSelectStatementSelectionInfoTests: RxGRDBTestCase { }
 
-extension ReactiveSelectStatementSelectionInfoTests {
+extension RxSelectStatementSelectionInfoTests {
     func testChanges() throws {
         try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testChanges)
         try TestDatabase({ try DatabasePool(path: $0) }).test(with: testChanges)
@@ -81,7 +81,7 @@ extension ReactiveSelectStatementSelectionInfoTests {
     }
 }
 
-extension ReactiveSelectStatementSelectionInfoTests {
+extension RxSelectStatementSelectionInfoTests {
     func testChangesRetry() throws {
         try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testChangesRetry)
         try TestDatabase({ try DatabasePool(path: $0) }).test(with: testChangesRetry)
