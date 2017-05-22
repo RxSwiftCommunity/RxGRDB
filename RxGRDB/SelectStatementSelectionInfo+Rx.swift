@@ -44,7 +44,7 @@ final class SelectionInfoChangesObservable : ObservableType {
         
         // Use GRDB in a reentrant way in order to support retries from errors
         // that happen in a database dispatch queue.
-        writer.reentrantWrite { db in
+        writer.unsafeReentrantWrite { db in
             // Install transaction observer and immediately notify if requested to do so
             db.add(transactionObserver: selectionInfoObserver)
             if synchronizedStart {
@@ -55,7 +55,7 @@ final class SelectionInfoChangesObservable : ObservableType {
         return Disposables.create {
             // Use GRDB in a reentrant way in order to support disposals that
             // happen in a database dispatch queue.
-            self.writer.reentrantWrite { db in
+            self.writer.unsafeReentrantWrite { db in
                 db.remove(transactionObserver: selectionInfoObserver)
             }
         }
@@ -72,8 +72,7 @@ final class SelectionInfoChangesObservable : ObservableType {
         }
         
         func observes(eventsOfKind eventKind: DatabaseEventKind) -> Bool {
-            // When in doubt, assume impact
-            return eventKind.impacts(selectionInfo) ?? true
+            return eventKind.impacts(selectionInfo)
         }
         
         func databaseDidChange(with event: DatabaseEvent) {

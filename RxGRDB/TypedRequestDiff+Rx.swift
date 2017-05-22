@@ -9,7 +9,7 @@ import RxSwift
 extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible & TableMapping {
     public func diff(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<(RequestResults<Base.Fetched>, RequestEvent<Base.Fetched>)> {
         let diffQueue = DispatchQueue(label: "RxGRDB.diff")
-        let items = base.bound(to: Item<Base.Fetched>.self).rx.fetchAll(in: writer, resultQueue: diffQueue)
+        let items = base.asRequest(of: Item<Base.Fetched>.self).rx.fetchAll(in: writer, resultQueue: diffQueue)
         return Diff(reader: writer, items: items.asObservable(), resultQueue: resultQueue).asObservable()
     }
 }

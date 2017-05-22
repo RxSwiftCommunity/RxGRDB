@@ -28,10 +28,11 @@ try dbQueue.inDatabase { db in
 }
 
 // Reactive:
-let persons = request.rx.fetchAll(in: dbQueue)
-persons.subscribe(onNext: { persons: [Person] in
-    ...
-})
+request.rx
+    .fetchAll(in: dbQueue)
+    .subscribe(onNext: { persons: [Person] in
+        ...
+    })
 ```
 
 
@@ -39,7 +40,6 @@ persons.subscribe(onNext: { persons: [Person] in
 
 - [Installation](#installation)
 - [Observing Requests](#observing-requests)
-- [What Exactly is a Request Change?](#what-exactly-is-a-request-change)
 
 
 ### Installation
@@ -85,16 +85,40 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 
 ### Observing Requests
 
-RxGRBD can track all database transactions that have [modified](#what-exactly-is-a-request-change) the database tables and columns fetched by a request. Modifications on other tables or columns are ignored.
+**When your application observes a request, it gets notified each time a change in the results of the request has been committed in the database.**
 
-If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [`rx.fetchCount`](#requestrxfetchcountinsynchronizedstartresultqueue), [`rx.fetchOne`](#typedrequestrxfetchoneinsynchronizedstartresultqueue), and [`rx.fetchAll`](#typedrequestrxfetchallinsynchronizedstartresultqueue) methods, depending on whether you want to track the number of results, the first one, or all of them.
+If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.fetchCount](#requestrxfetchcountinsynchronizedstartresultqueue), [rx.fetchOne](#typedrequestrxfetchoneinsynchronizedstartresultqueue), and [rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartresultqueue) methods, depending on whether you want to track the number of results, the first one, or all of them.
 
-Some applications need to be synchronously notified right after any impactful transaction has been committed, and before any other thread has the opportunity to further modify the database. This feature is provided by the [`rx.changes`](#requestrxchangesinsynchronizedstart) method.
+Some applications need to be synchronously notified right after any impactful transaction has been committed, and before any further database modification. This feature is provided by the [rx.changes](#requestrxchangesinsynchronizedstart) method.
 
 
-##### `Request.rx.changes(in:synchronizedStart:)`
+- [What is a Request Change?](#what-is-a-request-change)
+- [rx.changes](#requestrxchangesinsynchronizedstart)
+- [rx.fetchCount](#requestrxfetchcountinsynchronizedstartresultqueue)
+- [rx.fetchOne](#typedrequestrxfetchoneinsynchronizedstartdistinctuntilchangedresultqueue)
+- [rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartdistinctuntilchangedresultqueue)
 
-Emits a database connection after each impactful database transaction:
+
+### What is a Request Change?
+
+What are the "request changes" tracked by RxGRDB? Is there an opportunity for missed changes? Can change notifications happen even when the request results are the same?
+
+**First things first: RxGRDB requires a unique instance of GRDB [database queue](https://github.com/groue/GRDB.swift#database-queues) or [database pool](https://github.com/groue/GRDB.swift#database-pools) connected to the database file.** This is the 1st rule of [GRBD concurrency](https://github.com/groue/GRDB.swift#concurrency), and now it is bloody serious. Open one connection to the database, and keep this connection alive.
+
+**All changes are notified.** No matter how complex is the tracked request, if the change is performed via raw SQL, a foreign key cascade, or even an SQL trigger. That is because RxGRDB is based on reliable SQLite APIs ([1](https://sqlite.org/c3ref/set_authorizer.html), [2](https://www.sqlite.org/c3ref/commit_hook.html), [3](https://www.sqlite.org/c3ref/update_hook.html)). If you notice a change that is not notified, then this is a bug: please open an [issue](https://github.com/RxSwiftCommunity/RxGRDB/issues).
+
+**Some change notifications may happen even though the request results are the same.** By default, RxGRDB notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement has actually modified the tracked tables and columns by inserting, updating, or deleting a row.
+
+For example, if you track `Player.select(max(score))` (SQL: `SELECT MAX(score) FROM players`), then you'll get a notification for all changes performed on the `score` column of the `players` table (updates, insertions and deletions), even if they do not modify the value of the maximum score. However, you will not get any notification for changes performed on other database tables, or updates to other columns of the `players` table.
+
+**It is possible to avoid notifications of identical consecutive values**. For example you can use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator of RxSwift. You can also let RxGRDB perform efficient deduplication at the database level: see the documentation of each reactive method for more information.
+
+
+---
+
+#### `Request.rx.changes(in:synchronizedStart:)`
+
+Emits a database connection after each [impactful](#what-is-a-request-change) database transaction:
 
 ```swift
 let request = Person.all()
@@ -120,7 +144,8 @@ If you set `synchronizedStart` to true (the default value), the first element is
 
 Other elements are emitted on the database writer dispatch queue, serialized with all database updates.
 
-A variant, with SQL:
+
+**You can also track SQL requests:**
 
 ```swift
 let request = SQLRequest("SELECT * FROM persons")
@@ -136,9 +161,11 @@ try dbQueue.inDatabase { db in
 ```
 
 
-##### `Request.rx.fetchCount(in:synchronizedStart:resultQueue:)`
+---
 
-Emits a count after each impactful database transaction:
+#### `Request.rx.fetchCount(in:synchronizedStart:resultQueue:)`
+
+Emits a count after each [impactful](#what-is-a-request-change) database transaction:
 
 ```swift
 let request = Person.all()
@@ -157,12 +184,20 @@ try dbQueue.inTransaction { db in
 
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
 
-Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.main`.
+Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
+
+**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-a-request-change) changes. Use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator in order to avoid duplicates:
+
+```swift
+request.rx.fetchCount(in: dbQueue).distinctUntilChanged()...
+```
 
 
-##### `TypedRequest.rx.fetchOne(in:synchronizedStart:resultQueue:)`
+---
 
-Emits a value after each impactful database transaction:
+#### `TypedRequest.rx.fetchOne(in:synchronizedStart:distinctUntilChanged:resultQueue:)`
+
+Emits a value after each [impactful](#what-is-a-request-change) database transaction:
 
 ```swift
 let request = Person.filter(Column("email") == "arthur@example.com")
@@ -182,9 +217,10 @@ try dbQueue.inDatabase { db in
 
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
 
-Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.main`.
+Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
 
-A variant, with SQL and an alternative fetched type:
+
+**You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift#row-queries), plain [value](https://github.com/groue/GRDB.swift#values), custom [record](https://github.com/groue/GRDB.swift#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
 ```swift
 let request = SQLRequest("SELECT MAX(score) FROM rounds").bound(to: Int.self)
@@ -194,10 +230,23 @@ request.rx.fetchOne(in: dbQueue)
     })
 ```
 
+When tracking a *value*, you get nil in two cases: either the request yielded no database row, or one row with a NULL value.
 
-##### `TypedRequest.rx.fetchAll(in:synchronizedStart:resultQueue:)`
 
-Emits an array of values after each impactful database transaction:
+**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-a-request-change) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
+
+```swift
+request.rx.fetchOne(in: dbQueue, distinctUntilChanged: true)...
+```
+
+The `distinctUntilChanged` parameter performs comparisons of raw database rows. Those comparisons do not involve the fetched type, which is not required to adopt the [Equatable](https://developer.apple.com/reference/swift/equatable) protocol.
+
+
+---
+
+#### `TypedRequest.rx.fetchAll(in:synchronizedStart:distinctUntilChanged:resultQueue:)`
+
+Emits an array of values after each [impactful](#what-is-a-request-change) database transaction:
 
 ```swift
 let request = Person.order(Column("name"))
@@ -217,37 +266,36 @@ try dbQueue.inTransaction { db in
 
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
 
-Other elements are emitted on `resultQueue`, which defaults to `DispatchQueue.main`.
+Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
 
-A variant, with SQL and an alternative fetched type:
+
+**You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift#row-queries), plain [value](https://github.com/groue/GRDB.swift#values), custom [record](https://github.com/groue/GRDB.swift#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest("SELECT urls FROM links").bound(to: URL.self)
+let request = SQLRequest("SELECT url FROM links").bound(to: URL.self)
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { urls: [URL] in
         print(urls)
     })
 ```
 
-### What Exactly is a Request Change?
+When tracking *values*, make sure to ask for optionals when database may contain NULL:
 
-What exactly are the "request changes" tracked by RxGRDB? Is there an opportunity for missed changes? Can change notifications happen even when the request results are the same?
+```swift
+let request = SQLRequest("SELECT email FROM persons").bound(to: Optional<String>.self)
+request.rx.fetchAll(in: dbQueue)
+    .subscribe(onNext: { emails: [String?] in
+        print(urls)
+    })
+```
 
-**First things first**: to perform reliably, RxGRDB requires a unique instance of GRDB [database queue](https://github.com/groue/GRDB.swift#database-queues) or [database pool](https://github.com/groue/GRDB.swift#database-pools) connected to the database file. This is the 1st rule of [GRBD concurrency](https://github.com/groue/GRDB.swift#concurrency).
 
-**No change should ever be missed, ever.** No matter how complex is the tracked request, or if the change is performed via a direct modification, a foreign key cascade, or even an SQL trigger. That is because RxGRDB is based on fast and reliable SQLite APIs such as [Compile-Time Authorization Callbacks](https://sqlite.org/c3ref/set_authorizer.html), [Commit And Rollback Notification Callbacks](https://www.sqlite.org/c3ref/commit_hook.html), and [Data Change Notification Callbacks](https://www.sqlite.org/c3ref/update_hook.html). If you notice a change that is not notified, then this is a bug: please open an [issue](https://github.com/RxSwiftCommunity/RxGRDB/issues).
+**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-a-request-change) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
 
-**Some change notifications happen even though the request results are the same.** RxGRDB notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement that modifies the tracked tables and columns has been executed, has actually inserted, updated, or deleted a row, and has not been rollbacked along with the transaction or a savepoint.
+Use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) parameter in order to avoid duplicates:
 
-For example, if you track `Player.select(max(score))` (SQL: `SELECT MAX(score) FROM players`), then you'll get a notification for all the changes below, even if they do not modify the value of the maximum score:
+```swift
+request.rx.fetchAll(in: dbQueue, distinctUntilChanged: true)...
+```
 
-- insertions in the `players` table.
-- deletions in the `players` table.
-- updates to the `score` column of the `players` table.
-- other changes that indirectly touch the `score` column of the `players` table, through foreign key cascades or SQL triggers.
-
-However, you will not get any notification:
-
-- for changes performed on other database tables.
-- for updates to the columns of the `players` table which are not `score`.
-
+The `distinctUntilChanged` parameter performs comparisons of raw database rows. Those comparisons do not involve the fetched type, which is not required to adopt the [Equatable](https://developer.apple.com/reference/swift/equatable) protocol.

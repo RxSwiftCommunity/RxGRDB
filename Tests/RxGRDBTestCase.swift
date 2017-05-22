@@ -1,7 +1,7 @@
 import XCTest
 import RxSwift
 
-class ReactiveTestCase: XCTestCase {
+class RxGRDBTestCase: XCTestCase {
     var disposeBag: DisposeBag! = nil
     
     override func setUp() {

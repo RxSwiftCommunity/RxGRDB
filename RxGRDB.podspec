@@ -18,12 +18,12 @@ Pod::Spec.new do |s|
   
   s.subspec 'default' do |ss|
     ss.source_files = 'RxGRDB/**/*.{h,swift}'
-    ss.dependency "GRDB.swift", "~> 0.108.0"
+    ss.dependency "GRDB.swift", "~> 0.109.0"
   end
   
   s.subspec 'GRDBCipher' do |ss|
     ss.source_files = 'RxGRDB/**/*.{h,swift}'
-    ss.dependency "GRDBCipher", "~> 0.108.0"
+    ss.dependency "GRDBCipher", "~> 0.109.0"
     ss.xcconfig = {
       'OTHER_SWIFT_FLAGS' => '$(inherited) -DSQLITE_HAS_CODEC -DUSING_SQLCIPHER',
       'OTHER_CFLAGS' => '$(inherited) -DSQLITE_HAS_CODEC -DUSING_SQLCIPHER',

@@ -3,12 +3,12 @@ import GRDB
 import RxSwift
 @testable import RxGRDB
 
-class ReactiveRequestTests: ReactiveTestCase { }
+class RxRequestTests: RxGRDBTestCase { }
 
 
 // MARK: - Changes
 
-extension ReactiveRequestTests {
+extension RxRequestTests {
     func testRxChanges() throws {
         try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxChanges)
         try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxChanges)
@@ -84,7 +84,7 @@ extension ReactiveRequestTests {
     }
 }
 
-extension ReactiveRequestTests {
+extension RxRequestTests {
     func testChangesRetry() throws {
         try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testChangesRetry)
         try TestDatabase({ try DatabasePool(path: $0) }).test(with: testChangesRetry)
@@ -137,7 +137,7 @@ extension ReactiveRequestTests {
 
 // MARK: - Count
 
-extension ReactiveTypedRequestTests {
+extension RxRequestTests {
     func testRxFetchCount() throws {
         try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchCount)
         try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchCount)
@@ -145,41 +145,46 @@ extension ReactiveTypedRequestTests {
     
     func testRxFetchCount(writer: DatabaseWriter) throws {
         try writer.write { db in
-            try db.create(table: "table1") { t in
+            try db.create(table: "persons") { t in
                 t.column("id", .integer).primaryKey()
+                t.column("name", .text)
             }
+            try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
+            try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
         }
         
-        // Expectation for later transaction
-        let expectation = self.expectation(description: "1")
-        expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second on transaction.
+        let expectedCounts = [2, 2, 0, 3]
+        let recorder = EventRecorder<Int>(expectedEventCount: expectedCounts.count)
         
-        // Subscribe to a request
-        struct Record : TableMapping { static let databaseTableName = "table1" }
-        let request = Record.all()
-        var count: Int = 0xdeadbeef
-        request.rx
-            .fetchCount(in: writer)
-            .subscribe(onNext: {
+        struct Person : TableMapping { static let databaseTableName = "persons" }
+        let request = Person.all()
+        request.rx.fetchCount(in: writer)
+            .subscribe { event in
                 // events are expected to be delivered on the main thread
                 XCTAssertTrue(Thread.isMainThread)
-                count = $0
-                expectation.fulfill()
-            })
+                recorder.on(event)
+            }
             .addDisposableTo(disposeBag)
+        try writer.write { db in
+            try db.execute("UPDATE persons SET name = name")
+            try db.execute("DELETE FROM persons")
+            try db.inTransaction {
+                try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
+                try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
+                try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Eve"])
+                return .commit
+            }
+        }
+        wait(for: recorder, timeout: 1)
         
-        // Subscription immediately triggers an event
-        XCTAssertEqual(count, 0)
-        
-        // Transaction triggers an asynchronous event
-        try writer.write { try $0.execute("INSERT INTO table1 (id) VALUES (NULL)") }
-        waitForExpectations(timeout: 1, handler: nil)
-        
-        XCTAssertEqual(count, 1)
+        XCTAssertEqual(recorder.recordedEvents.count, expectedCounts.count)
+        for (event, count) in zip(recorder.recordedEvents, expectedCounts) {
+            XCTAssertEqual(event.element!, count)
+        }
     }
 }
 
-extension ReactiveTypedRequestTests {
+extension RxRequestTests {
     func testRxFetchCountRetry() throws {
         try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchCountRetry)
         try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchCountRetry)
