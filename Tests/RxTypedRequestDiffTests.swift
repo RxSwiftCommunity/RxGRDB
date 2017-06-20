@@ -90,8 +90,9 @@ private class Person: Record {
     
     override class var databaseTableName: String { return "persons" }
     
-    override var persistentDictionary: [String : DatabaseValueConvertible?] {
-        return ["id": id, "name": name]
+    override func encode(to container: inout PersistenceContainer) {
+        container["id"] = id
+        container["name"] = name
     }
     
     override func didInsert(with rowID: Int64, for column: String?) {

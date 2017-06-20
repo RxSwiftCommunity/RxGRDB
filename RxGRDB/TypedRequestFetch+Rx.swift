@@ -8,7 +8,7 @@ import RxSwift
 
 // MARK: - RowConvertible
 
-extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
+extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     /// Returns an Observable that emits an array of records after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -20,7 +20,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
     /// - parameter synchronizedStart: Whether the first element should be
     ///   emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.Fetched]> {
+    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.RowDecoder]> {
         if distinctUntilChanged {
             let rows = RequestFetchObservable(
                 writer: writer,
@@ -30,7 +30,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
                 resultQueue: resultQueue)
             return rows
                 .distinctUntilChanged(==)
-                .map { (rows: [Row]) in rows.map { Base.Fetched.init(row: $0) } }
+                .map { (rows: [Row]) in rows.map { Base.RowDecoder.init(row: $0) } }
                 .asObservable()
         } else {
             return RequestFetchObservable(
@@ -54,7 +54,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
     /// - parameter synchronizedStart: Whether the first element should be
     ///   emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.Fetched?> {
+    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.RowDecoder?> {
         if distinctUntilChanged {
             let row = RequestFetchObservable(
                 writer: writer,
@@ -64,7 +64,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
                 resultQueue: resultQueue)
             return row
                 .distinctUntilChanged(==)
-                .map { (row: Row?) in row.map { Base.Fetched.init(row: $0) } }
+                .map { (row: Row?) in row.map { Base.RowDecoder.init(row: $0) } }
                 .asObservable()
         } else {
             return RequestFetchObservable(
@@ -80,7 +80,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible {
 
 // MARK: - Row
 
-extension Reactive where Base: TypedRequest, Base.Fetched: Row {
+extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     /// Returns an Observable that emits an array of rows after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -137,7 +137,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: Row {
 
 // MARK: - DatabaseValueConvertible
 
-extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConvertible {
+extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -149,7 +149,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
     /// - parameter synchronizedStart: Whether the first element should be
     ///   emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.Fetched]> {
+    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.RowDecoder]> {
         if distinctUntilChanged {
             let databaseValues = RequestFetchObservable(
                 writer: writer,
@@ -159,7 +159,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
                 resultQueue: resultQueue)
             return databaseValues
                 .distinctUntilChanged(==)
-                .map { (databaseValues: [DatabaseValue]) in databaseValues.map { $0.losslessConvert() as Base.Fetched } }
+                .map { (databaseValues: [DatabaseValue]) in databaseValues.map { $0.losslessConvert() as Base.RowDecoder } }
                 .asObservable()
         } else {
             return RequestFetchObservable(
@@ -183,7 +183,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
     /// - parameter synchronizedStart: Whether the first element should be
     ///   emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.Fetched?> {
+    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.RowDecoder?> {
         if distinctUntilChanged {
             let databaseValue = RequestFetchObservable(
                 writer: writer,
@@ -193,7 +193,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
                 resultQueue: resultQueue)
             return databaseValue
                 .distinctUntilChanged(==)
-                .map { (databaseValue: DatabaseValue?) in databaseValue.map { $0.losslessConvert() as Base.Fetched? } ?? nil }
+                .map { (databaseValue: DatabaseValue?) in databaseValue.map { $0.losslessConvert() as Base.RowDecoder? } ?? nil }
                 .asObservable()
         } else {
             return RequestFetchObservable(
@@ -209,17 +209,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
 
 // MARK: - Optional DatabaseValueConvertible
 
-/// This protocol is an implementation detail of GRDB. Don't use it.
-public protocol _OptionalFetchable {
-    associatedtype _Wrapped
-}
-
-/// This conformance is an implementation detail of GRDB. Don't rely on it.
-extension Optional : _OptionalFetchable {
-    public typealias _Wrapped = Wrapped
-}
-
-extension Reactive where Base: TypedRequest, Base.Fetched: _OptionalFetchable, Base.Fetched._Wrapped: DatabaseValueConvertible {
+extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol, Base.RowDecoder._Wrapped: DatabaseValueConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -231,7 +221,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: _OptionalFetchable, B
     /// - parameter synchronizedStart: Whether the first element should be
     ///   emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.Fetched._Wrapped?]> {
+    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.RowDecoder._Wrapped?]> {
         if distinctUntilChanged {
             let databaseValues = RequestFetchObservable(
                 writer: writer,
@@ -241,14 +231,14 @@ extension Reactive where Base: TypedRequest, Base.Fetched: _OptionalFetchable, B
                 resultQueue: resultQueue)
             return databaseValues
                 .distinctUntilChanged(==)
-                .map { (databaseValues: [DatabaseValue]) in databaseValues.map { $0.losslessConvert() as Base.Fetched._Wrapped? } }
+                .map { (databaseValues: [DatabaseValue]) in databaseValues.map { $0.losslessConvert() as Base.RowDecoder._Wrapped? } }
                 .asObservable()
         } else {
             return RequestFetchObservable(
                 writer: writer,
                 synchronizedStart: synchronizedStart,
                 request: base,
-                fetch: { try Optional<Base.Fetched._Wrapped>.fetchAll($0, self.base) },
+                fetch: { try Optional<Base.RowDecoder._Wrapped>.fetchAll($0, self.base) },
                 resultQueue: resultQueue)
                 .asObservable()
         }
@@ -257,7 +247,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: _OptionalFetchable, B
 
 // MARK: - DatabaseValueConvertible & StatementColumnConvertible
 
-extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConvertible & StatementColumnConvertible {
+extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConvertible & StatementColumnConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -269,7 +259,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
     /// - parameter synchronizedStart: Whether the first element should be
     ///   emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.Fetched]> {
+    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.RowDecoder]> {
         if distinctUntilChanged {
             let databaseValues = RequestFetchObservable(
                 writer: writer,
@@ -279,7 +269,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
                 resultQueue: resultQueue)
             return databaseValues
                 .distinctUntilChanged(==)
-                .map { (databaseValues: [DatabaseValue]) in databaseValues.map { $0.losslessConvert() as Base.Fetched } }
+                .map { (databaseValues: [DatabaseValue]) in databaseValues.map { $0.losslessConvert() as Base.RowDecoder } }
                 .asObservable()
         } else {
             return RequestFetchObservable(
@@ -303,7 +293,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
     /// - parameter synchronizedStart: Whether the first element should be
     ///   emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.Fetched?> {
+    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.RowDecoder?> {
         if distinctUntilChanged {
             let databaseValue = RequestFetchObservable(
                 writer: writer,
@@ -313,7 +303,7 @@ extension Reactive where Base: TypedRequest, Base.Fetched: DatabaseValueConverti
                 resultQueue: resultQueue)
             return databaseValue
                 .distinctUntilChanged(==)
-                .map { (databaseValue: DatabaseValue?) in databaseValue.map { $0.losslessConvert() as Base.Fetched? } ?? nil }
+                .map { (databaseValue: DatabaseValue?) in databaseValue.map { $0.losslessConvert() as Base.RowDecoder? } ?? nil }
                 .asObservable()
         } else {
             return RequestFetchObservable(

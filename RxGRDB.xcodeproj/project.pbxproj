@@ -374,6 +374,8 @@
 		565029C31E9130F600615A2C /* RxGRDBTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxGRDBTestCase.swift; sourceTree = "<group>"; };
 		565029C51E91318F00615A2C /* RxTypedRequestTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxTypedRequestTests.swift; sourceTree = "<group>"; };
 		56D1212F1ECDB962001347D2 /* EventRecorder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventRecorder.swift; sourceTree = "<group>"; };
+		56D65F031EF8F5740098466C /* RxGRDB.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = RxGRDB.podspec; sourceTree = "<group>"; };
+		56D65F261EF8F5C60098466C /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -426,6 +428,8 @@
 		5650290B1E8FDF5600615A2C = {
 			isa = PBXGroup;
 			children = (
+				56D65F031EF8F5740098466C /* RxGRDB.podspec */,
+				56D65F261EF8F5C60098466C /* CHANGELOG.md */,
 				5650292F1E8FE02500615A2C /* Vendor */,
 				565029171E8FDF5600615A2C /* RxGRDB */,
 				565029221E8FDF5600615A2C /* Tests */,

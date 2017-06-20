@@ -6,18 +6,18 @@ import Foundation
 #endif
 import RxSwift
 
-extension Reactive where Base: TypedRequest, Base.Fetched: RowConvertible & TableMapping {
-    public func diff(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<(RequestResults<Base.Fetched>, RequestEvent<Base.Fetched>)> {
+extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & TableMapping {
+    public func diff(in writer: DatabaseWriter, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<(RequestResults<Base.RowDecoder>, RequestEvent<Base.RowDecoder>)> {
         let diffQueue = DispatchQueue(label: "RxGRDB.diff")
-        let items = base.asRequest(of: Item<Base.Fetched>.self).rx.fetchAll(in: writer, resultQueue: diffQueue)
+        let items = base.asRequest(of: Item<Base.RowDecoder>.self).rx.fetchAll(in: writer, resultQueue: diffQueue)
         return Diff(reader: writer, items: items.asObservable(), resultQueue: resultQueue).asObservable()
     }
 }
 
-public struct RequestResults<Fetched: RowConvertible> {
-    fileprivate let items: [Item<Fetched>]
+public struct RequestResults<Record: RowConvertible> {
+    fileprivate let items: [Item<Record>]
     
-    fileprivate init(items: [Item<Fetched>]) {
+    fileprivate init(items: [Item<Record>]) {
         self.items = items
     }
     
@@ -25,24 +25,24 @@ public struct RequestResults<Fetched: RowConvertible> {
         return items.count
     }
     
-    public subscript(_ index: Int) -> Fetched {
+    public subscript(_ index: Int) -> Record {
         return items[index].record
     }
     
-    public subscript(_ indexPath: IndexPath) -> Fetched {
+    public subscript(_ indexPath: IndexPath) -> Record {
         return items[indexPath[1]].record
     }
 }
 
-public enum RequestEvent<Fetched: RowConvertible> {
+public enum RequestEvent<Record: RowConvertible> {
     case snapshot
     case changes([Change])
     
     public struct Change {
-        let item: Item<Fetched>
+        let item: Item<Record>
         let kind: Kind
         
-        public var record: Fetched { return item.record }
+        public var record: Record { return item.record }
         
         public enum Kind {
             /// An insertion event, at given indexPath.
@@ -66,11 +66,11 @@ public enum RequestEvent<Fetched: RowConvertible> {
     
 }
 
-final class Item<Fetched: RowConvertible> : RowConvertible, Equatable {
+final class Item<Record: RowConvertible> : RowConvertible, Equatable {
     let row: Row
     
     // Records are lazily loaded
-    lazy var record: Fetched = Fetched(row: self.row)
+    lazy var record: Record = Record(row: self.row)
     
     public init(row: Row) {
         self.row = row.copy()
@@ -81,14 +81,14 @@ final class Item<Fetched: RowConvertible> : RowConvertible, Equatable {
     }
 }
 
-final class Diff<Fetched> : ObservableType where Fetched: RowConvertible & TableMapping {
-    typealias E = (RequestResults<Fetched>, RequestEvent<Fetched>)
+final class Diff<Record> : ObservableType where Record: RowConvertible & TableMapping {
+    typealias E = (RequestResults<Record>, RequestEvent<Record>)
     
     let reader: DatabaseReader
-    let items: Observable<[Item<Fetched>]>
+    let items: Observable<[Item<Record>]>
     let resultQueue: DispatchQueue
     
-    init(reader: DatabaseReader, items: Observable<[Item<Fetched>]>, resultQueue: DispatchQueue) {
+    init(reader: DatabaseReader, items: Observable<[Item<Record>]>, resultQueue: DispatchQueue) {
         self.reader = reader
         self.items = items
         self.resultQueue = resultQueue
@@ -96,10 +96,10 @@ final class Diff<Fetched> : ObservableType where Fetched: RowConvertible & Table
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
         do {
-            let rowComparator = try reader.unsafeRead { try Fetched.primaryKeyRowComparator($0) }
-            let itemsAreIdentical: ItemComparator<Fetched> = { rowComparator($0.row, $1.row) }
+            let rowComparator = try reader.unsafeRead { try Record.primaryKeyRowComparator($0) }
+            let itemsAreIdentical: ItemComparator<Record> = { rowComparator($0.row, $1.row) }
             
-            var lastItems: [Item<Fetched>]? = nil
+            var lastItems: [Item<Record>]? = nil
             return items.subscribe { event in
                 switch event {
                 case .next(let new):
@@ -133,17 +133,17 @@ final class Diff<Fetched> : ObservableType where Fetched: RowConvertible & Table
     }
 }
 
-fileprivate typealias ItemComparator<Fetched: RowConvertible> = (Item<Fetched>, Item<Fetched>) -> Bool
+fileprivate typealias ItemComparator<Record: RowConvertible> = (Item<Record>, Item<Record>) -> Bool
 
-fileprivate func computeChanges<Fetched>(from s: [Item<Fetched>], to t: [Item<Fetched>], itemsAreIdentical: ItemComparator<Fetched>) -> [RequestEvent<Fetched>.Change] {
-    typealias Change = RequestEvent<Fetched>.Change
+fileprivate func computeChanges<Record>(from s: [Item<Record>], to t: [Item<Record>], itemsAreIdentical: ItemComparator<Record>) -> [RequestEvent<Record>.Change] {
+    typealias Change = RequestEvent<Record>.Change
     
     let m = s.count
     let n = t.count
     
     // Fill first row and column of insertions and deletions.
     
-    var d: [[[RequestEvent<Fetched>.Change]]] = Array(repeating: Array(repeating: [], count: n + 1), count: m + 1)
+    var d: [[[RequestEvent<Record>.Change]]] = Array(repeating: Array(repeating: [], count: n + 1), count: m + 1)
     
     var changes = [Change]()
     for (row, item) in s.enumerated() {
@@ -196,13 +196,13 @@ fileprivate func computeChanges<Fetched>(from s: [Item<Fetched>], to t: [Item<Fe
     }
     
     /// Returns an array where deletion/insertion pairs of the same element are replaced by `.move` change.
-    func standardize(changes: [RequestEvent<Fetched>.Change], itemsAreIdentical: ItemComparator<Fetched>) -> [RequestEvent<Fetched>.Change] {
+    func standardize(changes: [RequestEvent<Record>.Change], itemsAreIdentical: ItemComparator<Record>) -> [RequestEvent<Record>.Change] {
         
         /// Returns a potential .move or .update if *change* has a matching change in *changes*:
         /// If *change* is a deletion or an insertion, and there is a matching inverse
         /// insertion/deletion with the same value in *changes*, a corresponding .move or .update is returned.
         /// As a convenience, the index of the matched change is returned as well.
-        func merge(change: RequestEvent<Fetched>.Change, in changes: [RequestEvent<Fetched>.Change], itemsAreIdentical: ItemComparator<Fetched>) -> (mergedChange: RequestEvent<Fetched>.Change, mergedIndex: Int)? {
+        func merge(change: RequestEvent<Record>.Change, in changes: [RequestEvent<Record>.Change], itemsAreIdentical: ItemComparator<Record>) -> (mergedChange: RequestEvent<Record>.Change, mergedIndex: Int)? {
             
             /// Returns the changes between two rows: a dictionary [key: oldValue]
             /// Precondition: both rows have the same columns
@@ -256,8 +256,8 @@ fileprivate func computeChanges<Fetched>(from s: [Item<Fetched>], to t: [Item<Fe
         }
         
         // Updates must be pushed at the end
-        var mergedChanges: [RequestEvent<Fetched>.Change] = []
-        var updateChanges: [RequestEvent<Fetched>.Change] = []
+        var mergedChanges: [RequestEvent<Record>.Change] = []
+        var updateChanges: [RequestEvent<Record>.Change] = []
         for change in changes {
             if let (mergedChange, mergedIndex) = merge(change: change, in: mergedChanges, itemsAreIdentical: itemsAreIdentical) {
                 mergedChanges.remove(at: mergedIndex)
