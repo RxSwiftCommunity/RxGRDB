@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+## v0.4.1
+
+Released June 20, 2017
+
+**Fixed**
+
+- Podspec requirement for RxSwift changed to `~> 3.3`
+- Added missing support for new AdaptedRequest and AdaptedTypedRequest of GRDB 1.0
+
+
 ## v0.4.0
 
 Released June 20, 2017
