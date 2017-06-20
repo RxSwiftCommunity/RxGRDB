@@ -7,6 +7,8 @@ import RxSwift
 
 extension QueryInterfaceRequest : ReactiveCompatible { }
 extension SQLRequest : ReactiveCompatible { }
+extension AdaptedRequest : ReactiveCompatible { }
+extension AdaptedTypedRequest : ReactiveCompatible { }
 extension AnyRequest : ReactiveCompatible { }
 extension AnyTypedRequest : ReactiveCompatible { }
 
