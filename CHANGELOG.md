@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+## v0.4.0
+
+Released June 20, 2017
+
+**RxGRDB now requires GRDB v1.0**
+
+
 ## v0.3.0
 
 Released May 22, 2017
