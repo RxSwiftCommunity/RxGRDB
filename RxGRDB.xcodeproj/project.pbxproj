@@ -7,20 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		560F92881E94D9260077EADF /* TypedRequestDiff+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */; };
 		560F92CB1E94DF7E0077EADF /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
 		560F92CE1E94DF830077EADF /* SelectStatementSelectionInfo+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */; };
 		560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */; };
-		560F92D01E94DF830077EADF /* TypedRequestDiff+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */; };
 		560F92D51E94DFCE0077EADF /* GRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650298B1E8FE0D200615A2C /* GRDB.framework */; };
 		560F92D61E94DFD50077EADF /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294C1E8FE05600615A2C /* RxSwift.framework */; };
-		560F92D81E94F43F0077EADF /* RxTypedRequestDiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92D71E94F43F0077EADF /* RxTypedRequestDiffTests.swift */; };
 		562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 560F92C31E94DF280077EADF /* RxGRDB.framework */; };
 		562756041E962C5B0035B653 /* RxRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RxRequestTests.swift */; };
 		562756051E962C5B0035B653 /* RxSelectStatementSelectionInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C11E9130D000615A2C /* RxSelectStatementSelectionInfoTests.swift */; };
 		562756061E962C5B0035B653 /* RxGRDBTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* RxGRDBTestCase.swift */; };
-		562756071E962C5B0035B653 /* RxTypedRequestDiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F92D71E94F43F0077EADF /* RxTypedRequestDiffTests.swift */; };
 		562756081E962C5B0035B653 /* RxTypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* RxTypedRequestTests.swift */; };
 		562756091E962C5B0035B653 /* TestDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029BF1E91308D00615A2C /* TestDatabase.swift */; };
 		562756581E963C1B0035B653 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* Result.swift */; };
@@ -353,9 +349,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TypedRequestDiff+Rx.swift"; sourceTree = "<group>"; };
 		560F92C31E94DF280077EADF /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		560F92D71E94F43F0077EADF /* RxTypedRequestDiffTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxTypedRequestDiffTests.swift; sourceTree = "<group>"; };
 		562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBmacOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		562756571E963C1B0035B653 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		565029151E8FDF5600615A2C /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -455,7 +449,6 @@
 				565029B91E91265A00615A2C /* Request+Rx.swift */,
 				565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */,
 				565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */,
-				560F92871E94D9260077EADF /* TypedRequestDiff+Rx.swift */,
 				560F92D91E9509990077EADF /* Support */,
 			);
 			path = RxGRDB;
@@ -469,7 +462,6 @@
 				565029C31E9130F600615A2C /* RxGRDBTestCase.swift */,
 				565029231E8FDF5600615A2C /* RxRequestTests.swift */,
 				565029C11E9130D000615A2C /* RxSelectStatementSelectionInfoTests.swift */,
-				560F92D71E94F43F0077EADF /* RxTypedRequestDiffTests.swift */,
 				565029C51E91318F00615A2C /* RxTypedRequestTests.swift */,
 				565029BF1E91308D00615A2C /* TestDatabase.swift */,
 			);
@@ -1006,7 +998,6 @@
 				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
 				562756591E963C1B0035B653 /* Result.swift in Sources */,
 				560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */,
-				560F92D01E94DF830077EADF /* TypedRequestDiff+Rx.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1014,7 +1005,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				562756071E962C5B0035B653 /* RxTypedRequestDiffTests.swift in Sources */,
 				562756081E962C5B0035B653 /* RxTypedRequestTests.swift in Sources */,
 				562756041E962C5B0035B653 /* RxRequestTests.swift in Sources */,
 				562756061E962C5B0035B653 /* RxGRDBTestCase.swift in Sources */,
@@ -1029,7 +1019,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */,
-				560F92881E94D9260077EADF /* TypedRequestDiff+Rx.swift in Sources */,
 				562756581E963C1B0035B653 /* Result.swift in Sources */,
 				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
 				565029B31E8FE12C00615A2C /* TypedRequestFetch+Rx.swift in Sources */,
@@ -1040,7 +1029,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				560F92D81E94F43F0077EADF /* RxTypedRequestDiffTests.swift in Sources */,
 				565029C41E9130F600615A2C /* RxGRDBTestCase.swift in Sources */,
 				565029C01E91308D00615A2C /* TestDatabase.swift in Sources */,
 				565029C61E91318F00615A2C /* RxTypedRequestTests.swift in Sources */,
