@@ -510,7 +510,24 @@ Other elements are asynchronously emitted on the main dispatch queue by default.
 changeTokens.mapFetch(resultQueue: ...) { ... }
 ```
 
-**The closure provided to `mapFetch` is guaranteed an immutable view of the last committed state of the database.** This means that you can perform subsequent fetches without fearing eventual concurrent writes to mess with your application logic.
+**The closure provided to `mapFetch` is guaranteed an immutable view of the last committed state of the database.** This means that you can perform subsequent fetches without fearing eventual concurrent writes to mess with your application logic:
+
+```swift
+// When the players table is changed, fetch the ten best ones, as well as the
+// total number of players:
+dbQueue.rx
+    .changeTokens(in: [Player.all()])
+    .mapFetch { (db: Database) -> ([Player], Int) in
+        // players and count are guaranteed to be consistent:
+        let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
+        let count = try Player.fetchCount(db)
+        return (players, count)
+    }
+    .subscribe(onNext: { (players, count) in
+        print("Best players out of \(count): \(players)")
+    })
+```
+
 
 
 ---

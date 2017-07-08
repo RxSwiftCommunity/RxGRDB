@@ -50,7 +50,31 @@ extension Reactive where Base: DatabaseWriter {
         return changeTokens(in: requests, synchronizedStart: synchronizedStart).map { $0.database }
     }
     
-    /// TODO
+    /// Returns an Observable that emits a change token after each committed
+    /// database transaction that has modified the tables and columns fetched by
+    /// the requests.
+    ///
+    /// If you set `synchronizedStart` to true (the default), the first element
+    /// is emitted synchronously, on subscription.
+    ///
+    /// The change tokens are meant to be used by the mapFetch operator:
+    ///
+    ///     // When the players table is changed, fetch the ten best ones, as well as the
+    ///     // total number of players:
+    ///     dbQueue.rx
+    ///         .changeTokens(in: [Player.all()])
+    ///         .mapFetch { (db: Database) -> ([Player], Int) in
+    ///             let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
+    ///             let count = try Player.fetchCount(db)
+    ///             return (players, count)
+    ///         }
+    ///         .subscribe(onNext: { (players, count) in
+    ///             print("Best players out of \(count): \(players)")
+    ///         })
+    ///
+    /// - parameter requests: The observed requests.
+    /// - parameter synchronizedStart: Whether the first element should be
+    ///   emitted synchronously, on subscription.
     public func changeTokens(in requests: [Request], synchronizedStart: Bool = true) -> Observable<ChangeToken> {
         let writer = base
         
