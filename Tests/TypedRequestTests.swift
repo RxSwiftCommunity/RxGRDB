@@ -1,11 +1,11 @@
 import XCTest
 import GRDB
 import RxSwift
-@testable import RxGRDB
+import RxGRDB
 
-class RxTypedRequestTests: RxGRDBTestCase { }
+class TypedRequestTests : XCTestCase { }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func setUpDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
             try db.create(table: "persons") { t in
@@ -33,13 +33,14 @@ extension RxTypedRequestTests {
 
 // MARK: - RowConvertible
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchAllRecords() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllRecords)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllRecords)
+        try Test(testRxFetchAllRecords)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllRecords(writer: DatabaseWriter) throws {
+    func testRxFetchAllRecords(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Person.order(Column("name"))
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -60,20 +61,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!.map { $0.name }, names)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchAllRecordsDistinctUntilChanged() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllRecordsDistinctUntilChanged)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllRecordsDistinctUntilChanged)
+        try Test(testRxFetchAllRecordsDistinctUntilChanged)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllRecordsDistinctUntilChanged(writer: DatabaseWriter) throws {
+    func testRxFetchAllRecordsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Person.order(Column("name"))
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -93,20 +94,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!.map { $0.name }, names)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchOneRecord() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneRecord)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneRecord)
+        try Test(testRxFetchOneRecord)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneRecord(writer: DatabaseWriter) throws {
+    func testRxFetchOneRecord(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Person.order(Column("name"))
         let expectedNames = [
             "Arthur",
@@ -127,20 +128,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!?.name, name)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchOneRecordDistinctUntilChanged() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneRecordDistinctUntilChanged)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneRecordDistinctUntilChanged)
+        try Test(testRxFetchOneRecordDistinctUntilChanged)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneRecordDistinctUntilChanged(writer: DatabaseWriter) throws {
+    func testRxFetchOneRecordDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Person.order(Column("name"))
         let expectedNames = [
             "Arthur",
@@ -160,7 +161,6 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!?.name, name)
         }
@@ -169,13 +169,14 @@ extension RxTypedRequestTests {
 
 // MARK: - Row
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchAllRows() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllRows)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllRows)
+        try Test(testRxFetchAllRows)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllRows(writer: DatabaseWriter) throws {
+    func testRxFetchAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -196,20 +197,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!.map { $0.value(named: "name") as String }, names)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchAllRowsDistinctUntilChanged() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllRowsDistinctUntilChanged)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllRowsDistinctUntilChanged)
+        try Test(testRxFetchAllRowsDistinctUntilChanged)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllRowsDistinctUntilChanged(writer: DatabaseWriter) throws {
+    func testRxFetchAllRowsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -229,20 +230,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!.map { $0.value(named: "name") as String }, names)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchOneRow() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneRow)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneRow)
+        try Test(testRxFetchOneRow)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneRow(writer: DatabaseWriter) throws {
+    func testRxFetchOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             "Arthur",
@@ -263,20 +264,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!?.value(named: "name") as String?, name)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchOneRowDistinctUntilChanged() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneRowDistinctUntilChanged)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneRowDistinctUntilChanged)
+        try Test(testRxFetchOneRowDistinctUntilChanged)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneRowDistinctUntilChanged(writer: DatabaseWriter) throws {
+    func testRxFetchOneRowDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             "Arthur",
@@ -296,7 +297,6 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!?.value(named: "name") as String?, name)
         }
@@ -305,13 +305,14 @@ extension RxTypedRequestTests {
 
 // MARK: - DatabaseValue
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchAllDatabaseValues() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllDatabaseValues)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllDatabaseValues)
+        try Test(testRxFetchAllDatabaseValues)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllDatabaseValues(writer: DatabaseWriter) throws {
+    func testRxFetchAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -332,20 +333,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!, names)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchAllDatabaseValuesDistinctUntilChanged() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllDatabaseValuesDistinctUntilChanged)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllDatabaseValuesDistinctUntilChanged)
+        try Test(testRxFetchAllDatabaseValuesDistinctUntilChanged)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter) throws {
+    func testRxFetchAllDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -365,20 +366,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!, names)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchOneDatabaseValue() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneDatabaseValue)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneDatabaseValue)
+        try Test(testRxFetchOneDatabaseValue)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneDatabaseValue(writer: DatabaseWriter) throws {
+    func testRxFetchOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             "Arthur",
@@ -399,20 +400,20 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!, name)
         }
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchOneDatabaseValueDistinctUntilChanged() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchOneDatabaseValueDistinctUntilChanged)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchOneDatabaseValueDistinctUntilChanged)
+        try Test(testRxFetchOneDatabaseValueDistinctUntilChanged)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneDatabaseValueDistinctUntilChanged(writer: DatabaseWriter) throws {
+    func testRxFetchOneDatabaseValueDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             "Arthur",
@@ -432,7 +433,6 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
             XCTAssertEqual(event.element!, name)
         }
@@ -441,13 +441,14 @@ extension RxTypedRequestTests {
 
 // MARK: - Optional DatabaseValue
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchAllOptionalDatabaseValues() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllOptionalDatabaseValues)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllOptionalDatabaseValues)
+        try Test(testRxFetchAllOptionalDatabaseValues)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter) throws {
+    func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT email FROM persons ORDER BY name").asRequest(of: Optional<String>.self)
         let expectedNames = [
             ["arthur@example.com", nil],
@@ -468,7 +469,6 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
             let fetchedNames = event.element!
             XCTAssertEqual(fetchedNames.count, names.count)
@@ -479,13 +479,14 @@ extension RxTypedRequestTests {
     }
 }
 
-extension RxTypedRequestTests {
+extension TypedRequestTests {
     func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged)
+        try Test(testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter) throws {
+    func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest("SELECT email FROM persons ORDER BY name").asRequest(of: Optional<String>.self)
         let expectedNames = [
             ["arthur@example.com", nil],
@@ -505,7 +506,6 @@ extension RxTypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedNames.count)
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
             let fetchedNames = event.element!
             XCTAssertEqual(fetchedNames.count, names.count)

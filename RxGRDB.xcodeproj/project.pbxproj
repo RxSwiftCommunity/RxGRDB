@@ -9,32 +9,41 @@
 /* Begin PBXBuildFile section */
 		560F92CB1E94DF7E0077EADF /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
-		560F92CE1E94DF830077EADF /* SelectStatementSelectionInfo+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */; };
 		560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */; };
 		560F92D51E94DFCE0077EADF /* GRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650298B1E8FE0D200615A2C /* GRDB.framework */; };
 		560F92D61E94DFD50077EADF /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294C1E8FE05600615A2C /* RxSwift.framework */; };
 		562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 560F92C31E94DF280077EADF /* RxGRDB.framework */; };
-		562756041E962C5B0035B653 /* RxRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RxRequestTests.swift */; };
-		562756051E962C5B0035B653 /* RxSelectStatementSelectionInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C11E9130D000615A2C /* RxSelectStatementSelectionInfoTests.swift */; };
-		562756061E962C5B0035B653 /* RxGRDBTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* RxGRDBTestCase.swift */; };
-		562756081E962C5B0035B653 /* RxTypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* RxTypedRequestTests.swift */; };
-		562756091E962C5B0035B653 /* TestDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029BF1E91308D00615A2C /* TestDatabase.swift */; };
+		562756041E962C5B0035B653 /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
+		562756061E962C5B0035B653 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
+		562756081E962C5B0035B653 /* TypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* TypedRequestTests.swift */; };
 		562756581E963C1B0035B653 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* Result.swift */; };
 		562756591E963C1B0035B653 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* Result.swift */; };
 		5650291F1E8FDF5600615A2C /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565029151E8FDF5600615A2C /* RxGRDB.framework */; };
-		565029241E8FDF5600615A2C /* RxRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RxRequestTests.swift */; };
+		565029241E8FDF5600615A2C /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
 		565029261E8FDF5600615A2C /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		565029B01E8FE0FD00615A2C /* GRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650299D1E8FE0D200615A2C /* GRDB.framework */; };
 		565029B11E8FE10800615A2C /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294A1E8FE05600615A2C /* RxSwift.framework */; };
 		565029B31E8FE12C00615A2C /* TypedRequestFetch+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */; };
-		565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */; };
 		565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
-		565029C01E91308D00615A2C /* TestDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029BF1E91308D00615A2C /* TestDatabase.swift */; };
-		565029C21E9130D000615A2C /* RxSelectStatementSelectionInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C11E9130D000615A2C /* RxSelectStatementSelectionInfoTests.swift */; };
-		565029C41E9130F600615A2C /* RxGRDBTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* RxGRDBTestCase.swift */; };
-		565029C61E91318F00615A2C /* RxTypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* RxTypedRequestTests.swift */; };
-		56D121301ECDB962001347D2 /* EventRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D1212F1ECDB962001347D2 /* EventRecorder.swift */; };
-		56D121311ECDB962001347D2 /* EventRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D1212F1ECDB962001347D2 /* EventRecorder.swift */; };
+		565029C41E9130F600615A2C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
+		565029C61E91318F00615A2C /* TypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* TypedRequestTests.swift */; };
+		565933EE1F0D72A400707571 /* ChangeToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565933ED1F0D72A400707571 /* ChangeToken.swift */; };
+		565934121F0DF77E00707571 /* AnyDatabaseWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934111F0DF77E00707571 /* AnyDatabaseWriter.swift */; };
+		565934131F0DF77E00707571 /* AnyDatabaseWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934111F0DF77E00707571 /* AnyDatabaseWriter.swift */; };
+		565934181F0E157800707571 /* ChangeTokensObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934171F0E157800707571 /* ChangeTokensObserver.swift */; };
+		565934191F0E157800707571 /* ChangeTokensObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934171F0E157800707571 /* ChangeTokensObserver.swift */; };
+		565934451F0EB6BC00707571 /* DatabaseWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */; };
+		565934461F0EB6BC00707571 /* DatabaseWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */; };
+		565934481F0F419600707571 /* ChangeTokenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934471F0F419600707571 /* ChangeTokenTests.swift */; };
+		565934491F0F419600707571 /* ChangeTokenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934471F0F419600707571 /* ChangeTokenTests.swift */; };
+		56DBA50A1F0BACA800C90A18 /* TransactionObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5091F0BACA800C90A18 /* TransactionObservable.swift */; };
+		56DBA50B1F0BACA800C90A18 /* TransactionObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5091F0BACA800C90A18 /* TransactionObservable.swift */; };
+		56DBA52F1F0BB02200C90A18 /* MapFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA52E1F0BB02200C90A18 /* MapFetch.swift */; };
+		56DBA5301F0BB02200C90A18 /* MapFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA52E1F0BB02200C90A18 /* MapFetch.swift */; };
+		56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */; };
+		56DBA5431F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */; };
+		56DBA5671F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */; };
+		56DBA5681F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -356,20 +365,26 @@
 		565029181E8FDF5600615A2C /* RxGRDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RxGRDB.h; sourceTree = "<group>"; };
 		565029191E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5650291E1E8FDF5600615A2C /* RxGRDBiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		565029231E8FDF5600615A2C /* RxRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxRequestTests.swift; sourceTree = "<group>"; };
+		565029231E8FDF5600615A2C /* RequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestTests.swift; sourceTree = "<group>"; };
 		565029251E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		565029311E8FE05600615A2C /* Rx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Rx.xcodeproj; path = RxSwift/Rx.xcodeproj; sourceTree = "<group>"; };
 		565029731E8FE0D200615A2C /* GRDB.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GRDB.xcodeproj; path = GRDB.swift/GRDB.xcodeproj; sourceTree = "<group>"; };
 		565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TypedRequestFetch+Rx.swift"; sourceTree = "<group>"; };
-		565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SelectStatementSelectionInfo+Rx.swift"; sourceTree = "<group>"; };
 		565029B91E91265A00615A2C /* Request+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Request+Rx.swift"; sourceTree = "<group>"; };
-		565029BF1E91308D00615A2C /* TestDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDatabase.swift; sourceTree = "<group>"; };
-		565029C11E9130D000615A2C /* RxSelectStatementSelectionInfoTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxSelectStatementSelectionInfoTests.swift; sourceTree = "<group>"; };
-		565029C31E9130F600615A2C /* RxGRDBTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxGRDBTestCase.swift; sourceTree = "<group>"; };
-		565029C51E91318F00615A2C /* RxTypedRequestTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxTypedRequestTests.swift; sourceTree = "<group>"; };
-		56D1212F1ECDB962001347D2 /* EventRecorder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventRecorder.swift; sourceTree = "<group>"; };
+		565029C31E9130F600615A2C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
+		565029C51E91318F00615A2C /* TypedRequestTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypedRequestTests.swift; sourceTree = "<group>"; };
+		565933ED1F0D72A400707571 /* ChangeToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeToken.swift; sourceTree = "<group>"; };
+		565934111F0DF77E00707571 /* AnyDatabaseWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyDatabaseWriter.swift; sourceTree = "<group>"; };
+		565934171F0E157800707571 /* ChangeTokensObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeTokensObserver.swift; sourceTree = "<group>"; };
+		565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseWriterTests.swift; sourceTree = "<group>"; };
+		565934471F0F419600707571 /* ChangeTokenTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeTokenTests.swift; sourceTree = "<group>"; };
 		56D65F031EF8F5740098466C /* RxGRDB.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = RxGRDB.podspec; sourceTree = "<group>"; };
 		56D65F261EF8F5C60098466C /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		56DBA5091F0BACA800C90A18 /* TransactionObservable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionObservable.swift; sourceTree = "<group>"; };
+		56DBA52E1F0BB02200C90A18 /* MapFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapFetch.swift; sourceTree = "<group>"; };
+		56DBA5311F0BC0C000C90A18 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
+		56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GRDB+Rx.swift"; sourceTree = "<group>"; };
+		56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseWriter+Rx.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -424,6 +439,7 @@
 			children = (
 				56D65F031EF8F5740098466C /* RxGRDB.podspec */,
 				56D65F261EF8F5C60098466C /* CHANGELOG.md */,
+				56DBA5311F0BC0C000C90A18 /* TODO.md */,
 				5650292F1E8FE02500615A2C /* Vendor */,
 				565029171E8FDF5600615A2C /* RxGRDB */,
 				565029221E8FDF5600615A2C /* Tests */,
@@ -445,10 +461,13 @@
 		565029171E8FDF5600615A2C /* RxGRDB */ = {
 			isa = PBXGroup;
 			children = (
-				562756571E963C1B0035B653 /* Result.swift */,
+				565933ED1F0D72A400707571 /* ChangeToken.swift */,
+				56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */,
+				56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */,
 				565029B91E91265A00615A2C /* Request+Rx.swift */,
-				565029B71E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift */,
 				565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */,
+				56DBA5691F0BF1EF00C90A18 /* Implementations */,
+				56DBA56A1F0BF20500C90A18 /* Lib */,
 				560F92D91E9509990077EADF /* Support */,
 			);
 			path = RxGRDB;
@@ -457,13 +476,12 @@
 		565029221E8FDF5600615A2C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				565029251E8FDF5600615A2C /* Info.plist */,
-				56D1212F1ECDB962001347D2 /* EventRecorder.swift */,
-				565029C31E9130F600615A2C /* RxGRDBTestCase.swift */,
-				565029231E8FDF5600615A2C /* RxRequestTests.swift */,
-				565029C11E9130D000615A2C /* RxSelectStatementSelectionInfoTests.swift */,
-				565029C51E91318F00615A2C /* RxTypedRequestTests.swift */,
-				565029BF1E91308D00615A2C /* TestDatabase.swift */,
+				565934471F0F419600707571 /* ChangeTokenTests.swift */,
+				565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */,
+				565029231E8FDF5600615A2C /* RequestTests.swift */,
+				565029C31E9130F600615A2C /* Support.swift */,
+				565029C51E91318F00615A2C /* TypedRequestTests.swift */,
+				565934431F0EB29E00707571 /* Support */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -527,6 +545,33 @@
 				565029AB1E8FE0D200615A2C /* GRDB.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		565934431F0EB29E00707571 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				565029251E8FDF5600615A2C /* Info.plist */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
+		56DBA5691F0BF1EF00C90A18 /* Implementations */ = {
+			isa = PBXGroup;
+			children = (
+				565934111F0DF77E00707571 /* AnyDatabaseWriter.swift */,
+				565934171F0E157800707571 /* ChangeTokensObserver.swift */,
+				56DBA52E1F0BB02200C90A18 /* MapFetch.swift */,
+				56DBA5091F0BACA800C90A18 /* TransactionObservable.swift */,
+			);
+			name = Implementations;
+			sourceTree = "<group>";
+		};
+		56DBA56A1F0BF20500C90A18 /* Lib */ = {
+			isa = PBXGroup;
+			children = (
+				562756571E963C1B0035B653 /* Result.swift */,
+			);
+			name = Lib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -994,10 +1039,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				560F92CE1E94DF830077EADF /* SelectStatementSelectionInfo+Rx.swift in Sources */,
+				56DBA5301F0BB02200C90A18 /* MapFetch.swift in Sources */,
 				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
+				565934191F0E157800707571 /* ChangeTokensObserver.swift in Sources */,
 				562756591E963C1B0035B653 /* Result.swift in Sources */,
+				56DBA5681F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */,
+				565934131F0DF77E00707571 /* AnyDatabaseWriter.swift in Sources */,
+				56DBA5431F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
 				560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */,
+				56DBA50B1F0BACA800C90A18 /* TransactionObservable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1005,12 +1055,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				562756081E962C5B0035B653 /* RxTypedRequestTests.swift in Sources */,
-				562756041E962C5B0035B653 /* RxRequestTests.swift in Sources */,
-				562756061E962C5B0035B653 /* RxGRDBTestCase.swift in Sources */,
-				562756091E962C5B0035B653 /* TestDatabase.swift in Sources */,
-				562756051E962C5B0035B653 /* RxSelectStatementSelectionInfoTests.swift in Sources */,
-				56D121311ECDB962001347D2 /* EventRecorder.swift in Sources */,
+				565934491F0F419600707571 /* ChangeTokenTests.swift in Sources */,
+				562756081E962C5B0035B653 /* TypedRequestTests.swift in Sources */,
+				565934461F0EB6BC00707571 /* DatabaseWriterTests.swift in Sources */,
+				562756041E962C5B0035B653 /* RequestTests.swift in Sources */,
+				562756061E962C5B0035B653 /* Support.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1018,10 +1067,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				565029B81E9124AF00615A2C /* SelectStatementSelectionInfo+Rx.swift in Sources */,
+				56DBA52F1F0BB02200C90A18 /* MapFetch.swift in Sources */,
 				562756581E963C1B0035B653 /* Result.swift in Sources */,
+				565934121F0DF77E00707571 /* AnyDatabaseWriter.swift in Sources */,
 				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
+				56DBA5671F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */,
+				56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
+				565933EE1F0D72A400707571 /* ChangeToken.swift in Sources */,
 				565029B31E8FE12C00615A2C /* TypedRequestFetch+Rx.swift in Sources */,
+				565934181F0E157800707571 /* ChangeTokensObserver.swift in Sources */,
+				56DBA50A1F0BACA800C90A18 /* TransactionObservable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1029,12 +1084,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				565029C41E9130F600615A2C /* RxGRDBTestCase.swift in Sources */,
-				565029C01E91308D00615A2C /* TestDatabase.swift in Sources */,
-				565029C61E91318F00615A2C /* RxTypedRequestTests.swift in Sources */,
-				565029241E8FDF5600615A2C /* RxRequestTests.swift in Sources */,
-				565029C21E9130D000615A2C /* RxSelectStatementSelectionInfoTests.swift in Sources */,
-				56D121301ECDB962001347D2 /* EventRecorder.swift in Sources */,
+				565934481F0F419600707571 /* ChangeTokenTests.swift in Sources */,
+				565029C41E9130F600615A2C /* Support.swift in Sources */,
+				565934451F0EB6BC00707571 /* DatabaseWriterTests.swift in Sources */,
+				565029C61E91318F00615A2C /* TypedRequestTests.swift in Sources */,
+				565029241E8FDF5600615A2C /* RequestTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
