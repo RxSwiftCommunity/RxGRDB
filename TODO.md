@@ -1,0 +1,2 @@
+- [ ] Test observation of several requests at the same time
+- [ ] Make FetchObservable kickable (so that one can pause values observation, and restart with fresh values)

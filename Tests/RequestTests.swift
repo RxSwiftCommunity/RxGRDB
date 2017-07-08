@@ -1,20 +1,21 @@
 import XCTest
 import GRDB
 import RxSwift
-@testable import RxGRDB
+import RxGRDB
 
-class RxRequestTests: RxGRDBTestCase { }
+class RequestTests : XCTestCase { }
 
 
 // MARK: - Changes
 
-extension RxRequestTests {
+extension RequestTests {
     func testRxChanges() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxChanges)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxChanges)
+        try Test(testRxChanges)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxChanges(writer: DatabaseWriter) throws {
+    func testRxChanges(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "table1") { t in
                 t.column("id", .integer).primaryKey()
@@ -84,13 +85,14 @@ extension RxRequestTests {
     }
 }
 
-extension RxRequestTests {
+extension RequestTests {
     func testChangesRetry() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testChangesRetry)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testChangesRetry)
+        try Test(testChangesRetry)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testChangesRetry(writer: DatabaseWriter) throws {
+    func testChangesRetry(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "table1") { t in
                 t.column("id", .integer).primaryKey()
@@ -137,13 +139,14 @@ extension RxRequestTests {
 
 // MARK: - Count
 
-extension RxRequestTests {
+extension RequestTests {
     func testRxFetchCount() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchCount)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchCount)
+        try Test(testRxFetchCount)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchCount(writer: DatabaseWriter) throws {
+    func testRxFetchCount(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "persons") { t in
                 t.column("id", .integer).primaryKey()
@@ -177,20 +180,20 @@ extension RxRequestTests {
         }
         wait(for: recorder, timeout: 1)
         
-        XCTAssertEqual(recorder.recordedEvents.count, expectedCounts.count)
         for (event, count) in zip(recorder.recordedEvents, expectedCounts) {
             XCTAssertEqual(event.element!, count)
         }
     }
 }
 
-extension RxRequestTests {
+extension RequestTests {
     func testRxFetchCountRetry() throws {
-        try TestDatabase({ try DatabaseQueue(path: $0) }).test(with: testRxFetchCountRetry)
-        try TestDatabase({ try DatabasePool(path: $0) }).test(with: testRxFetchCountRetry)
+        try Test(testRxFetchCountRetry)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchCountRetry(writer: DatabaseWriter) throws {
+    func testRxFetchCountRetry(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "table1") { t in
                 t.column("id", .integer).primaryKey()
