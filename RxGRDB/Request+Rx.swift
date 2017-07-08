@@ -6,9 +6,9 @@
 import RxSwift
 
 extension Reactive where Base: Request {
-    /// Returns a RequestChangesObservable that emits a database connection
-    /// after each committed database transaction that has modified the tables
-    /// and columns fetched by the request.
+    /// Returns an Observable that emits a database connection after each
+    /// committed database transaction that has modified the tables and columns
+    /// fetched by the request.
     ///
     /// If you set `synchronizedStart` to true (the default), the first element
     /// is emitted synchronously, on subscription.
