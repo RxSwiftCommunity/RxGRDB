@@ -37,7 +37,7 @@ dbQueue.rx
 +}
 
 +extension ObservableType where E == ChangeToken {
-+    func mapFetch<ResultType>(resultQueue: DispatchQueue = DispatchQueue.main, _ fetch: @escaping (Database) throws -> ResultType) -> Observable<ResultType>
++    func func mapFetch<R>(resultQueue: DispatchQueue = DispatchQueue.main, _ fetch: @escaping (Database) throws -> R) -> Observable<R>
 +}
 ```
 
