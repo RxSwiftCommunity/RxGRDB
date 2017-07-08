@@ -176,6 +176,14 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
 
 // MARK: - Optional DatabaseValueConvertible
 
+public protocol _OptionalProtocol {
+    associatedtype _Wrapped
+}
+
+extension Optional : _OptionalProtocol {
+    public typealias _Wrapped = Wrapped
+}
+
 extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol, Base.RowDecoder._Wrapped: DatabaseValueConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
