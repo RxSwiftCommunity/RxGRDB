@@ -1,6 +1,47 @@
 Release Notes
 =============
 
+## Next Version
+
+Released July 8, 2017
+
+**New**: RxGRDB has learned how to observe multiple requests and fetch from other requests. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-multiple-requests)
+
+To get a single notification when a transaction has modified several requests, use `DatabaseWriter.rx.changes`:
+
+```swift
+// Observable<Database>
+dbQueue.rx.changes(in: [request, ...])
+```
+
+To turn a change notification into consistent results fetched from multiple requests, use `DatabaseWriter.rx.changeTokens` and the `mapFetch` operator:
+
+```swift
+dbQueue.rx
+    .changeTokens(in: [request, ...])
+    .mapFetch { (db: Database) in
+        return ...
+    }
+```
+
+**API diff**
+
+```diff
++extension Reactive where Base: DatabaseWriter {
++    func changes(in requests: [Request], synchronizedStart: Bool = true) -> Observable<Database>
++    func changeTokens(in requests: [Request], synchronizedStart: Bool = true) -> Observable<ChangeToken>
++}
+
++struct ChangeToken {
++    var database: Database
++}
+
++extension ObservableType where E == ChangeToken {
++    func mapFetch<ResultType>(resultQueue: DispatchQueue = DispatchQueue.main, _ fetch: @escaping (Database) throws -> ResultType) -> Observable<ResultType>
++}
+```
+
+
 ## v0.4.1
 
 Released June 20, 2017
