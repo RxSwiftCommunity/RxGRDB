@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-## Next Version
+## v0.5.0
 
 Released July 8, 2017
 
@@ -33,7 +33,7 @@ dbQueue.rx
 +}
 
 +struct ChangeToken {
-+    var database: Database
++    var database: Database { get }
 +}
 
 +extension ObservableType where E == ChangeToken {
