@@ -18,6 +18,7 @@
 		562756081E962C5B0035B653 /* TypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* TypedRequestTests.swift */; };
 		562756581E963C1B0035B653 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* Result.swift */; };
 		562756591E963C1B0035B653 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* Result.swift */; };
+		562EA7F51F17A2A600FA528C /* ChangeToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565933ED1F0D72A400707571 /* ChangeToken.swift */; };
 		5650291F1E8FDF5600615A2C /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565029151E8FDF5600615A2C /* RxGRDB.framework */; };
 		565029241E8FDF5600615A2C /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
 		565029261E8FDF5600615A2C /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1040,6 +1041,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				56DBA5301F0BB02200C90A18 /* MapFetch.swift in Sources */,
+				562EA7F51F17A2A600FA528C /* ChangeToken.swift in Sources */,
 				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
 				565934191F0E157800707571 /* ChangeTokensObserver.swift in Sources */,
 				562756591E963C1B0035B653 /* Result.swift in Sources */,

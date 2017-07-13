@@ -68,6 +68,10 @@ class AnyDatabaseWriter : DatabaseWriter, ReactiveCompatible {
         return try base.unsafeRead(block)
     }
     
+    func unsafeReentrantRead<T>(_ block: (Database) throws -> T) throws -> T {
+        return try base.unsafeReentrantRead(block)
+    }
+    
     func add(function: DatabaseFunction) {
         base.add(function: function)
     }
