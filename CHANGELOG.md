@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+## v0.6.0
+
+Released July 13, 2017
+
+- **Fixed**: Support for macOS, broken in v0.5.0
+- **New**: GRDB dependency bumped to v1.2
+
+
 ## v0.5.0
 
 Released July 8, 2017
