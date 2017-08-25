@@ -37,7 +37,7 @@ class EventRecorder<E> : ObserverType {
     
     init(expectedEventCount: Int, description: String = "") {
         expectation = XCTestExpectation(description: description)
-        expectation.expectedFulfillmentCount = UInt(expectedEventCount)
+        expectation.expectedFulfillmentCount = expectedEventCount
         expectation.assertForOverFulfill = true
     }
     

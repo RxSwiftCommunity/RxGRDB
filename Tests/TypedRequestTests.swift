@@ -198,7 +198,7 @@ extension TypedRequestTests {
         wait(for: recorder, timeout: 1)
         
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!.map { $0.value(named: "name") as String }, names)
+            XCTAssertEqual(event.element!.map { $0["name"] as String }, names)
         }
     }
 }
@@ -231,7 +231,7 @@ extension TypedRequestTests {
         wait(for: recorder, timeout: 1)
         
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!.map { $0.value(named: "name") as String }, names)
+            XCTAssertEqual(event.element!.map { $0["name"] as String }, names)
         }
     }
 }
@@ -265,7 +265,7 @@ extension TypedRequestTests {
         wait(for: recorder, timeout: 1)
         
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!?.value(named: "name") as String?, name)
+            XCTAssertEqual(event.element!?["name"] as String?, name)
         }
     }
 }
@@ -298,7 +298,7 @@ extension TypedRequestTests {
         wait(for: recorder, timeout: 1)
         
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!?.value(named: "name") as String?, name)
+            XCTAssertEqual(event.element!?["name"] as String?, name)
         }
     }
 }
@@ -531,9 +531,9 @@ private class Person: Record {
     }
     
     required init(row: Row) {
-        id = row.value(named: "id")
-        name = row.value(named: "name")
-        email = row.value(named: "email")
+        id = row["id"]
+        name = row["name"]
+        email = row["email"]
         super.init(row: row)
     }
     
