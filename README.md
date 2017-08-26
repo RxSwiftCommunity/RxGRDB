@@ -166,7 +166,7 @@ try dbQueue.inDatabase { db in
 }
 ```
 
-When the record has nil primary key, the observable completes right on subscription. When the primary key spans several columns, all primary key columns must be nil for the observable to complete immediately.
+When the record has a nil primary key, the observable completes right on subscription. When the primary key spans several columns, all primary key columns must be nil for the observable to complete immediately.
 
 If you set `synchronizedStart` to true (the default value), the record is reloaded from the database and emitted synchronously upon subscription.
 
