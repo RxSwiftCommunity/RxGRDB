@@ -1,51 +1,80 @@
-RxGRDB [![Swift](https://img.shields.io/badge/swift-3.1-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE)
+RxGRDB [![Swift](https://img.shields.io/badge/swift-4-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE)
 ======
 
 ### A set of reactive extensions for SQLite and [GRDB.swift](http://github.com/groue/GRDB.swift)
 
 **Latest release**: July 13, 2017 &bull; version 0.6.0 &bull; [Release Notes](CHANGELOG.md)
 
-**Requirements**: iOS 8.0+ / OSX 10.10+ / watchOS 2.0+ • Xcode 8.3+ • Swift 3.1
+**Requirements**: iOS 8.0+ / OSX 10.10+ / watchOS 2.0+ • Xcode 9+ • Swift 4
 
 ---
 
 ## Usage
 
-**RxGRDB produces RxSwift observables from GRDB requests.**
+**RxGRDB produces RxSwift observables that track database changes.**
 
-GRDB requests are built with the [query interface](https://github.com/groue/GRDB.swift#the-query-interface) or raw SQL. For example:
+Track [record](https://github.com/groue/GRDB.swift#records) changes:
 
 ```swift
-// Query Interface request
-let request = Player.order(scoreColumn.desc).limit(10)
-
-// SQL request
-let request = SQLRequest(
-    "SELECT * FROM players ORDER BY score DESC LIMIT 10")
-    .asRequest(of: Player.self)
+let player: Player = ...
+Observable.from(record: player, in: dbQueue)
+    .subscribe(
+        onNext: { player: Player in
+            print("Player has changed")
+        },
+        onCompleted: {
+            print("Player was deleted")
+        })
 ```
 
-You can fetch values from those requests, or track them in a reactive way with RxGRDB:
+Track [request](https://github.com/groue/GRDB.swift#requests) changes:
 
 ```swift
-// Non-reactive
-try dbQueue.inDatabase { db in
-    let players = try request.fetchAll(db) // [Player]
-}
-
-// Reactive:
+let request = Player.order(scoreColumn.desc).limit(10)
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { players: [Player] in
         print("Players have changed")
     })
 ```
 
+Track [value](https://github.com/groue/GRDB.swift#values) changes:
+
+```swift
+let request = Player.all()
+request.rx.fetchCount(in: dbQueue)
+    .subscribe(onNext: { count: Int in
+        print("Number of players has changed")
+    })
+
+let request = Player.select(max(scoreColumn)).asRequest(of: Int.self)
+request.rx.fetchOne(in: dbQueue)
+    .subscribe(onNext: { maxScore: Int? in
+        print("Maximum score has changed")
+    })
+```
+
+As always with GRDB, raw SQL is welcome:
+
+```swift
+let request = SQLRequest(
+    "SELECT * FROM players ORDER BY score DESC LIMIT 10")
+    .asRequest(of: Player.self)
+request.rx.fetchAll(in: dbQueue)
+    .subscribe(onNext: { players: [Player] in
+        print("Players have changed")
+    })
+```
+
+To connect to the database, define requests and records, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
+
 
 Documentation
 =============
 
 - [Installation](#installation)
-- [What is Request Observation?](#what-is-request-observation)
+- [What is Database Observation?](#what-is-database-observation)
+- [Observing a Single Record](#observing-a-single-record)
+- [Observing Multiple Records](#observing-multiple-records)
 - [Observing Individual Requests](#observing-individual-requests)
 - [Observing Multiple Requests](#observing-multiple-requests)
 
@@ -91,37 +120,67 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
     ```
 
 
-## What is Request Observation?
+## What is Database Observation?
 
-**RxGRBD lets your application observe database requests, and get notified each time a change in their results has been committed in the database.**
-
-```swift
-let request = Player.order(scoreColumn.desc).limit(10)
-request.rx
-    .fetchAll(in: dbQueue)
-    .subscribe(onNext: { players: [Player] in
-        print("Players have changed: \(players)")
-    })
-```
-
-To define requests and connect to the database, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
-
-
-### What is a Request Change?
-
-What are the "changes" tracked by RxGRDB? Is there an opportunity for missed changes? Can change notifications happen even when the request results are the same?
-
-**First things first: RxGRDB requires that a unique database [connection](https://github.com/groue/GRDB.swift#database-connections) is connected to a database file during the whole duration of the observation.** 
-
-**A change is a committed transaction that has impacted a tracked request.** No insertion, update, or deletion in a tracked table is missed. This includes changes to requests that involve several tables. This also includes indirect changes triggered by [foreign keys](https://www.sqlite.org/foreignkeys.html#fk_actions) or [SQL triggers](https://www.sqlite.org/lang_createtrigger.html).
+**RxGRDB notifies changes that have been committed in the database.** No insertion, update, or deletion in tracked tables is missed. This includes indirect changes triggered by [foreign keys](https://www.sqlite.org/foreignkeys.html#fk_actions) or [SQL triggers](https://www.sqlite.org/lang_createtrigger.html).
 
 > :point_up: **Note**: some special changes are not notified: changes to SQLite system tables (such as `sqlite_master`), and changes to [`WITHOUT ROWID`](https://www.sqlite.org/withoutrowid.html) tables. See [Data Change Notification Callbacks](https://www.sqlite.org/c3ref/update_hook.html) for more information.
 
-**Change notifications may happen even though the request results are the same.** By default, RxGRDB notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement has actually modified the tracked tables and columns by inserting, updating, or deleting a row.
+To function correctly, RxGRDB requires that a unique database [connection](https://github.com/groue/GRDB.swift#database-connections) is connected to a database file during the whole duration of the observation.
 
-For example, if you track `Player.select(max(score))`, then you'll get a notification for all changes performed on the `score` column of the `players` table (updates, insertions and deletions), even if they do not modify the value of the maximum score. However, you will not get any notification for changes performed on other database tables, or updates to other columns of the `players` table.
+**Change notifications may happen even though the request results are the same.** RxGRDB often notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement has actually modified the tracked tables and columns by inserting, updating, or deleting a row.
 
-**It is possible to avoid notifications of identical consecutive values**. For example you can use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator of RxSwift. You can also let RxGRDB perform efficient deduplication at the database level: see the documentation of each reactive method for more information.
+For example, if you track `Player.select(max(scoreColumn))`, then you'll get a notification for all changes performed on the `score` column of the `players` table (updates, insertions and deletions), even if they do not modify the value of the maximum score. However, you will not get any notification for changes performed on other database tables, or updates to other columns of the `players` table.
+
+It is possible to avoid notifications of identical consecutive values. For example you can use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator of RxSwift. You can also let RxGRDB perform efficient deduplication at the database level: see the documentation of each reactive method for more information.
+
+
+## Observing a Single Record
+
+When your application observes a record, it gets notified each time a change in the record columns has been committed in the database.
+
+
+#### `Observable.from(record:in:synchronizedStart:resultQueue:)`
+
+This observable emits a fresh record after each database transaction that has modified a record's columns, and completes when the record has been deleted.
+
+The tracked record must confom to the [Persistable and RowConvertible GRDB protocols](https://github.com/groue/GRDB.swift#record-protocols-overview).
+
+```swift
+let player: Player = ...
+Observable(from: player, in: dbQueue) // or dbPool
+    .subscribe(
+        onNext: { player: Player in
+            print("Player has changed")
+        },
+        onCompleted: {
+            print("Player was deleted")
+        })
+
+try dbQueue.inDatabase { db in
+    player.score = 1000
+    try player.update(db)
+    // Prints "Player has changed."
+    try Player.deleteAll(db)
+    // Prints "Player was deleted."
+}
+```
+
+When the record has nil primary key, the observable completes right on subscription. When the primary key spans several columns, all primary key columns must be nil for the observable to complete immediately.
+
+If you set `synchronizedStart` to true (the default value), the record is reloaded from the database and emitted synchronously upon subscription.
+
+Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
+
+**This observable never emits identical consecutive values.**
+
+
+## Observing Multiple Records
+
+To observe multiple records at the same time, use request observation:
+
+- [Observing Individual Requests](#observing-individual-requests)
+- [Observing Multiple Requests](#observing-multiple-requests)
 
 
 ## Observing Individual Requests
@@ -154,7 +213,7 @@ request.rx.changes(in: dbQueue)    // Observable<Database>
 
 #### `Request.rx.changes(in:synchronizedStart:)`
 
-Emits a database connection after each [impactful](#what-is-a-request-change) database transaction:
+Emits a database connection after each [impactful](#what-is-database-observation) database transaction:
 
 ```swift
 let request = Player.all()
@@ -201,7 +260,7 @@ try dbQueue.inDatabase { db in
 
 #### `Request.rx.fetchCount(in:synchronizedStart:resultQueue:)`
 
-Emits a count after each [impactful](#what-is-a-request-change) database transaction:
+Emits a count after each [impactful](#what-is-database-observation) database transaction:
 
 ```swift
 let request = Player.all()
@@ -222,7 +281,7 @@ If you set `synchronizedStart` to true (the default value), the first element is
 
 Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
 
-**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-a-request-change) changes. Use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator in order to avoid duplicates:
+**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator in order to avoid duplicates:
 
 ```swift
 request.rx.fetchCount(in: dbQueue).distinctUntilChanged()...
@@ -233,7 +292,7 @@ request.rx.fetchCount(in: dbQueue).distinctUntilChanged()...
 
 #### `TypedRequest.rx.fetchOne(in:synchronizedStart:distinctUntilChanged:resultQueue:)`
 
-Emits a value after each [impactful](#what-is-a-request-change) database transaction:
+Emits a value after each [impactful](#what-is-database-observation) database transaction:
 
 ```swift
 let request = Player.filter(Column("name") == "Arthur")
@@ -269,7 +328,7 @@ request.rx.fetchOne(in: dbQueue)
 When tracking a *value*, you get nil in two cases: either the request yielded no database row, or one row with a NULL value.
 
 
-**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-a-request-change) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
+**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
 
 ```swift
 request.rx.fetchOne(in: dbQueue, distinctUntilChanged: true)...
@@ -282,7 +341,7 @@ The `distinctUntilChanged` parameter does not involve the fetched type, and simp
 
 #### `TypedRequest.rx.fetchAll(in:synchronizedStart:distinctUntilChanged:resultQueue:)`
 
-Emits an array of values after each [impactful](#what-is-a-request-change) database transaction:
+Emits an array of values after each [impactful](#what-is-database-observation) database transaction:
 
 ```swift
 let request = Player.order(Column("name"))
@@ -326,7 +385,7 @@ request.rx.fetchAll(in: dbQueue)
 ```
 
 
-**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-a-request-change) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
+**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
 
 ```swift
 request.rx.fetchAll(in: dbQueue, distinctUntilChanged: true)...
@@ -351,7 +410,7 @@ Those observables can be composed together using [RxSwift operators](https://git
 
 To get a single notification when a transaction has modified several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinsynchronizedstart).
 
-When some change happens, you can fetch from several requests with the guarantee of consistent results: see [Change Tokens](#change-tokens).
+When you may need to fetch from several requests with the guarantee of consistent results, see [Change Tokens](#change-tokens).
 
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinsynchronizedstart)
 - [Change Tokens](#change-tokens)
@@ -364,7 +423,7 @@ When some change happens, you can fetch from several requests with the guarantee
 
 #### `DatabaseWriter.rx.changes(in:synchronizedStart:)`
 
-Emits a database connection after each database transaction that has an [impact](#what-is-a-request-change) on any of the tracked requests:
+Emits a database connection after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
 
 ```swift
 let players = Player.all()
@@ -470,7 +529,7 @@ dbQueue.rx
 
 #### `DatabaseWriter.rx.changeTokens(in:synchronizedStart:)`
 
-Given a database writer ([database queue](https://github.com/groue/GRDB.swift#database-queues) or [database pool](https://github.com/groue/GRDB.swift#database-pools)), emits a [change token](#change-tokens) after each database transaction that has an [impact](#what-is-a-request-change) on any of the tracked requests:
+Given a database writer ([database queue](https://github.com/groue/GRDB.swift#database-queues) or [database pool](https://github.com/groue/GRDB.swift#database-pools)), emits a [change token](#change-tokens) after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
 
 ```swift
 let players = Player.all()

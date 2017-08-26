@@ -1,6 +1,28 @@
 Release Notes
 =============
 
+## Next Version
+
+### New
+
+- Support for Swift 4
+- Tracking of individual records. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-a-single-record)
+
+
+### Breaking Changes
+
+- Requirements have changed: Xcode 9+, Swift 4, GRDB 2.0
+
+
+### API diff
+
+```diff
++extension Observable where Element: RowConvertible & MutablePersistable {
++    static func from(record: Element, in writer: DatabaseWriter, synchronizedStart: Bool = true, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable
++}
+```
+
+
 ## v0.6.0
 
 Released July 13, 2017
@@ -13,7 +35,9 @@ Released July 13, 2017
 
 Released July 8, 2017
 
-**New**: RxGRDB has learned how to observe multiple requests and fetch from other requests. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-multiple-requests)
+### New
+
+RxGRDB has learned how to observe multiple requests and fetch from other requests. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-multiple-requests)
 
 To get a single notification when a transaction has modified several requests, use `DatabaseWriter.rx.changes`:
 
@@ -32,7 +56,7 @@ dbQueue.rx
     }
 ```
 
-**API diff**
+### API diff
 
 ```diff
 +extension Reactive where Base: DatabaseWriter {
@@ -54,7 +78,7 @@ dbQueue.rx
 
 Released June 20, 2017
 
-**Fixed**
+### Fixed
 
 - Podspec requirement for RxSwift changed to `~> 3.3`
 - Added missing support for new AdaptedRequest and AdaptedTypedRequest of GRDB 1.0
@@ -64,14 +88,16 @@ Released June 20, 2017
 
 Released June 20, 2017
 
-**RxGRDB now requires GRDB v1.0**
+### Breaking Changes
+
+- RxGRDB now requires GRDB v1.0
 
 
 ## v0.3.0
 
 Released May 22, 2017
 
-**New**
+### New
 
 - The new `distinctUntilChanged` parameter has RxGRDB avoid notifying consecutive identical values.
 
@@ -95,7 +121,7 @@ Released May 22, 2017
 
 Released May 17, 2017
 
-**New**
+### New
 
 - Support for SQLCipher.
 
@@ -104,7 +130,7 @@ Released May 17, 2017
 
 Released April 6, 2017
 
-**Fixed**
+### Fixed
 
 - RxGRDB observables now support the `retry` operator, and no longer crash when disposed on a database queue.
 
@@ -113,7 +139,7 @@ Released April 6, 2017
 
 Released April 5, 2017
 
-**New**
+### New
 
 - `synchronizedStart` option
 - `Request.rx.fetchCount(in:synchronizedStart)`
