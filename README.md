@@ -406,11 +406,11 @@ request.rx.fetchOne(in: dbQueue)   // Observable<Player?>
 request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 ```
 
-Those observables can be composed together using [RxSwift operators](https://github.com/ReactiveX/RxSwift). However such composition won't provide some specific scheduling requirements:
+Those observables can be composed together using [RxSwift operators](https://github.com/ReactiveX/RxSwift). However, be careful: those operators are unable to fulfill some database-specific requirements:
 
 To get a single notification when a transaction has modified several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinsynchronizedstart).
 
-When you may need to fetch from several requests with the guarantee of consistent results, see [Change Tokens](#change-tokens).
+When you need to fetch from several requests with the guarantee of consistent results, that is to say when you need values that come alltogether from a single database transaction, see [Change Tokens](#change-tokens).
 
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinsynchronizedstart)
 - [Change Tokens](#change-tokens)
