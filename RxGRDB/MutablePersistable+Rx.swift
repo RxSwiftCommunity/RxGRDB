@@ -18,15 +18,20 @@ extension Dictionary where Key == String {
     }
 }
 
-private enum ObservationStrategy<Record: MutablePersistable> {
+private enum ObservationStrategy<Record> {
+    /// A general observation strategy based on a request
     case request(QueryInterfaceRequest<Record>)
+    
+    /// An optimized observation strategy based on rowID
     case row(selectionInfo: SelectStatement.SelectionInfo, rowIDColumn: String, rowID: Int64)
     
     init(request: QueryInterfaceRequest<Record>) {
         self = .request(request)
     }
-    
-    /// An optimized observation strategy based on rowID
+}
+
+extension ObservationStrategy where Record: MutablePersistable {
+    /// Returns nil when record has nil primary key
     init?(_ db: Database, record: Record, rowIDColumn: String) throws {
         let dict = record.databaseDictionary()
         guard let rowID = dict[caseInsensitive: rowIDColumn] else {
@@ -42,7 +47,7 @@ private enum ObservationStrategy<Record: MutablePersistable> {
         }
     }
     
-    /// A general observation strategy based on a request
+    /// Returns nil when record has nil primary key
     init?(_ db: Database, record: Record, primaryKey: PrimaryKeyInfo) throws {
         if let rowIDColumn = primaryKey.rowIDColumn {
             try self.init(db, record: record, rowIDColumn: rowIDColumn)
@@ -63,7 +68,6 @@ private enum ObservationStrategy<Record: MutablePersistable> {
         let condition = pkColumns.map { "\($0.quotedDatabaseIdentifier) = ?" }.joined(separator: " AND ")
         self.init(request: Record.filter(sql: condition, arguments: StatementArguments(pkValues)))
     }
-
 }
 
 private extension MutablePersistable {
@@ -137,4 +141,3 @@ extension Observable where Element: RowConvertible & MutablePersistable {
         }
     }
 }
-
