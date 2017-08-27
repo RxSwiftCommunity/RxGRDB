@@ -7,6 +7,9 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-4-orange.svg?style=flat)](ht
 
 **Requirements**: iOS 8.0+ / OSX 10.10+ / watchOS 2.0+ • Xcode 9+ • Swift 4
 
+**Other Swift versions**: For Swift 3.0 and Xcode 8.0, use [v0.3.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.3.0) • Swift 3.1, Xcode 8.3: [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0) • Swift 3.2, Xcode 9: [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0)
+
+
 ---
 
 ## Usage
