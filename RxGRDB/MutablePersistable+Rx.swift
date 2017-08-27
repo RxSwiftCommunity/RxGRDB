@@ -82,24 +82,26 @@ private extension MutablePersistable {
 }
 
 extension Observable where Element: RowConvertible & MutablePersistable {
-    /// Returns an Observable that emits an optional record after each committed
-    /// database transaction that has modified or deleted the row identified by
-    /// the argument's primary key.
+    /// Returns an Observable that emits a record after each committed database
+    /// transaction that has modified the row identified by the argument's
+    /// primary key. The observable completes when the row has been deleted.
     ///
     /// For example:
     ///
     ///     let player: Player = ...
     ///     Observable.from(record: player, in: dbQueue)
-    ///         .subscribe(onNext: { player in
-    ///             if let player = player {
-    ///                 print("player has changed")
-    ///             } else {
-    ///                 print("player was deleted")
-    ///             }
-    ///         })
+    ///         .subscribe(
+    ///             onNext: { player: Player in
+    ///                 print("Player has changed")
+    ///             },
+    ///             onCompleted: {
+    ///                 print("Player was deleted")
+    ///             })
     ///
     /// - parameter record: An observed record
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter synchronizedStart: When true (the default), the first
+    ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
     public static func from(record: Element, in writer: DatabaseWriter, synchronizedStart: Bool = true, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable {
         return Observable.create { observer in

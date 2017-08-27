@@ -44,8 +44,8 @@ extension Reactive where Base: DatabaseWriter {
     ///     // Prints "Number of persons: 4"
     ///
     /// - parameter requests: The observed requests.
-    /// - parameter synchronizedStart: Whether the first element should be
-    ///   emitted synchronously, on subscription.
+    /// - parameter synchronizedStart: When true (the default), the first
+    ///   element is emitted synchronously, on subscription.
     public func changes(in requests: [Request], synchronizedStart: Bool = true) -> Observable<Database> {
         return changeTokens(in: requests, synchronizedStart: synchronizedStart).map { $0.database }
     }
@@ -73,8 +73,8 @@ extension Reactive where Base: DatabaseWriter {
     ///         })
     ///
     /// - parameter requests: The observed requests.
-    /// - parameter synchronizedStart: Whether the first element should be
-    ///   emitted synchronously, on subscription.
+    /// - parameter synchronizedStart: When true (the default), the first
+    ///   element is emitted synchronously, on subscription.
     public func changeTokens(in requests: [Request], synchronizedStart: Bool = true) -> Observable<ChangeToken> {
         let writer = base
         
