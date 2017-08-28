@@ -34,17 +34,15 @@ extension ObservationStrategy where Record: MutablePersistable {
     /// Returns nil when record has nil primary key
     init?(_ db: Database, record: Record, rowIDColumn: String) throws {
         let dict = record.databaseDictionary()
-        guard let rowID = dict[caseInsensitive: rowIDColumn] else {
+        guard let dbValue = dict[caseInsensitive: rowIDColumn] else {
             fatalError("Record does not encode its primary key \(rowIDColumn) in the encode(to:) method")
         }
-        if let rowID = rowID {
-            let rowID: Int64 = rowID.databaseValue.losslessConvert() // we need Int64
-            let request = Record.filter(Column(rowIDColumn) == rowID)
-            let (statement, _) = try request.prepare(db)
-            self = .row(selectionInfo: statement.selectionInfo, rowIDColumn: rowIDColumn, rowID: rowID)
-        } else {
+        guard let rowID = Int64.fromDatabaseValue(dbValue) else {
             return nil // nil primary key => no observation strategy
         }
+        let request = Record.filter(Column(rowIDColumn) == rowID)
+        let (statement, _) = try request.prepare(db)
+        self = .row(selectionInfo: statement.selectionInfo, rowIDColumn: rowIDColumn, rowID: rowID)
     }
     
     /// Returns nil when record has nil primary key
@@ -56,13 +54,13 @@ extension ObservationStrategy where Record: MutablePersistable {
         
         let pkColumns = primaryKey.columns
         let dict = record.databaseDictionary()
-        let pkValues = pkColumns.map { column -> DatabaseValueConvertible? in
+        let pkValues = pkColumns.map { column -> DatabaseValue in
             guard let value = dict[caseInsensitive: column] else {
                 fatalError("Record does not encode its primary key \(pkColumns) in the encode(to:) method")
             }
             return value
         }
-        guard pkValues.contains(where: { !($0?.databaseValue ?? .null).isNull }) else {
+        guard pkValues.contains(where: { !$0.isNull }) else {
             return nil // nil primary key => no observation strategy
         }
         let condition = pkColumns.map { "\($0.quotedDatabaseIdentifier) = ?" }.joined(separator: " AND ")
