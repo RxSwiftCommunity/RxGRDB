@@ -18,3 +18,4 @@ extension QueryInterfaceRequest : ReactiveCompatible { }
 // DatabaseWriter
 extension DatabasePool : ReactiveCompatible { }
 extension DatabaseQueue : ReactiveCompatible { }
+extension AnyDatabaseWriter : ReactiveCompatible { }

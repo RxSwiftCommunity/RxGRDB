@@ -1,3 +1,2 @@
 - [ ] Test observation of several requests at the same time
 - [ ] Allow one can pause values observation, and restart with fresh values
-- [ ] Remove the need for AnyDatabaseWriter
