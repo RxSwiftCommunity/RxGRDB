@@ -18,7 +18,7 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
     init<R>(_ db: Database, request: R, initialElements: [Element]) throws where R: TypedRequest, Element == R.RowDecoder {
         let primaryKey = try request.primaryKey(db)
         let references = initialElements.map { element -> Reference in
-            let row = Row(element.databaseDictionary())
+            let row = Row(element.databaseDictionary)
             return Reference(
                 primaryKey: primaryKey(row),
                 row: row,
@@ -92,7 +92,7 @@ extension PrimaryKeySortedDiffStrategy where Element: MutablePersistable {
     init<R>(_ db: Database, request: R, elements: [Element]) throws where R: TypedRequest, Element == R.RowDecoder {
         let primaryKey = try request.primaryKey(db)
         let references = elements.map { element -> Reference in
-            let row = Row(element.databaseDictionary())
+            let row = Row(element.databaseDictionary)
             return Reference(
                 primaryKey: primaryKey(row),
                 row: row,
