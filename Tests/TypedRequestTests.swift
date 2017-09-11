@@ -1,7 +1,7 @@
 import XCTest
 import GRDB
 import RxSwift
-import RxGRDB
+@testable import RxGRDB
 
 class TypedRequestTests : XCTestCase { }
 
@@ -13,8 +13,10 @@ extension TypedRequestTests {
                 t.column("name", .text)
                 t.column("email", .text)
             }
-            try Person(id: nil, name: "Arthur", email: "arthur@example.com").insert(db)
-            try Person(id: nil, name: "Barbara", email: nil).insert(db)
+            var person = Person(id: nil, name: "Arthur", email: "arthur@example.com")
+            try person.insert(db)
+            person = Person(id: nil, name: "Barbara", email: nil)
+            try person.insert(db)
         }
     }
     
@@ -23,8 +25,10 @@ extension TypedRequestTests {
             try db.execute("UPDATE persons SET name = name")
             _ = try Person.deleteAll(db)
             try db.inTransaction {
-                try Person(id: nil, name: "Craig", email: nil).insert(db)
-                try Person(id: nil, name: "David", email: "david@example.com").insert(db)
+                var person = Person(id: nil, name: "Craig", email: nil)
+                try person.insert(db)
+                person = Person(id: nil, name: "David", email: "david@example.com")
+                try person.insert(db)
                 return .commit
             }
         }
@@ -516,9 +520,61 @@ extension TypedRequestTests {
     }
 }
 
+extension TypedRequestTests {
+    func testPrimaryKeySortedDiff() throws {
+        try Test(testPrimaryKeySortedDiff)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testPrimaryKeySortedDiff(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        let request = Person.order(Column("id"))
+        let expectedDiffs = [
+            PrimaryKeySortedDiff<Person>(
+                inserted: [
+                    Person(id: 1, name: "Arthur", email: "arthur@example.com"),
+                    Person(id: 2, name: "Barbara", email: nil)],
+                updated: [],
+                deleted: []),
+            PrimaryKeySortedDiff<Person>(
+                inserted: [],
+                updated: [],
+                deleted: [
+                    Person(id: 1, name: "Arthur", email: "arthur@example.com"),
+                    Person(id: 2, name: "Barbara", email: nil)]),
+            PrimaryKeySortedDiff<Person>(
+                inserted: [
+                    Person(id: 1, name: "Craig", email: nil),
+                    Person(id: 2, name: "David", email: "david@example.com")
+                ],
+                updated: [],
+                deleted: []),
+            ]
+        
+        try setUpDatabase(in: writer)
+        let recorder = EventRecorder<PrimaryKeySortedDiff<Person>>(expectedEventCount: expectedDiffs.count)
+        request.rx
+            .primaryKeySortedDiff(in: writer, initialElements: [])
+            .subscribe { event in
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                recorder.on(event)
+            }
+            .addDisposableTo(disposeBag)
+        try modifyDatabase(in: writer)
+        wait(for: recorder, timeout: 1)
+        
+        for (event, diff) in zip(recorder.recordedEvents, expectedDiffs) {
+            XCTAssertEqual(event.element!.inserted, diff.inserted)
+            XCTAssertEqual(event.element!.updated, diff.updated)
+            XCTAssertEqual(event.element!.deleted, diff.deleted)
+        }
+    }
+}
+
 // MARK: - Support
 
-private class Person: Record {
+private struct Person : RowConvertible, MutablePersistable {
     var id: Int64?
     var name: String
     var email: String?
@@ -527,25 +583,34 @@ private class Person: Record {
         self.id = id
         self.name = name
         self.email = email
-        super.init()
     }
     
-    required init(row: Row) {
+    init(row: Row) {
         id = row["id"]
         name = row["name"]
         email = row["email"]
-        super.init(row: row)
     }
     
-    override class var databaseTableName: String { return "persons" }
+    static var databaseTableName = "persons"
     
-    override func encode(to container: inout PersistenceContainer) {
+    func encode(to container: inout PersistenceContainer) {
         container["id"] = id
         container["name"] = name
         container["email"] = email
     }
     
-    override func didInsert(with rowID: Int64, for column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
+    }
+}
+
+extension Person : Diffable { }
+
+extension Person : Equatable {
+    static func == (lhs: Person, rhs: Person) -> Bool {
+        if lhs.id != rhs.id { return false }
+        if lhs.name != rhs.name { return false }
+        if lhs.email != rhs.email { return false }
+        return true
     }
 }
