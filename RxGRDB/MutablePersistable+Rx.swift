@@ -33,7 +33,7 @@ private enum ObservationStrategy<Record> {
 extension ObservationStrategy where Record: MutablePersistable {
     /// Returns nil when record has nil primary key
     init?(_ db: Database, record: Record, rowIDColumn: String) throws {
-        let dict = record.databaseDictionary()
+        let dict = record.databaseDictionary
         guard let dbValue = dict[caseInsensitive: rowIDColumn] else {
             fatalError("Record does not encode its primary key \(rowIDColumn) in the encode(to:) method")
         }
@@ -53,7 +53,7 @@ extension ObservationStrategy where Record: MutablePersistable {
         }
         
         let pkColumns = primaryKey.columns
-        let dict = record.databaseDictionary()
+        let dict = record.databaseDictionary
         let pkValues = pkColumns.map { column -> DatabaseValue in
             guard let value = dict[caseInsensitive: column] else {
                 fatalError("Record does not encode its primary key \(pkColumns) in the encode(to:) method")
