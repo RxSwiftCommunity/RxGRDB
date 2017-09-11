@@ -8,27 +8,28 @@ class TypedRequestTests : XCTestCase { }
 extension TypedRequestTests {
     func setUpDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
-            try db.create(table: "persons") { t in
+            try db.create(table: "players") { t in
                 t.column("id", .integer).primaryKey()
                 t.column("name", .text)
                 t.column("email", .text)
             }
-            var person = Person(id: nil, name: "Arthur", email: "arthur@example.com")
-            try person.insert(db)
-            person = Person(id: nil, name: "Barbara", email: nil)
-            try person.insert(db)
+            var player = Player(id: nil, name: "Arthur", email: "arthur@example.com")
+            try player.insert(db)
+            player = Player(id: nil, name: "Barbara", email: nil)
+            try player.insert(db)
         }
     }
     
     func modifyDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
-            try db.execute("UPDATE persons SET name = name")
-            _ = try Person.deleteAll(db)
+            try db.execute("UPDATE players SET name = name")
+            try db.execute("UPDATE players SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
+            _ = try Player.deleteAll(db)
             try db.inTransaction {
-                var person = Person(id: nil, name: "Craig", email: nil)
-                try person.insert(db)
-                person = Person(id: nil, name: "David", email: "david@example.com")
-                try person.insert(db)
+                var player = Player(id: nil, name: "Craig", email: nil)
+                try player.insert(db)
+                player = Player(id: nil, name: "David", email: "david@example.com")
+                try player.insert(db)
                 return .commit
             }
         }
@@ -45,16 +46,17 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRecords(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("name"))
+        let request = Player.order(Column("name"))
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<[Person]>(expectedEventCount: expectedNames.count)
+        let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected to be delivered on the main thread
@@ -79,15 +81,16 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRecordsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("name"))
+        let request = Player.order(Column("name"))
         let expectedNames = [
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<[Person]>(expectedEventCount: expectedNames.count)
+        let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected to be delivered on the main thread
@@ -112,8 +115,9 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRecord(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("name"))
+        let request = Player.order(Column("name"))
         let expectedNames = [
+            "Arthur",
             "Arthur",
             "Arthur",
             nil,
@@ -121,7 +125,7 @@ extension TypedRequestTests {
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<Person?>(expectedEventCount: expectedNames.count)
+        let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
                 // events are expected to be delivered on the main thread
@@ -146,7 +150,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRecordDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("name"))
+        let request = Player.order(Column("name"))
         let expectedNames = [
             "Arthur",
             nil,
@@ -154,7 +158,7 @@ extension TypedRequestTests {
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<Person?>(expectedEventCount: expectedNames.count)
+        let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected to be delivered on the main thread
@@ -181,10 +185,11 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
@@ -215,9 +220,10 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRowsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
@@ -248,8 +254,9 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
+            "Arthur",
             "Arthur",
             "Arthur",
             nil,
@@ -282,7 +289,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRowDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             "Arthur",
             nil,
@@ -317,10 +324,11 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
@@ -351,9 +359,10 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
@@ -384,8 +393,9 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
+            "Arthur",
             "Arthur",
             "Arthur",
             nil,
@@ -418,7 +428,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneDatabaseValueDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             "Arthur",
             nil,
@@ -453,8 +463,9 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT email FROM persons ORDER BY name").asRequest(of: Optional<String>.self)
+        let request = SQLRequest("SELECT email FROM players ORDER BY name").asRequest(of: Optional<String>.self)
         let expectedNames = [
+            ["arthur@example.com", nil],
             ["arthur@example.com", nil],
             ["arthur@example.com", nil],
             [],
@@ -491,7 +502,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT email FROM persons ORDER BY name").asRequest(of: Optional<String>.self)
+        let request = SQLRequest("SELECT email FROM players ORDER BY name").asRequest(of: Optional<String>.self)
         let expectedNames = [
             ["arthur@example.com", nil],
             [],
@@ -528,31 +539,35 @@ extension TypedRequestTests {
     }
     
     func testPrimaryKeySortedDiff(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("id"))
+        let request = Player.order(Column("id"))
         let expectedDiffs = [
-            PrimaryKeySortedDiff<Person>(
+            PrimaryKeySortedDiff<Player>(
                 inserted: [
-                    Person(id: 1, name: "Arthur", email: "arthur@example.com"),
-                    Person(id: 2, name: "Barbara", email: nil)],
+                    Player(id: 1, name: "Arthur", email: "arthur@example.com"),
+                    Player(id: 2, name: "Barbara", email: nil)],
                 updated: [],
                 deleted: []),
-            PrimaryKeySortedDiff<Person>(
+            PrimaryKeySortedDiff<Player>(
+                inserted: [],
+                updated: [Player(id: 2, name: "Barbie", email: nil)],
+                deleted: []),
+            PrimaryKeySortedDiff<Player>(
                 inserted: [],
                 updated: [],
                 deleted: [
-                    Person(id: 1, name: "Arthur", email: "arthur@example.com"),
-                    Person(id: 2, name: "Barbara", email: nil)]),
-            PrimaryKeySortedDiff<Person>(
+                    Player(id: 1, name: "Arthur", email: "arthur@example.com"),
+                    Player(id: 2, name: "Barbie", email: nil)]),
+            PrimaryKeySortedDiff<Player>(
                 inserted: [
-                    Person(id: 1, name: "Craig", email: nil),
-                    Person(id: 2, name: "David", email: "david@example.com")
+                    Player(id: 1, name: "Craig", email: nil),
+                    Player(id: 2, name: "David", email: "david@example.com")
                 ],
                 updated: [],
                 deleted: []),
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<PrimaryKeySortedDiff<Person>>(expectedEventCount: expectedDiffs.count)
+        let recorder = EventRecorder<PrimaryKeySortedDiff<Player>>(expectedEventCount: expectedDiffs.count)
         request.rx
             .primaryKeySortedDiff(in: writer, initialElements: [])
             .subscribe { event in
@@ -564,17 +579,18 @@ extension TypedRequestTests {
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
-        for (event, diff) in zip(recorder.recordedEvents, expectedDiffs) {
-            XCTAssertEqual(event.element!.inserted, diff.inserted)
-            XCTAssertEqual(event.element!.updated, diff.updated)
-            XCTAssertEqual(event.element!.deleted, diff.deleted)
+        for (event, expectedDiff) in zip(recorder.recordedEvents, expectedDiffs) {
+            let diff = event.element!
+            XCTAssertEqual(diff.inserted, expectedDiff.inserted)
+            XCTAssertEqual(diff.updated, expectedDiff.updated)
+            XCTAssertEqual(diff.deleted, expectedDiff.deleted)
         }
     }
 }
 
 // MARK: - Support
 
-private struct Person : RowConvertible, MutablePersistable {
+private struct Player : RowConvertible, MutablePersistable {
     var id: Int64?
     var name: String
     var email: String?
@@ -591,7 +607,7 @@ private struct Person : RowConvertible, MutablePersistable {
         email = row["email"]
     }
     
-    static var databaseTableName = "persons"
+    static var databaseTableName = "players"
     
     func encode(to container: inout PersistenceContainer) {
         container["id"] = id
@@ -604,10 +620,10 @@ private struct Person : RowConvertible, MutablePersistable {
     }
 }
 
-extension Person : Diffable { }
+extension Player : Diffable { } // Diffable implementation is derived from RowConvertible
 
-extension Person : Equatable {
-    static func == (lhs: Person, rhs: Person) -> Bool {
+extension Player : Equatable {
+    static func == (lhs: Player, rhs: Player) -> Bool {
         if lhs.id != rhs.id { return false }
         if lhs.name != rhs.name { return false }
         if lhs.email != rhs.email { return false }
