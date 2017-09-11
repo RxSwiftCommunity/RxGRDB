@@ -22,64 +22,7 @@ struct RowValue : Comparable {
 /// Compares DatabaseValue like SQLite
 ///
 /// WARNING: this comparison does not handle database collations.
-private func < (lhs: DatabaseValue, rhs: DatabaseValue) -> Bool {
-    // sqlite> SELECT value, TYPEOF(value) FROM (
-    //    ...>   SELECT NULL AS value
-    //    ...>   UNION ALL SELECT 1
-    //    ...>   UNION ALL SELECT 2
-    //    ...>   UNION ALL SELECT 3
-    //    ...>   UNION ALL SELECT 1.0
-    //    ...>   UNION ALL SELECT 2.0
-    //    ...>   UNION ALL SELECT 3.0
-    //    ...>   UNION ALL SELECT '1'
-    //    ...>   UNION ALL SELECT '2'
-    //    ...>   UNION ALL SELECT '3'
-    //    ...>   UNION ALL SELECT CAST('1' AS BLOB)
-    //    ...>   UNION ALL SELECT CAST('2' AS BLOB)
-    //    ...>   UNION ALL SELECT CAST('3' AS BLOB)
-    //    ...> ) ORDER BY value;
-    // |null
-    // 1|integer
-    // 1.0|real
-    // 2|integer
-    // 2.0|real
-    // 3|integer
-    // 3.0|real
-    // 1|text
-    // 2|text
-    // 3|text
-    // 1|blob
-    // 2|blob
-    // 3|blob
-    // sqlite> SELECT value, TYPEOF(value) FROM (
-    //    ...>   SELECT NULL AS value
-    //    ...>   UNION ALL SELECT CAST('3' AS BLOB)
-    //    ...>   UNION ALL SELECT CAST('2' AS BLOB)
-    //    ...>   UNION ALL SELECT CAST('1' AS BLOB)
-    //    ...>   UNION ALL SELECT '3'
-    //    ...>   UNION ALL SELECT '2'
-    //    ...>   UNION ALL SELECT '1'
-    //    ...>   UNION ALL SELECT 3.0
-    //    ...>   UNION ALL SELECT 2.0
-    //    ...>   UNION ALL SELECT 1.0
-    //    ...>   UNION ALL SELECT 3
-    //    ...>   UNION ALL SELECT 2
-    //    ...>   UNION ALL SELECT 1
-    //    ...> ) ORDER BY value;
-    // |null
-    // 1.0|real
-    // 1|integer
-    // 2.0|real
-    // 2|integer
-    // 3.0|real
-    // 3|integer
-    // 1|text
-    // 2|text
-    // 3|text
-    // 1|blob
-    // 2|blob
-    // 3|blob
-    
+func < (lhs: DatabaseValue, rhs: DatabaseValue) -> Bool {
     switch (lhs.storage, rhs.storage) {
     case (.int64(let lhs), .int64(let rhs)):
         return lhs < rhs
@@ -90,14 +33,25 @@ private func < (lhs: DatabaseValue, rhs: DatabaseValue) -> Bool {
     case (.double(let lhs), .int64(let rhs)):
         return lhs < Double(rhs)
     case (.string(let lhs), .string(let rhs)):
-        // Warning: this may not match SQLite collation
         return lhs.utf8.lexicographicallyPrecedes(rhs.utf8)
     case (.blob(let lhs), .blob(let rhs)):
         return lhs.lexicographicallyPrecedes(rhs, by: <)
-    case (.blob, _): return false
-    case (.string, _): return false
-    case (.int64, _), (.double, _): return false
-    case (.null, _): return false
+    case (.blob, _):
+        return false
+    case (_, .blob):
+        return true
+    case (.string, _):
+        return false
+    case (_, .string):
+        return true
+    case (.int64, _), (.double, _):
+        return false
+    case (_, .int64), (_, .double):
+        return true
+    case (.null, _):
+        return false
+    case (_, .null):
+        return true
     }
 }
 
