@@ -281,13 +281,13 @@ extension RequestTests {
 }
 
 extension RequestTests {
-    func testObserveSingleRecordNilRowID() throws {
-        try Test(testObserveSingleRecordNilRowID)
+    func testObserveSingleRecordNilRowIDWithoutSynchronizedStart() throws {
+        try Test(testObserveSingleRecordNilRowIDWithoutSynchronizedStart)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testObserveSingleRecordNilRowID(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testObserveSingleRecordNilRowIDWithoutSynchronizedStart(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         struct Player: MutablePersistable, RowConvertible {
             var id: Int64?
             
@@ -331,13 +331,121 @@ extension RequestTests {
 }
 
 extension RequestTests {
-    func testObserveRecordNilSingleColumnPrimaryKey() throws {
-        try Test(testObserveRecordNilSingleColumnPrimaryKey)
+    func testObserveSingleRecordNilRowIDWithSynchronizedStart() throws {
+        try Test(testObserveSingleRecordNilRowIDWithSynchronizedStart)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testObserveRecordNilSingleColumnPrimaryKey(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testObserveSingleRecordNilRowIDWithSynchronizedStart(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        struct Player: MutablePersistable, RowConvertible {
+            var id: Int64?
+            
+            static let databaseTableName = "players"
+            
+            init(row: Row) {
+                id = row["id"]
+            }
+            
+            func encode(to container: inout PersistenceContainer) {
+                container["id"] = id
+            }
+            
+            mutating func didInsert(with rowID: Int64, for column: String?) {
+                id = rowID
+            }
+        }
+        
+        try writer.write { db in
+            try db.create(table: "players") { t in
+                t.column("id", .integer).primaryKey()
+            }
+        }
+        
+        let recorder = EventRecorder<Player>(expectedEventCount: 2)
+        let player = Player(row: ["id": nil])
+        Observable.from(record: player, in: writer, synchronizedStart: true)
+            .subscribe { event in
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                recorder.on(event)
+            }
+            .addDisposableTo(disposeBag)
+        wait(for: recorder, timeout: 1)
+        
+        switch recorder.recordedEvents[0] {
+        case .next: break
+        default: XCTFail("Expected next event")
+        }
+        
+        switch recorder.recordedEvents[1] {
+        case .completed: break
+        default: XCTFail("Expected completed event")
+        }
+    }
+}
+
+extension RequestTests {
+    func testObserveRecordNilSingleColumnPrimaryKeyWithSynchronizedStart() throws {
+        try Test(testObserveRecordNilSingleColumnPrimaryKeyWithSynchronizedStart)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testObserveRecordNilSingleColumnPrimaryKeyWithSynchronizedStart(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        struct Player: Persistable, RowConvertible {
+            var id: String?
+            
+            static let databaseTableName = "players"
+            
+            init(row: Row) {
+                id = row["id"]
+            }
+            
+            func encode(to container: inout PersistenceContainer) {
+                container["id"] = id
+            }
+        }
+        
+        try writer.write { db in
+            try db.create(table: "players") { t in
+                t.column("id", .text).primaryKey()
+            }
+        }
+        
+        let recorder = EventRecorder<Player>(expectedEventCount: 2)
+        
+        // (1)
+        let player = Player(row: ["id": nil])
+        Observable.from(record: player, in: writer, synchronizedStart: true)
+            .subscribe { event in
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                recorder.on(event)
+            }
+            .addDisposableTo(disposeBag)
+        wait(for: recorder, timeout: 1)
+        
+        switch recorder.recordedEvents[0] {
+        case .next: break
+        default: XCTFail("Expected next event")
+        }
+
+        switch recorder.recordedEvents[1] {
+        case .completed: break
+        default: XCTFail("Expected completed event")
+        }
+    }
+}
+
+extension RequestTests {
+    func testObserveRecordNilSingleColumnPrimaryKeyWithoutSynchronizedStart() throws {
+        try Test(testObserveRecordNilSingleColumnPrimaryKeyWithoutSynchronizedStart)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testObserveRecordNilSingleColumnPrimaryKeyWithoutSynchronizedStart(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         struct Player: Persistable, RowConvertible {
             var id: String?
             
@@ -379,13 +487,69 @@ extension RequestTests {
 }
 
 extension RequestTests {
-    func testObserveRecordNilCompoundPrimaryKey() throws {
-        try Test(testObserveRecordNilCompoundPrimaryKey)
+    func testObserveRecordNilCompoundPrimaryKeyWithSynchronizedStart() throws {
+        try Test(testObserveRecordNilCompoundPrimaryKeyWithSynchronizedStart)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testObserveRecordNilCompoundPrimaryKey(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testObserveRecordNilCompoundPrimaryKeyWithSynchronizedStart(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        struct Passport: Persistable, RowConvertible {
+            var countryCode: String?
+            let citizenId: Int?
+            
+            static let databaseTableName = "passports"
+            
+            init(row: Row) {
+                countryCode = row["countryCode"]
+                citizenId = row["citizenId"]
+            }
+            
+            func encode(to container: inout PersistenceContainer) {
+                container["countryCode"] = countryCode
+                container["citizenId"] = citizenId
+            }
+        }
+        
+        try writer.write { db in
+            try db.create(table: "passports") { t in
+                t.column("countryCode", .text).notNull()
+                t.column("citizenId", .integer).notNull()
+                t.primaryKey(["countryCode", "citizenId"])
+            }
+        }
+        
+        let recorder = EventRecorder<Passport>(expectedEventCount: 2)
+        let passport = Passport(row: ["countryCode": nil, "citizenId": nil])
+        Observable.from(record: passport, in: writer, synchronizedStart: true)
+            .subscribe { event in
+                // events are expected to be delivered on the main thread
+                XCTAssertTrue(Thread.isMainThread)
+                recorder.on(event)
+            }
+            .addDisposableTo(disposeBag)
+        wait(for: recorder, timeout: 1)
+        
+        switch recorder.recordedEvents[0] {
+        case .next: break
+        default: XCTFail("Expected next event")
+        }
+
+        switch recorder.recordedEvents[1] {
+        case .completed: break
+        default: XCTFail("Expected completed event")
+        }
+    }
+}
+
+extension RequestTests {
+    func testObserveRecordNilCompoundPrimaryKeyWithoutSynchronizedStart() throws {
+        try Test(testObserveRecordNilCompoundPrimaryKeyWithoutSynchronizedStart)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testObserveRecordNilCompoundPrimaryKeyWithoutSynchronizedStart(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         struct Passport: Persistable, RowConvertible {
             var countryCode: String?
             let citizenId: Int?
