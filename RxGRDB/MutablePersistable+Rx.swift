@@ -69,6 +69,7 @@ extension ObservationStrategy where Record: MutablePersistable {
 }
 
 private extension MutablePersistable {
+    /// Returns nil when record has nil primary key
     func observationStrategy(_ db: Database) throws -> ObservationStrategy<Self>? {
         let primaryKey = try db.primaryKey(type(of: self).databaseTableName)
         if let primaryKey = primaryKey {
@@ -105,6 +106,10 @@ extension Observable where Element: RowConvertible & MutablePersistable {
         return Observable.create { observer in
             do {
                 guard let observationStrategy = try writer.read({ try record.observationStrategy($0) }) else {
+                    if synchronizedStart {
+                        // Consumer expects an initial value
+                        observer.on(.next(record))
+                    }
                     observer.on(.completed)
                     return Disposables.create()
                 }

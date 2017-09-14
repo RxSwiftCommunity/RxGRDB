@@ -169,11 +169,12 @@ try dbQueue.inDatabase { db in
 }
 ```
 
-When the record has a nil primary key, the observable completes right on subscription. When the primary key spans several columns, all primary key columns must be nil for the observable to complete immediately.
-
 If you set `synchronizedStart` to true (the default value), the record is reloaded from the database and emitted synchronously upon subscription.
 
 Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
+
+When the record has a nil primary key, no database observation can occur. In this case, the observable emits the record right on subscription if `synchronizedStart` is true, and then immediately completes. When the primary key spans several columns, all primary key columns must be nil for the observable to behave this way.
+
 
 **This observable never emits identical consecutive values.**
 
