@@ -105,7 +105,7 @@ extension Observable where Element: RowConvertible & MutablePersistable {
     public static func from(record: Element, in writer: DatabaseWriter, synchronizedStart: Bool = true, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable {
         return Observable.create { observer in
             do {
-                guard let observationStrategy = try writer.read({ try record.observationStrategy($0) }) else {
+                guard let observationStrategy = try writer.unsafeReentrantRead({ try record.observationStrategy($0) }) else {
                     // No observation strategy means that record has a nil
                     // primary key and can't be tracked.
                     if synchronizedStart {
