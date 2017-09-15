@@ -72,10 +72,10 @@ private extension MutablePersistable {
     /// Returns nil when record has nil primary key
     func observationStrategy(_ db: Database) throws -> ObservationStrategy<Self>? {
         let primaryKey = try db.primaryKey(type(of: self).databaseTableName)
-        if let primaryKey = primaryKey {
-            return try ObservationStrategy(db, record: self, primaryKey: primaryKey)
+        if primaryKey.isRowID {
+            return try ObservationStrategy(db, record: self, rowIDColumn: primaryKey.columns[0])
         } else {
-            return try ObservationStrategy(db, record: self, rowIDColumn: Column.rowID.name)
+            return try ObservationStrategy(db, record: self, primaryKey: primaryKey)
         }
     }
 }
@@ -106,6 +106,8 @@ extension Observable where Element: RowConvertible & MutablePersistable {
         return Observable.create { observer in
             do {
                 guard let observationStrategy = try writer.read({ try record.observationStrategy($0) }) else {
+                    // No observation strategy means that record has a nil
+                    // primary key and can't be tracked.
                     if synchronizedStart {
                         // Consumer expects an initial value
                         observer.on(.next(record))
@@ -126,13 +128,13 @@ extension Observable where Element: RowConvertible & MutablePersistable {
                 // Optimization for records whose primary key is the rowID
                 case .row(let selectionInfo, let rowIDColumn, let rowID):
                     let request = Element.filter(Column(rowIDColumn) == rowID)
-                    let changes: Observable<ChangeToken> = RowIDChangeTokensObserver.rx.observable(forTransactionsIn: writer) { (db, observer) in
+                    let changeTokens: Observable<ChangeToken> = RowIDChangeTokensObserver.rx.observable(forTransactionsIn: writer) { (db, observer) in
                         if synchronizedStart {
                             observer.on(.next(ChangeToken(.initialSync(db))))
                         }
                         return RowIDChangeTokensObserver(writer: writer, selectionInfo: selectionInfo, rowID: rowID, observer: observer)
                     }
-                    return changes
+                    return changeTokens
                         .mapFetch(resultQueue: resultQueue) { try Row.fetchOne($0, request) }
                         .distinctUntilChanged(==)
                         .takeWhile { $0 != nil } // complete when record has been deleted
