@@ -66,12 +66,7 @@ extension TypedRequest where RowDecoder: TableMapping {
     ///     }
     func primaryKey(_ db: Database) throws -> (Row) -> RowValue {
         // Extract primary key columns
-        let columns: [String]
-        if let primaryKey = try db.primaryKey(RowDecoder.databaseTableName) {
-            columns = primaryKey.columns
-        } else {
-            columns = [Column.rowID.name]
-        }
+        let columns = try db.primaryKey(RowDecoder.databaseTableName).columns
         
         // Turn column names into statement indexes
         let (statement, rowAdapter) = try prepare(db)

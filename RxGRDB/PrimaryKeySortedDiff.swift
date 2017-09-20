@@ -64,7 +64,7 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
                 if sameRows {
                     nextReferences.append(previous)
                 } else {
-                    let newElement = previous.element.updating(with: new.row)
+                    let newElement = previous.element.updated(with: new.row)
                     updated.append(newElement)
                     nextReferences.append(Reference(primaryKey: previous.primaryKey, row: new.row, element: newElement))
                 }
@@ -88,7 +88,7 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
     }
 }
 
-extension PrimaryKeySortedDiffStrategy where Element: MutablePersistable {
+extension PrimaryKeySortedDiffStrategy {
     init<R>(_ db: Database, request: R, elements: [Element]) throws where R: TypedRequest, Element == R.RowDecoder {
         let primaryKey = try request.primaryKey(db)
         let references = elements.map { element -> Reference in
