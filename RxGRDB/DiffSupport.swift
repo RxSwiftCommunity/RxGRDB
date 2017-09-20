@@ -7,9 +7,11 @@
 /// A "row value" https://www.sqlite.org/rowvalue.html
 ///
 /// WARNING: the Comparable conformance does not handle database collations.
-struct RowValue : Comparable {
+struct RowValue {
     let dbValues: [DatabaseValue]
-    
+}
+
+extension RowValue : Comparable {
     static func < (lhs: RowValue, rhs: RowValue) -> Bool {
         return lhs.dbValues.lexicographicallyPrecedes(rhs.dbValues, by: <)
     }

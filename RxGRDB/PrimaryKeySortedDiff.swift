@@ -15,8 +15,7 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
         let element: Element     // An element reference
     }
     
-    init<R>(_ db: Database, request: R, initialElements: [Element]) throws where R: TypedRequest, Element == R.RowDecoder {
-        let primaryKey = try request.primaryKey(db)
+    init(primaryKey: @escaping (Row) -> RowValue, initialElements: [Element]) {
         let references = initialElements.map { element -> Reference in
             let row = Row(element.databaseDictionary)
             return Reference(
@@ -24,28 +23,28 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
                 row: row,
                 element: element)
         }
-        self.init(references: references, primaryKey: primaryKey)
-    }
-
-    private init(references: [Reference], primaryKey: @escaping (Row) -> RowValue) {
-        self.references = references
-        self.primaryKey = primaryKey
+        self.init(primaryKey: primaryKey, references: references)
     }
     
-    mutating func diff(from rows: RowCursor) throws -> PrimaryKeySortedDiff<Element>? {
+    private init(primaryKey: @escaping (Row) -> RowValue, references: [Reference]) {
+        self.primaryKey = primaryKey
+        self.references = references
+    }
+
+    mutating func diff<RowCursor>(from rows: RowCursor) throws -> PrimaryKeySortedDiff<Element>? where RowCursor: Cursor, RowCursor.Element: Row {
         let primaryKey = self.primaryKey
         let newElements = try Array(rows.map { (primaryKey: primaryKey($0), row: $0.copy()) })
-        
+
         var inserted: [Element] = []
         var updated: [Element] = []
         var deleted: [Element] = []
-        
+
         let mergeSteps = sortedMerge(
             left: references,
             right: newElements,
             leftKey: { $0.primaryKey },
             rightKey: { $0.primaryKey })
-        
+
         var nextReferences: [Reference] = []
         for step in mergeSteps {
             switch step {
@@ -75,30 +74,16 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
                 nextReferences.append(Reference(primaryKey: new.primaryKey, row: new.row, element: element))
             }
         }
-        
+
         // Ready for next rows
         references = nextReferences
-        
+
         // Result
         if inserted.isEmpty && updated.isEmpty && deleted.isEmpty { return nil }
         return PrimaryKeySortedDiff(
             inserted: inserted,
             updated: updated,
             deleted: deleted)
-    }
-}
-
-extension PrimaryKeySortedDiffStrategy {
-    init<R>(_ db: Database, request: R, elements: [Element]) throws where R: TypedRequest, Element == R.RowDecoder {
-        let primaryKey = try request.primaryKey(db)
-        let references = elements.map { element -> Reference in
-            let row = Row(element.databaseDictionary)
-            return Reference(
-                primaryKey: primaryKey(row),
-                row: row,
-                element: element)
-        }
-        self.init(references: references, primaryKey: primaryKey)
     }
 }
 
