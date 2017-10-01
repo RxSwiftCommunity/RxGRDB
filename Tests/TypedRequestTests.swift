@@ -570,11 +570,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<PrimaryKeySortedDiff<Player>>(expectedEventCount: expectedDiffs.count)
         request.rx
             .primaryKeySortedDiff(in: writer, initialElements: [])
-            .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
-                recorder.on(event)
-            }
+            .subscribe(recorder)
             .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)

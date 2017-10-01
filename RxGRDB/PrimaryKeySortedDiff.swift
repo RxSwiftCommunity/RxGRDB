@@ -31,9 +31,9 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
         self.references = references
     }
 
-    mutating func diff<RowCursor>(from rows: RowCursor) throws -> PrimaryKeySortedDiff<Element>? where RowCursor: Cursor, RowCursor.Element: Row {
+    mutating func diff(from rows: [Row]) throws -> PrimaryKeySortedDiff<Element>? {
         let primaryKey = self.primaryKey
-        let newElements = try Array(rows.map { (primaryKey: primaryKey($0), row: $0.copy()) })
+        let newElements = Array(rows.map { (primaryKey: primaryKey($0), row: $0) })
 
         var inserted: [Element] = []
         var updated: [Element] = []

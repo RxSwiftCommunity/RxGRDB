@@ -18,7 +18,7 @@ extension Diffable where Self: RowConvertible {
 
 extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & MutablePersistable & Diffable {
     /// TODO
-    public func primaryKeySortedDiff(in writer: DatabaseWriter, initialElements: [Base.RowDecoder] = [], resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>> {
+    public func primaryKeySortedDiff(in writer: DatabaseWriter, initialElements: [Base.RowDecoder] = []) -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>> {
         let request = base
         return Observable.create { observer in
             do {
@@ -26,24 +26,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
                     try request.primaryKey($0)
                 }
                 let diffQueue = DispatchQueue(label: "RxGRDB.diff")
-                return AnyDatabaseWriter(writer).rx
-                    .changeTokens(in: [request])
-                    // TODO:
-                    // - When writer is DatabasePool, we want to compute the diff on the reader queue from a cursor of metal rows.
-                    // - When writer is DatabaseQueue, we want to compute the diff on the distinct queue from a cursor of copied rows.
-                    // Below we are processing a cursor of row copies on a distinct queue:
-                    .mapFetch(resultQueue: diffQueue) {
-                        try IteratorCursor(Row.fetchAll($0, request).makeIterator())
-                    }
+                return request
+                    .asRequest(of: Row.self)
+                    .rx
+                    .fetchAll(in: writer, resultQueue: diffQueue)
                     .diff(
                         primaryKey: primaryKey,
                         initialElements: initialElements,
                         stategy: PrimaryKeySortedDiffStrategy<Base.RowDecoder>.self)
-                    .subscribe { event in
-                        resultQueue.async {
-                            observer.on(event)
-                        }
-                }
+                    .subscribe(observer)
             } catch {
                 observer.on(.error(error))
                 return Disposables.create()

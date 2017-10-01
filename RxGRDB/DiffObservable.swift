@@ -9,51 +9,47 @@ protocol DiffStrategy {
     associatedtype Element
     associatedtype DiffType
     init(primaryKey: @escaping (Row) -> RowValue, initialElements: [Element])
-    mutating func diff<RowCursor>(from rows: RowCursor) throws -> DiffType? where RowCursor: Cursor, RowCursor.Element: Row
+    mutating func diff(from rows: [Row]) throws -> DiffType?
 }
 
-extension ObservableType where E: Cursor, E.Element: Row {
+extension ObservableType where E == [Row] {
     func diff<Strategy>(primaryKey: @escaping (Row) -> RowValue, initialElements: [Strategy.Element], stategy: Strategy.Type) -> Observable<Strategy.DiffType>
         where Strategy: DiffStrategy
     {
-        return DiffObservable<E, Strategy>(
-            rowCursors: asObservable(),
+        return DiffObservable<Strategy>(
+            rows: asObservable(),
             primaryKey: primaryKey,
             initialElements: initialElements)
             .asObservable()
     }
 }
 
-final class DiffObservable<RowCursor, Strategy> : ObservableType
-    where RowCursor: Cursor,
-    RowCursor.Element : Row,
-    Strategy: DiffStrategy
-{
+final class DiffObservable<Strategy: DiffStrategy> : ObservableType {
     typealias Element = Strategy.Element
     typealias E = Strategy.DiffType
     
-    let rowCursors: Observable<RowCursor>
+    let rows: Observable<[Row]>
     let primaryKey: (Row) -> RowValue
     let initialElements: [Element]
     
-    init(rowCursors: Observable<RowCursor>, primaryKey: @escaping (Row) -> RowValue, initialElements: [Element]) {
-        self.rowCursors = rowCursors
+    init(rows: Observable<[Row]>, primaryKey: @escaping (Row) -> RowValue, initialElements: [Element]) {
+        self.rows = rows
         self.primaryKey = primaryKey
         self.initialElements = initialElements
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
         var strategy: Strategy? = nil
-        let disposable = rowCursors.subscribe { event in
+        let disposable = rows.subscribe { event in
             switch event {
             case .completed: observer.on(.completed)
             case .error(let error): observer.on(.error(error))
-            case .next(let rowCursor):
+            case .next(let rows):
                 do {
                     if strategy == nil {
                         strategy = Strategy(primaryKey: self.primaryKey, initialElements: self.initialElements)
                     }
-                    if let diff = try strategy!.diff(from: rowCursor) {
+                    if let diff = try strategy!.diff(from: rows) {
                         observer.on(.next(diff))
                     }
                 } catch {
