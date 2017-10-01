@@ -634,7 +634,7 @@ Since RxGRDB is able to track database changes, it is a natural desire to comput
 
 **There are several diff algorithms**: you'll have to pick the one that suits your needs.
 
-RxGRDB itself ships with a single diff algorithm, which computes the lists of inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for unordered collections, such as annotations in a map view. See [`rx.primaryKeySortedDiff`](#typedrequestrxprimarykeysorteddiffininitialelements).
+RxGRDB itself ships with diff algorithm which computes the inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for collections whose order does not matter, such as annotations in a map view. See [`rx.primaryKeySortedDiff`](#typedrequestrxprimarykeysorteddiffininitialelements).
 
 For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses Differ in order to animate the content of a table view.
 
@@ -673,4 +673,4 @@ protocol Diffable {
 
 The Diffable protocol has a default implementation of the `updated(with:)` method which returns a newly created record from the given row. When the record type is a class, and you want records to be *reused* as the request results change, you'll provide a custom implementation that returns the same instance, updated from the given row.
 
-**The `primaryKeySortedDiff` diff algorithm is particularly suited for diffing unordered collections, such as annotations in a map view.** Check the [demo application](Documentation/RxGRDBDemo) for an example app that keeps the content of a map view synchronized with the content of the database.
+Check the [demo application](Documentation/RxGRDBDemo) for an example app that uses `primaryKeySortedDiff` to synchronize the content of a map view with the content of the database.
