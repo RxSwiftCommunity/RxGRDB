@@ -634,17 +634,23 @@ Since RxGRDB is able to track database changes, it is a natural desire to comput
 
 **There are several diff algorithms**: you'll have to pick the one that suits your needs.
 
-RxGRDB itself ships with a single diff algorithm, which computes the lists of inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for unordered collections, such as annotations in a map view. See [`rx.primaryKeySortedDiff`].
+RxGRDB itself ships with a single diff algorithm, which computes the lists of inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for unordered collections, such as annotations in a map view. See [`rx.primaryKeySortedDiff`](#typedrequestrxprimarykeysorteddiffininitialelements).
 
-For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo/README.md) that uses Differ in order to animate the content of a table view.
+For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses Differ in order to animate the content of a table view.
 
 ---
 
 #### `TypedRequest.rx.primaryKeySortedDiff(in:initialElements:)`
 
-This observable emits a diff after each database transaction that has  [impacted](#what-is-database-observation) the results of a request.
+This observable emits a diff of type PrimaryKeySortedDiff after each database transaction that has  [impacted](#what-is-database-observation) the results of a request.
 
-##### Preconditions
+```swift
+struct PrimaryKeySortedDiff<Element> {
+    let inserted: [Element]
+    let updated: [Element]
+    let deleted: [Element]
+}
+```
 
 To perform reliably, this observable has a few preconditions:
 
@@ -659,26 +665,12 @@ RowConvertible and MutablePersistable are [GRDB record protocols](https://github
 Diffable is the following protocol:
 
 ```swift
-public protocol Diffable {
+protocol Diffable {
     /// Returns a record updated with the given row.
     func updated(with row: Row) -> Self
 }
 ```
 
-It has a default implementation which returns a newly created record from the given row. When the record type is a class, and you want records to be *reused* as the request results change, you'll implement this `updated(with:)` method and return the same instance, updated from the given row.
+The Diffable protocol has a default implementation of the `updated(with:)` method which returns a newly created record from the given row. When the record type is a class, and you want records to be *reused* as the request results change, you'll provide a custom implementation that returns the same instance, updated from the given row.
 
-The resulting diffs have the PrimaryKeySortedDiff type:
-
-```swift
-struct PrimaryKeySortedDiff<Element> {
-    let inserted: [Element]
-    let updated: [Element]
-    let deleted: [Element]
-}
-```
-
-**This makes this algorithm particularly suited for diffing unordered collections, such as annotations in a map view.**
-
-##### Example: Diffing Map View Annotations
-
-TODO
+**The `primaryKeySortedDiff` diff algorithm is particularly suited for diffing unordered collections, such as annotations in a map view.** Check the [demo application](Documentation/RxGRDBDemo) for an example app that keeps the content of a map view synchronized with the content of the database.
