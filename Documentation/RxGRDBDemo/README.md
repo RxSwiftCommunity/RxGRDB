@@ -1,7 +1,9 @@
 RxGRDBDemo
 ==========
 
-This demo applications uses [RxSwift], [RxGRDB], and [Differ](https://github.com/tonyarnold/Differ) to synchronize its view with the content of the database.
+This demo application uses [RxSwift], [RxGRDB], and [Differ](https://github.com/tonyarnold/Differ) to synchronize its view with the content of the database.
+
+To play with it, open `RxGRDB.xcworkspace` at the root of the repository, and run the RxGRDBDemo application.
 
 |         |         |
 | :-----: | :-----: |
