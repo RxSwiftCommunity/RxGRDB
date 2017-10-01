@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		56019BCC1F81143C004C8B11 /* ExtendedDiff+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56019BCB1F81143C004C8B11 /* ExtendedDiff+Rx.swift */; };
+		563BD2CE1F81363A006A5390 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2CD1F81363A006A5390 /* Place.swift */; };
+		563BD2D11F81369D006A5390 /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */; };
+		563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2D21F81395F006A5390 /* PlacesViewController.swift */; };
 		56E1F97D1F8101EE00793BFA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F97C1F8101EE00793BFA /* AppDelegate.swift */; };
 		56E1F97F1F8101EE00793BFA /* PlayersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F97E1F8101EE00793BFA /* PlayersViewController.swift */; };
 		56E1F9821F8101EE00793BFA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 56E1F9801F8101EE00793BFA /* Main.storyboard */; };
@@ -44,6 +47,9 @@
 
 /* Begin PBXFileReference section */
 		56019BCB1F81143C004C8B11 /* ExtendedDiff+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExtendedDiff+Rx.swift"; sourceTree = "<group>"; };
+		563BD2CD1F81363A006A5390 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
+		563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
+		563BD2D21F81395F006A5390 /* PlacesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesViewController.swift; sourceTree = "<group>"; };
 		56E1F9791F8101EE00793BFA /* RxGRDBDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxGRDBDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		56E1F97C1F8101EE00793BFA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		56E1F97E1F8101EE00793BFA /* PlayersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersViewController.swift; sourceTree = "<group>"; };
@@ -92,6 +98,9 @@
 				56E1F97C1F8101EE00793BFA /* AppDelegate.swift */,
 				56E1F9931F81021300793BFA /* Database.swift */,
 				56019BCB1F81143C004C8B11 /* ExtendedDiff+Rx.swift */,
+				563BD2CD1F81363A006A5390 /* Place.swift */,
+				563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */,
+				563BD2D21F81395F006A5390 /* PlacesViewController.swift */,
 				56E1F9951F81033200793BFA /* Player.swift */,
 				56E1F97E1F8101EE00793BFA /* PlayersViewController.swift */,
 				56E1F9801F8101EE00793BFA /* Main.storyboard */,
@@ -217,8 +226,11 @@
 				56E1F9961F81033200793BFA /* Player.swift in Sources */,
 				56019BCC1F81143C004C8B11 /* ExtendedDiff+Rx.swift in Sources */,
 				56E1F9941F81021300793BFA /* Database.swift in Sources */,
+				563BD2CE1F81363A006A5390 /* Place.swift in Sources */,
+				563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */,
 				56E1F97F1F8101EE00793BFA /* PlayersViewController.swift in Sources */,
 				56E1F97D1F8101EE00793BFA /* AppDelegate.swift in Sources */,
+				563BD2D11F81369D006A5390 /* PlaceAnnotation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +378,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = AMD8W895CT;
 				INFOPLIST_FILE = RxGRDBDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -381,6 +394,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = AMD8W895CT;
 				INFOPLIST_FILE = RxGRDBDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";

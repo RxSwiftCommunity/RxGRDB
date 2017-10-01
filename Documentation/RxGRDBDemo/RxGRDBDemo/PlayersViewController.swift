@@ -69,11 +69,9 @@ extension PlayersViewController {
                     var player = Player(id: nil, name: Player.randomName(), score: Player.randomScore())
                     try player.insert(db)
                 }
-                // Delete a player
+                // Delete a random player
                 if arc4random_uniform(2) == 0 {
-                    if let player = try Player.order(sql: "RANDOM()").fetchOne(db) {
-                        try player.delete(db)
-                    }
+                    try Player.order(sql: "RANDOM()").limit(1).deleteAll(db)
                 }
                 // Update some players
                 for player in try Player.fetchAll(db) where arc4random_uniform(2) == 0 {

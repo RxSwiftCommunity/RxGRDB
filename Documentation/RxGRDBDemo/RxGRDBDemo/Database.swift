@@ -29,12 +29,23 @@ var databaseMigrator: DatabaseMigrator {
             t.column("name", .text).notNull().collate(.localizedCaseInsensitiveCompare)
             t.column("score", .integer).notNull()
         }
+        
+        try db.create(table: "places") { t in
+            t.column("id", .integer).primaryKey()
+            t.column("latitude", .double).notNull()
+            t.column("longitude", .double).notNull()
+        }
     }
     
     migrator.registerMigration("fixtures") { db in
         for _ in 0..<10 {
             var player = Player(id: nil, name: Player.randomName(), score: Player.randomScore())
             try player.insert(db)
+        }
+        for _ in 0..<10 {
+            let coordinate = Place.randomCoordinate()
+            var place = Place(id: nil, latitude: coordinate.latitude, longitude: coordinate.longitude)
+            try place.insert(db)
         }
     }
     
