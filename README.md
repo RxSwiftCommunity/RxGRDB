@@ -14,12 +14,15 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-4-orange.svg?style=flat)](ht
 
 ## Usage
 
-**RxGRDB produces RxSwift observables that track database changes.**
+**RxGRDB produces RxSwift observables that track database changes and can compute diffs.**
 
-Track [record](https://github.com/groue/GRDB.swift#records) changes:
+To connect to the database, define requests and records, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
+
+Track changes in a single record:
 
 ```swift
 let player: Player = ...
+
 Observable.from(record: player, in: dbQueue)
     .subscribe(
         onNext: { player: Player in
@@ -30,26 +33,29 @@ Observable.from(record: player, in: dbQueue)
         })
 ```
 
-Track [request](https://github.com/groue/GRDB.swift#requests) changes:
+Track changes in the results of a request:
 
 ```swift
 let request = Player.order(scoreColumn.desc).limit(10)
+
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { players: [Player] in
         print("Players have changed")
     })
 ```
 
-Track [value](https://github.com/groue/GRDB.swift#values) changes:
+Track changes in a value:
 
 ```swift
 let request = Player.all()
+
 request.rx.fetchCount(in: dbQueue)
     .subscribe(onNext: { count: Int in
         print("Number of players has changed")
     })
 
 let request = Player.select(max(scoreColumn)).asRequest(of: Int.self)
+
 request.rx.fetchOne(in: dbQueue)
     .subscribe(onNext: { maxScore: Int? in
         print("Maximum score has changed")
@@ -62,15 +68,14 @@ As always with GRDB, raw SQL is welcome:
 let request = SQLRequest(
     "SELECT * FROM players ORDER BY score DESC LIMIT 10")
     .asRequest(of: Player.self)
+    
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { players: [Player] in
         print("Players have changed")
     })
 ```
 
-You can also compute [diffs](#diffs) in order to animate the rows of a table views, or update annotations in a map view.
-
-To connect to the database, define requests and records, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
+You can also compute diffs in order to animate the rows of a table views, update annotations in a map view, or any other purpose.
 
 
 Documentation
@@ -634,7 +639,7 @@ Since RxGRDB is able to track database changes, it is a natural desire to comput
 
 **There are several diff algorithms**: you'll have to pick the one that suits your needs.
 
-RxGRDB itself ships with diff algorithm which computes the inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for collections whose order does not matter, such as annotations in a map view. See [`rx.primaryKeySortedDiff`](#typedrequestrxprimarykeysorteddiffininitialelements).
+RxGRDB ships with a diff algorithm which computes the inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for collections whose order does not matter, such as annotations in a map view. See [`rx.primaryKeySortedDiff`](#typedrequestrxprimarykeysorteddiffininitialelements).
 
 For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses Differ in order to animate the content of a table view.
 
