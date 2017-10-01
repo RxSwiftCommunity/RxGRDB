@@ -89,6 +89,17 @@ Documentation
 - [Observing Multiple Requests](#observing-multiple-requests)
 - [Diffs](#diffs)
 
+Observables and operators:
+
+- [request.rx.changes](#requestrxchangesinsynchronizedstart)
+- [request.rx.fetchCount](#requestrxfetchcountinsynchronizedstartresultqueue)
+- [request.rx.fetchOne](#typedrequestrxfetchoneinsynchronizedstartresultqueue)
+- [request.rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartresultqueue)
+- [request.rx.primaryKeySortedDiff](#typedrequestrxprimarykeysorteddiffininitialelements)
+- [connection.rx.changes](#databasewriterrxchangesinsynchronizedstart)
+- [connection.rx.changeTokens](#databasewriterrxchangeTokensinsynchronizedstart)
+- [mapFetch](#observablefetchresultqueueelement)
+
 
 ## Installation
 
