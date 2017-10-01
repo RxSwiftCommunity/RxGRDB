@@ -6,7 +6,8 @@ Release Notes
 ### New
 
 - Support for Swift 4
-- Tracking of individual records. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-a-single-record)
+- Tracking of individual records ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-a-single-record))
+- Support for diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffs))
 
 
 ### Breaking Changes
