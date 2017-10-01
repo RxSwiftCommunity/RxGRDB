@@ -11,7 +11,7 @@ To play with it, open `RxGRDB.xcworkspace` at the root of the repository, and ru
 
 The rows of the players table view animate as you change the players ordering, delete all players, or refresh them (refreshing applies random transformations to the database)
 
-The annotations of the map view move, appear, and dissapear as you delete them, or "refresh" the map view content.
+The annotations of the map view move, appear, and disappear as you delete them, or "refresh" the map view content.
 
 In both screens, the bomb icon spawns 50 dispatch items that concurrently perform random database transformations.
 
