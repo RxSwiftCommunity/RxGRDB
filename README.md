@@ -642,7 +642,7 @@ For other diff algorithms, we advise you to have a look to [Differ](https://gith
 
 #### `TypedRequest.rx.primaryKeySortedDiff(in:initialElements:)`
 
-This observable emits a diff of type PrimaryKeySortedDiff after each database transaction that has  [impacted](#what-is-database-observation) the results of a request.
+This observable emits values of type PrimaryKeySortedDiff after each database transaction that has  [impacted](#what-is-database-observation) the results of a request.
 
 ```swift
 struct PrimaryKeySortedDiff<Element> {
