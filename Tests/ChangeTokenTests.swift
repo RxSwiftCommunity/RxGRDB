@@ -44,7 +44,7 @@ extension ChangeTokenTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         
         try writer.write { db in
             // 2: modify observed requests

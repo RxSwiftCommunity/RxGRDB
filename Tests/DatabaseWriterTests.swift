@@ -40,7 +40,7 @@ extension DatabaseWriterTests {
             .changes(in: requests)
             .map { _ in }
             .subscribe(recorder)
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         
         try writer.write { db in
             // 2 (modify both requests)

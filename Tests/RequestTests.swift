@@ -39,7 +39,7 @@ extension RequestTests {
             request.rx
                 .changes(in: writer)
                 .subscribe(onNext: { _ in changes[index] = true })
-                .addDisposableTo(disposeBag)
+                .disposed(by: disposeBag)
         }
         
         // Subscription immediately triggers an event
@@ -114,7 +114,7 @@ extension RequestTests {
             .subscribe(onNext: { _ in
                 changesCount += 1
             })
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         
         XCTAssertEqual(changesCount, 1)
         
@@ -167,7 +167,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try writer.write { db in
             try db.execute("UPDATE persons SET name = name")
             try db.execute("DELETE FROM persons")
@@ -222,7 +222,7 @@ extension RequestTests {
                 eventsCount += 1
                 expectation.fulfill()
             })
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         
         XCTAssertEqual(eventsCount, 1)
         

@@ -66,7 +66,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try writer.write { db in
             // No change to player1
             try db.execute("UPDATE players SET name = name")
@@ -156,7 +156,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try writer.write { db in
             // No change to player1
             try db.execute("UPDATE players SET name = name")
@@ -247,7 +247,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try writer.write { db in
             // No change to passport1
             try db.execute("UPDATE passports SET citizenId = citizenId")
@@ -320,7 +320,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         wait(for: recorder, timeout: 1)
         
         switch recorder.recordedEvents[0] {
@@ -370,7 +370,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         wait(for: recorder, timeout: 1)
         
         switch recorder.recordedEvents[0] {
@@ -423,7 +423,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         wait(for: recorder, timeout: 1)
         
         switch recorder.recordedEvents[0] {
@@ -476,7 +476,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         wait(for: recorder, timeout: 1)
         
         switch recorder.recordedEvents[0] {
@@ -527,7 +527,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         wait(for: recorder, timeout: 1)
         
         switch recorder.recordedEvents[0] {
@@ -583,7 +583,7 @@ extension RequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         wait(for: recorder, timeout: 1)
         
         switch recorder.recordedEvents[0] {

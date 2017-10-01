@@ -63,7 +63,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -97,7 +97,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -132,7 +132,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -165,7 +165,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -202,7 +202,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -236,7 +236,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -271,7 +271,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -304,7 +304,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -341,7 +341,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -375,7 +375,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -410,7 +410,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -443,7 +443,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -480,7 +480,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -517,7 +517,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -575,7 +575,7 @@ extension TypedRequestTests {
                 XCTAssertTrue(Thread.isMainThread)
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
