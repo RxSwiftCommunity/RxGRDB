@@ -5,8 +5,9 @@
 #endif
 import RxSwift
 
-/// TODO
+/// The protocol for records that suit diff algorithms.
 public protocol Diffable {
+    /// Returns a record updated with the given row.
     func updated(with row: Row) -> Self
 }
 
