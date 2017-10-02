@@ -98,23 +98,24 @@ extension PlacesViewController {
     }
     
     private func zoomOnPlaces(animated: Bool) {
-        let places = try! dbPool.read { try Place.fetchAll($0) }
-        guard let firstPlace = places.first else {
+        let annotations = mapView.annotations
+        guard let first = annotations.first else {
             return
         }
-        let zeroSize = MKMapSize(width: 0, height: 0)
-        let initialMapRect = MKMapRect(
-            origin: MKMapPointForCoordinate(firstPlace.coordinate),
-            size: zeroSize)
-        let fittingMapRect = places
-            .suffix(from: 1)
-            .reduce(initialMapRect) { mapRect, place in
-                MKMapRectUnion(
-                    mapRect,
-                    MKMapRect(
-                        origin: MKMapPointForCoordinate(place.coordinate),
-                        size: zeroSize))
+        
+        func rect(_ coordinate: CLLocationCoordinate2D) -> MKMapRect {
+            return MKMapRect(
+                origin: MKMapPointForCoordinate(coordinate),
+                size: MKMapSize(width: 0, height: 0))
         }
+        
+        let initialMapRect = rect(first.coordinate)
+        let fittingMapRect = annotations
+            .suffix(from: 1)
+            .reduce(initialMapRect) { mapRect, annotation in
+                MKMapRectUnion(mapRect, rect(annotation.coordinate))
+        }
+        
         mapView.setVisibleMapRect(
             fittingMapRect,
             edgePadding: UIEdgeInsets(top: 40, left: 40, bottom: 40, right: 40),
