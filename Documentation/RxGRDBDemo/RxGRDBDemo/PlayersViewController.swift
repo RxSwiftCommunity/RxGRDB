@@ -4,22 +4,39 @@ import RxGRDB
 import GRDB
 import Differ
 
-private let playersByScore = Player.order(Player.Columns.score.desc)
-private let playersByName = Player.order(Player.Columns.name)
-
 class PlayersViewController: UITableViewController {
     private let disposeBag = DisposeBag()
     
-    // A variable of player requests, that the user changes in order to sort
-    // players by score or name.
-    private var playerRequest: Variable<QueryInterfaceRequest<Player>> = Variable(playersByScore)
+    // An enum that describes a players ordering
+    enum Ordering: Equatable {
+        case byScore
+        case byName
+        
+        var request: QueryInterfaceRequest<Player> {
+            switch self {
+            case .byScore: return Player.order(Player.Columns.score.desc)
+            case .byName: return Player.order(Player.Columns.name)
+            }
+        }
+        
+        var localizedName: String {
+            switch self {
+            case .byScore: return "Score ⬇︎"
+            case .byName: return "Name ⬆︎"
+            }
+        }
+    }
     
-    // A variable of player arrays, which feeds the table view. Its content
-    // depends on playerRequest.
+    // The user can change the players ordering
+    private var ordering: Variable<Ordering> = Variable(.byScore)
+    
+    // A variable of player arrays, which feeds the table view.
+    // Its content depends on the current ordering.
     private var players: Variable<[Player]> = Variable([])
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupNavigationItem()
         setupToolbar()
         setupTableView()
     }
@@ -27,25 +44,43 @@ class PlayersViewController: UITableViewController {
 
 extension PlayersViewController {
     
-    // MARK: - Toolbar
+    // MARK: - Actions
+    
+    private func setupNavigationItem() {
+        // Navigation item depends on the ordering
+        ordering.asObservable()
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [weak self] ordering in
+                guard let strongSelf = self else { return }
+                
+                let action: Selector
+                switch ordering {
+                case .byScore: action = #selector(strongSelf.sortByName)
+                case .byName: action = #selector(strongSelf.sortByScore)
+                }
+                
+                strongSelf.navigationItem.rightBarButtonItem = UIBarButtonItem(title: ordering.localizedName, style: .plain, target: self, action: action)
+                
+            })
+            .disposed(by: disposeBag)
+    }
     
     private func setupToolbar() {
         toolbarItems = [
-            UIBarButtonItem(title: "Name ⬆︎", style: .plain, target: self, action: #selector(sortByName)),
-            UIBarButtonItem(title: "Score ⬇︎", style: .plain, target: self, action: #selector(sortByScore)),
-            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deletePlayers)),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refresh)),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(title: "💣", style: .plain, target: self, action: #selector(stressTest)),
         ]
     }
     
     @IBAction func sortByName() {
-        playerRequest.value = playersByName
+        ordering.value = .byName
     }
     
     @IBAction func sortByScore() {
-        playerRequest.value = playersByScore
+        ordering.value = .byScore
     }
     
     @IBAction func deletePlayers() {
@@ -99,14 +134,14 @@ extension PlayersViewController {
         // We'll compute diffs in a background thread
         let diffQueue = DispatchQueue(label: "diff")
         
-        // Start tracking player requests
-        playerRequest.asObservable()
+        // Tracking player ordering
+        ordering.asObservable()
             
             // Observe database changes
-            .flatMapLatest { request -> Observable<[Row]> in
+            .flatMapLatest { ordering -> Observable<[Row]> in
                 // Turn player requests into row requests so that we can compute
                 // diffs based on Row's implementation of Equatable protocol.
-                let rowRequest = request.asRequest(of: Row.self)
+                let rowRequest = ordering.request.asRequest(of: Row.self)
                 
                 // Emits a new row array each time the database changes
                 return rowRequest.rx.fetchAll(in: dbPool, resultQueue: diffQueue)

@@ -22,7 +22,7 @@ class PlacesViewController: UIViewController {
 
 extension PlacesViewController {
     
-    // MARK: - Toolbar
+    // MARK: - Actions
     
     private func setupToolbar() {
         toolbarItems = [
@@ -81,6 +81,7 @@ extension PlacesViewController {
 }
 
 extension PlacesViewController {
+    
     // MARK: - Map View
     
     private func setupMapView() {
