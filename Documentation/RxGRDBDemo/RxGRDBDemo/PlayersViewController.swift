@@ -134,10 +134,10 @@ extension PlayersViewController {
         // We'll compute diffs in a background thread
         let diffQueue = DispatchQueue(label: "diff")
         
-        // Tracking player ordering
+        // Track player ordering
         ordering.asObservable()
             
-            // Observe database changes
+            // Each ordering has a database request: observe its changes
             .flatMapLatest { ordering -> Observable<[Row]> in
                 // Turn player requests into row requests so that we can compute
                 // diffs based on Row's implementation of Equatable protocol.
