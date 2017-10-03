@@ -11,12 +11,7 @@ The annotations of the map view move, appear, and disappear as you refresh the m
 
 In both screens, the bomb icon spawns 50 dispatch items that concurrently perform random database transformations.
 
-Relevant view controllers:
-
-- [PlayersViewController](RxGRDBDemo/PlayersViewController.swift)
-- [PlacesViewController](RxGRDBDemo/PlacesViewController.swift)
-
-|         |         |
+| [PlayersViewController](RxGRDBDemo/PlayersViewController.swift) | [PlacesViewController](RxGRDBDemo/PlacesViewController.swift) |
 | :-----: | :-----: |
 | ![Screen shot 1](Documentation/Screen1.png) | ![Screen shot 2](Documentation/Screen2.png) |
 
