@@ -1,6 +1,5 @@
 import UIKit
 import GRDB
-import RxSwift
 
 // The shared database pool
 var dbPool: DatabasePool!

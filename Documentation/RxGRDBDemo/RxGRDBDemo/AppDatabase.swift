@@ -1,4 +1,3 @@
-import UIKit
 import GRDB
 
 /// A type responsible for initializing the application database.
