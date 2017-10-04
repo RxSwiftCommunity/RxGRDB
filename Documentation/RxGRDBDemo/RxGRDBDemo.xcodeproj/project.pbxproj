@@ -19,7 +19,7 @@
 		56E1F9821F8101EE00793BFA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 56E1F9801F8101EE00793BFA /* Main.storyboard */; };
 		56E1F9841F8101EE00793BFA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 56E1F9831F8101EE00793BFA /* Assets.xcassets */; };
 		56E1F9871F8101EE00793BFA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 56E1F9851F8101EE00793BFA /* LaunchScreen.storyboard */; };
-		56E1F9941F81021300793BFA /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F9931F81021300793BFA /* Database.swift */; };
+		56E1F9941F81021300793BFA /* AppDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F9931F81021300793BFA /* AppDatabase.swift */; };
 		56E1F9961F81033200793BFA /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F9951F81033200793BFA /* Player.swift */; };
 		56E1F9A31F81083800793BFA /* Differ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E1F99D1F81082700793BFA /* Differ.framework */; };
 /* End PBXBuildFile section */
@@ -385,7 +385,7 @@
 		56E1F9831F8101EE00793BFA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		56E1F9861F8101EE00793BFA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		56E1F9881F8101EE00793BFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		56E1F9931F81021300793BFA /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
+		56E1F9931F81021300793BFA /* AppDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDatabase.swift; sourceTree = "<group>"; };
 		56E1F9951F81033200793BFA /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		56E1F9971F81082700793BFA /* Differ.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Differ.xcodeproj; path = Vendor/Differ/Differ.xcodeproj; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -494,7 +494,7 @@
 				564979EF1F82973D005CE4D7 /* Rx.xcodeproj */,
 				564979A61F829726005CE4D7 /* RxGRDB.xcodeproj */,
 				56E1F97C1F8101EE00793BFA /* AppDelegate.swift */,
-				56E1F9931F81021300793BFA /* Database.swift */,
+				56E1F9931F81021300793BFA /* AppDatabase.swift */,
 				56019BCB1F81143C004C8B11 /* ExtendedDiff+Rx.swift */,
 				563BD2CD1F81363A006A5390 /* Place.swift */,
 				563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */,
@@ -940,7 +940,7 @@
 			files = (
 				56E1F9961F81033200793BFA /* Player.swift in Sources */,
 				56019BCC1F81143C004C8B11 /* ExtendedDiff+Rx.swift in Sources */,
-				56E1F9941F81021300793BFA /* Database.swift in Sources */,
+				56E1F9941F81021300793BFA /* AppDatabase.swift in Sources */,
 				563BD2CE1F81363A006A5390 /* Place.swift in Sources */,
 				563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */,
 				56E1F97F1F8101EE00793BFA /* PlayersViewController.swift in Sources */,
