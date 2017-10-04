@@ -43,8 +43,7 @@ var databaseMigrator: DatabaseMigrator {
             try player.insert(db)
         }
         for _ in 0..<10 {
-            let coordinate = Place.randomCoordinate()
-            var place = Place(id: nil, latitude: coordinate.latitude, longitude: coordinate.longitude)
+            var place = Place(id: nil, coordinate: Place.randomCoordinate())
             try place.insert(db)
         }
     }

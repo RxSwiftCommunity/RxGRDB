@@ -19,6 +19,12 @@ struct Place: Codable {
             longitude = newValue.longitude
         }
     }
+    
+    init(id: Int64?, coordinate: CLLocationCoordinate2D) {
+        self.id = id
+        self.latitude = coordinate.latitude
+        self.longitude = coordinate.longitude
+    }
 }
 
 // Define colums so that we can build GRDB requests

@@ -46,15 +46,13 @@ extension PlacesViewController {
             if try Place.fetchCount(db) == 0 {
                 // Insert places
                 for _ in 0..<8 {
-                    let coordinate = Place.randomCoordinate()
-                    var place = Place(id: nil, latitude: coordinate.latitude, longitude: coordinate.longitude)
+                    var place = Place(id: nil, coordinate: Place.randomCoordinate())
                     try place.insert(db)
                 }
             } else {
                 // Insert a place
                 if arc4random_uniform(2) == 0 {
-                    let coordinate = Place.randomCoordinate()
-                    var place = Place(id: nil, latitude: coordinate.latitude, longitude: coordinate.longitude)
+                    var place = Place(id: nil, coordinate: Place.randomCoordinate())
                     try place.insert(db)
                 }
                 // Delete a random place
