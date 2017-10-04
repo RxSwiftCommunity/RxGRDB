@@ -39,32 +39,4 @@ extension Player {
     static func randomScore() -> Int {
         return 10 * Int(arc4random_uniform(101))
     }
-    
-    static func randomizePlayers(_ db: Database) throws {
-        if try fetchCount(db) == 0 {
-            // Insert players
-            for _ in 0..<8 {
-                var player = Player(id: nil, name: randomName(), score: randomScore())
-                try player.insert(db)
-            }
-        } else {
-            // Insert a player
-            if arc4random_uniform(2) == 0 {
-                var player = Player(id: nil, name: randomName(), score: randomScore())
-                try player.insert(db)
-            }
-            // Delete a player
-            if arc4random_uniform(2) == 0 {
-                if let player = try order(sql: "RANDOM()").fetchOne(db) {
-                    try player.delete(db)
-                }
-            }
-            // Update some players
-            for player in try fetchAll(db) where arc4random_uniform(2) == 0 {
-                var player = player
-                player.score = randomScore()
-                try player.update(db)
-            }
-        }
-    }
 }
