@@ -41,12 +41,12 @@ private final class ExtendedDiffObservable<C: Collection>: ObservableType {
         let isEqual = self.isEqual
         return collection.subscribe { event in
             switch event {
-            case .completed: observer.on(.completed)
-            case .error(let error): observer.on(.error(error))
+            case .completed:
+                observer.onCompleted()
+            case .error(let error):
+                observer.onError(error)
             case .next(let collection):
-                let diff = previousCollection.map {
-                    $0.extendedDiff(collection, isEqual: isEqual)
-                }
+                let diff = previousCollection?.extendedDiff(collection, isEqual: isEqual)
                 previousCollection = collection
                 observer.onNext((collection, diff))
             }
