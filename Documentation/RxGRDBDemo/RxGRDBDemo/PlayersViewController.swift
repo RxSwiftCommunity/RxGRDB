@@ -30,9 +30,9 @@ class PlayersViewController: UITableViewController {
     // The user can change the players ordering
     private var ordering: Variable<Ordering> = Variable(.byScore)
     
-    // A variable of player arrays, which feeds the table view.
-    // Its content depends on the current ordering.
-    private var players: Variable<[Player]> = Variable([])
+    // The players that feed the table view.
+    // They depend on the current ordering.
+    private var players: [Player] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -154,7 +154,7 @@ extension PlayersViewController {
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] (playerRows, diff) in
                 guard let strongSelf = self else { return }
-                strongSelf.players.value = playerRows.map { Player(row: $0) }
+                strongSelf.players = playerRows.map { Player(row: $0) }
                 if let diff = diff {
                     strongSelf.tableView.apply(
                         diff,
@@ -168,7 +168,7 @@ extension PlayersViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return players.value.count
+        return players.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -178,7 +178,7 @@ extension PlayersViewController {
     }
     
     private func configure(_ cell: UITableViewCell, at indexPath: IndexPath) {
-        let player = players.value[indexPath.row]
+        let player = players[indexPath.row]
         cell.textLabel?.text = player.name
         cell.detailTextLabel?.text = "\(player.score)"
     }
