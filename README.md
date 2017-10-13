@@ -14,11 +14,20 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-4-orange.svg?style=flat)](ht
 
 ## Usage
 
-**RxGRDB produces RxSwift observables that track database changes and can compute diffs.**
+To connect to the database and define the tracked requests and records, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
 
-To connect to the database, define requests and records, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
+**Track changes in the results of a request:**
 
-Track changes in a single record:
+```swift
+let request = Player.order(scoreColumn.desc).limit(10)
+
+request.rx.fetchAll(in: dbQueue)
+    .subscribe(onNext: { players: [Player] in
+        print("Best ten players have changed")
+    })
+```
+
+**Track the lifetime of a single record:**
 
 ```swift
 let player: Player = ...
@@ -33,18 +42,7 @@ Observable.from(record: player, in: dbQueue)
         })
 ```
 
-Track changes in the results of a request:
-
-```swift
-let request = Player.order(scoreColumn.desc).limit(10)
-
-request.rx.fetchAll(in: dbQueue)
-    .subscribe(onNext: { players: [Player] in
-        print("Players have changed")
-    })
-```
-
-Track changes in a value:
+**Track changes in a value:**
 
 ```swift
 let request = Player.all()
@@ -53,16 +51,9 @@ request.rx.fetchCount(in: dbQueue)
     .subscribe(onNext: { count: Int in
         print("Number of players has changed")
     })
-
-let request = Player.select(max(scoreColumn)).asRequest(of: Int.self)
-
-request.rx.fetchOne(in: dbQueue)
-    .subscribe(onNext: { maxScore: Int? in
-        print("Maximum score has changed")
-    })
 ```
 
-As always with GRDB, raw SQL is welcome:
+**As always with GRDB, raw SQL is welcome:**
 
 ```swift
 let request = SQLRequest(
@@ -71,11 +62,11 @@ let request = SQLRequest(
     
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { players: [Player] in
-        print("Players have changed")
+        print("Best ten players have changed")
     })
 ```
 
-You can also compute diffs in order to animate the rows of a table views, update annotations in a map view, or any other purpose.
+**RxGRDB can also compute diffs** in order to animate the rows of a table views, update annotations in a map view, or any other purpose.
 
 
 Documentation
@@ -88,18 +79,6 @@ Documentation
 - [Observing Individual Requests](#observing-individual-requests)
 - [Observing Multiple Requests](#observing-multiple-requests)
 - [Diffs](#diffs)
-
-Observables and operators:
-
-- [Observable.from(record:)](#observablefromrecordinsynchronizedstartresultqueue)
-- [request.rx.changes](#requestrxchangesinsynchronizedstart)
-- [request.rx.fetchCount](#requestrxfetchcountinsynchronizedstartresultqueue)
-- [request.rx.fetchOne](#typedrequestrxfetchoneinsynchronizedstartresultqueue)
-- [request.rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartresultqueue)
-- [request.rx.primaryKeySortedDiff](#typedrequestrxprimarykeysorteddiffininitialelements)
-- [database.rx.changes](#databasewriterrxchangesinsynchronizedstart)
-- [database.rx.changeTokens](#databasewriterrxchangeTokensinsynchronizedstart)
-- [mapFetch](#observablefetchresultqueueelement)
 
 
 ## Installation
