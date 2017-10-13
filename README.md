@@ -651,8 +651,10 @@ struct PrimaryKeySortedDiff<Element> {
 To perform reliably, this observable has a few preconditions:
 
 - The request must be sorted by primary key.
-- If the primary key contains string columns, then those columns must use the default [BINARY collation](https://www.sqlite.org/datatype3.html#collation).
+- The eventual initialElements argument array must be sorted by primary key.
 - The fetched values must be records that adopt the RowConvertible, MutablePersistable, and Diffable protocols.
+
+> :point_up: **Note**: if the primary key contains string column(s), then they must be sorted according to the default [BINARY collation](https://www.sqlite.org/datatype3.html#collation) of SQLite (which lexicographically sorts the UTF8 representation of strings).
 
 Those preconditions gives this algorithm a low complexity of `O(max(N,M))`, where `N` and `M` are the sizes of two consecutive request results.
 
