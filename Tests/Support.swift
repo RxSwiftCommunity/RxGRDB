@@ -53,6 +53,13 @@ extension XCTestCase {
     }
 }
 
+
+fileprivate let mainQueueKey = DispatchSpecificKey<Void>()
+func assertMainQueue(_ message: @autoclosure () -> String = "Not on the main dispatch queue", file: StaticString = #file, line: UInt = #line) {
+    DispatchQueue.main.setSpecific(key: mainQueueKey, value: ())
+    XCTAssertNotNil(DispatchQueue.getSpecific(key: mainQueueKey), message, file: file, line: line)
+}
+
 class AnyDatabaseWriter : DatabaseWriter, ReactiveCompatible {
     let base: DatabaseWriter
     

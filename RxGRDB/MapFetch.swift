@@ -32,10 +32,11 @@ class MapFetch<ResultType> : ObservableType {
         // Makes sure fetched results are ordered like change tokens
         let orderingQueue = DispatchQueue(label: "RxGRDB.MapFetch")
         
-        // Prevent user from feeding several .initialSync change tokens, because
+        // Prevent user from feeding several .synchronizedStartInDatabase change tokens, because
         // we haven't guaranteed yet that this does not mess with the ordering of
         // fetched results.
-        var allowsInitialSync = true
+        var allowsSynchronizedStart = true
+        var synchronizedStartElement: E? = nil
         
         dbSubscription = changeTokens.subscribe { event in
             switch event {
@@ -44,23 +45,29 @@ class MapFetch<ResultType> : ObservableType {
             case .next(let changeToken):
                 switch changeToken.mode {
                     
-                case .initialSync(let db):
-                    guard allowsInitialSync else {
-                        fatalError("Wrong scheduling: synchronized start must happen first or never")
+                case .synchronizedStartInDatabase(let db):
+                    guard allowsSynchronizedStart else {
+                        fatalError("Wrong scheduling: synchronizedStartInDatabase must happen first and once, or never")
                     }
-                    // No more initialSync allowed
-                    allowsInitialSync = false
+                    // No more .synchronizedStartInDatabase allowed
+                    allowsSynchronizedStart = false
                     
                     do {
-                        let element = try self.fetch(db)
-                        observer.on(.next(element))
+                        synchronizedStartElement = try self.fetch(db)
                     } catch {
                         observer.on(.error(error))
                     }
                     
+                case .synchronizedStartInSubscription:
+                    guard let element = synchronizedStartElement else {
+                        fatalError("Wrong scheduling: synchronizedStartInSubscription must happen right after synchronizedStartInDatabase")
+                    }
+                    synchronizedStartElement = nil
+                    observer.onNext(element)
+
                 case .async(let writer, _):
-                    // No more initialSync allowed
-                    allowsInitialSync = false
+                    // No more .synchronizedStartInDatabase allowed
+                    allowsSynchronizedStart = false
                     
                     // We only need a read access to fetch values, and thus want
                     // to release the writer queue as soon as possible. This is

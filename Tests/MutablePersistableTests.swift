@@ -62,8 +62,8 @@ extension RequestTests {
         // (1)
         Observable.from(record: player1, in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
@@ -152,8 +152,8 @@ extension RequestTests {
         // (1)
         Observable.from(record: player1, in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
@@ -243,8 +243,8 @@ extension RequestTests {
         // (1)
         Observable.from(record: passport1, in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
@@ -316,8 +316,8 @@ extension RequestTests {
         let player = Player(row: ["id": nil])
         Observable.from(record: player, in: writer, synchronizedStart: false)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
@@ -366,8 +366,8 @@ extension RequestTests {
         let player = Player(row: ["id": nil])
         Observable.from(record: player, in: writer, synchronizedStart: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
@@ -419,8 +419,8 @@ extension RequestTests {
         let player = Player(row: ["id": nil])
         Observable.from(record: player, in: writer, synchronizedStart: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
@@ -472,8 +472,8 @@ extension RequestTests {
         let player = Player(row: ["id": nil])
         Observable.from(record: player, in: writer, synchronizedStart: false)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
@@ -523,8 +523,8 @@ extension RequestTests {
         let passport = Passport(row: ["countryCode": nil, "citizenId": nil])
         Observable.from(record: passport, in: writer, synchronizedStart: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
@@ -579,8 +579,8 @@ extension RequestTests {
         let passport = Passport(row: ["countryCode": nil, "citizenId": nil])
         Observable.from(record: passport, in: writer, synchronizedStart: false)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)

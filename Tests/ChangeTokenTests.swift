@@ -6,6 +6,7 @@ import RxGRDB
 class ChangeTokenTests : XCTestCase { }
 
 extension ChangeTokenTests {
+    
     func testFetch() throws {
         try Test(testFetch)
             .run { try DatabaseQueue(path: $0) }
@@ -40,8 +41,8 @@ extension ChangeTokenTests {
                 return (strings, int)
             }
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)

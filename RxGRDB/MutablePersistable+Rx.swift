@@ -128,13 +128,11 @@ extension Observable where Element: RowConvertible & MutablePersistable {
                 // Optimization for records whose primary key is the rowID
                 case .row(let selectionInfo, let rowIDColumn, let rowID):
                     let request = Element.filter(Column(rowIDColumn) == rowID)
-                    let changeTokens: Observable<ChangeToken> = RowIDChangeTokensObserver.rx.observable(forTransactionsIn: writer) { (db, observer) in
-                        if synchronizedStart {
-                            observer.on(.next(ChangeToken(.initialSync(db))))
-                        }
-                        return RowIDChangeTokensObserver(writer: writer, selectionInfo: selectionInfo, rowID: rowID, observer: observer)
-                    }
-                    return changeTokens
+                    
+                    return RowIDChangeTokensObservable(
+                        writer: writer,
+                        selectionInfo: selectionInfo,
+                        rowID: rowID)
                         .mapFetch(resultQueue: resultQueue) { try Row.fetchOne($0, request) }
                         .distinctUntilChanged(==)
                         .takeWhile { $0 != nil } // complete when record has been deleted

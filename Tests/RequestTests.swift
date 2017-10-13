@@ -163,8 +163,8 @@ extension RequestTests {
         let request = Person.all()
         request.rx.fetchCount(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
