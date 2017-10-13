@@ -1,2 +1,3 @@
 - [ ] Test observation of several requests at the same time
+- [ ] Use schedulers with mapFetch, and force the same scheduler on both subscription and observation.
 - [ ] Allow one can pause values observation, and restart with fresh values
