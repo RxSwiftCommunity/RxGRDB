@@ -128,13 +128,15 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 
 > :point_up: **Note**: some special changes are not notified: changes to SQLite system tables (such as `sqlite_master`), and changes to [`WITHOUT ROWID`](https://www.sqlite.org/withoutrowid.html) tables. See [Data Change Notification Callbacks](https://www.sqlite.org/c3ref/update_hook.html) for more information.
 
-To function correctly, RxGRDB requires that a unique database [connection](https://github.com/groue/GRDB.swift#database-connections) is connected to a database file during the whole duration of the observation.
+To function correctly, RxGRDB requires that a unique database [connection](https://github.com/groue/GRDB.swift#database-connections) is kept open during the whole duration of the observation.
 
 **Change notifications may happen even though the request results are the same.** RxGRDB often notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement has actually modified the tracked tables and columns by inserting, updating, or deleting a row.
 
 For example, if you track `Player.select(max(scoreColumn))`, then you'll get a notification for all changes performed on the `score` column of the `players` table (updates, insertions and deletions), even if they do not modify the value of the maximum score. However, you will not get any notification for changes performed on other database tables, or updates to other columns of the `players` table.
 
 It is possible to avoid notifications of identical consecutive values. For example you can use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator of RxSwift. You can also let RxGRDB perform efficient deduplication at the database level: see the documentation of each reactive method for more information.
+
+**RxGRDB observables are based on GRDB's [TransactionObserver](https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol) protocol** If your application needs change notifications that are not built in RxGRDB, this versatile protocol may well provide a solution.
 
 
 ## Observing a Single Record
