@@ -11,7 +11,27 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
     let synchronizedStart: Bool
     let selectionInfos: (Database) throws -> [SelectStatement.SelectionInfo]
     
-    init(writer: DatabaseWriter, synchronizedStart: Bool = true, selectionInfos: @escaping (Database) throws -> [SelectStatement.SelectionInfo]) {
+    /// Creates an observable that emits `.change` tokens on the database writer
+    /// queue when a transaction has modified the database in a way that impacts
+    /// some requests' selections.
+    ///
+    /// When the `synchronizedStart` argument is true, the observable also emits
+    /// one `.databaseSubscription` and one `.subscription` token upon
+    /// subscription, synchronously.
+    ///
+    /// The `.databaseSubscription` token is emitted from the database writer
+    /// queue, and the `.subscription` token is emitted from the subscription
+    /// dispatch queue.
+    ///
+    /// It is possible for concurrent threads to commit database transactions
+    /// that modify the database between the `.databaseSubscription` token and
+    /// the `.subscription` token. When this happens, `.change` tokens are
+    /// emitted after `.databaseSubscription`, and before `.subscription`.
+    init(
+        writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        selectionInfos: @escaping (Database) throws -> [SelectStatement.SelectionInfo])
+    {
         self.writer = writer
         self.synchronizedStart = synchronizedStart
         self.selectionInfos = selectionInfos
@@ -22,19 +42,19 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
         do {
             let transactionObserver = try writer.unsafeReentrantWrite { db -> SelectionInfoChangeObserver in
                 if synchronizedStart {
-                    observer.onNext(ChangeToken(.synchronizedStartInDatabase(db)))
+                    observer.onNext(ChangeToken(.databaseSubscription(db)))
                 }
                 
                 let selectionInfos = try self.selectionInfos(db)
                 let transactionObserver = SelectionInfoChangeObserver(
                     selectionInfos: selectionInfos,
-                    onChange: { observer.onNext(ChangeToken(.async(writer, db))) })
+                    onChange: { observer.onNext(ChangeToken(.change(writer, db))) })
                 db.add(transactionObserver: transactionObserver)
                 return transactionObserver
             }
             
             if synchronizedStart {
-                observer.onNext(ChangeToken(.synchronizedStartInSubscription))
+                observer.onNext(ChangeToken(.subscription))
             }
 
             return Disposables.create {

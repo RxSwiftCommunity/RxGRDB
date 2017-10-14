@@ -12,7 +12,28 @@ final class RowIDChangeTokensObservable : ObservableType {
     let selectionInfo: SelectStatement.SelectionInfo
     let rowID: Int64
     
-    init(writer: DatabaseWriter, synchronizedStart: Bool = true, selectionInfo: SelectStatement.SelectionInfo, rowID: Int64) {
+    /// Creates an observable that emits `.change` tokens on the database writer
+    /// queue when a transaction has modified the database in a way that impacts
+    /// a specific database row.
+    ///
+    /// When the `synchronizedStart` argument is true, the observable also emits
+    /// one `.databaseSubscription` and one `.subscription` token upon
+    /// subscription, synchronously.
+    ///
+    /// The `.databaseSubscription` token is emitted from the database writer
+    /// queue, and the `.subscription` token is emitted from the subscription
+    /// dispatch queue.
+    ///
+    /// It is possible for concurrent threads to commit database transactions
+    /// that modify the database between the `.databaseSubscription` token and
+    /// the `.subscription` token. When this happens, `.change` tokens are
+    /// emitted after `.databaseSubscription`, and before `.subscription`.
+    init(
+        writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        selectionInfo: SelectStatement.SelectionInfo,
+        rowID: Int64)
+    {
         self.writer = writer
         self.synchronizedStart = synchronizedStart
         self.selectionInfo = selectionInfo
@@ -23,19 +44,19 @@ final class RowIDChangeTokensObservable : ObservableType {
         let writer = self.writer
         let transactionObserver = writer.unsafeReentrantWrite { db -> RowIDChangeObserver in
             if synchronizedStart {
-                observer.onNext(ChangeToken(.synchronizedStartInDatabase(db)))
+                observer.onNext(ChangeToken(.databaseSubscription(db)))
             }
             
             let transactionObserver = RowIDChangeObserver(
                 selectionInfo: self.selectionInfo,
                 rowID: rowID,
-                onChange: { observer.onNext(ChangeToken(.async(writer, db))) })
+                onChange: { observer.onNext(ChangeToken(.change(writer, db))) })
             db.add(transactionObserver: transactionObserver)
             return transactionObserver
         }
         
         if synchronizedStart {
-            observer.onNext(ChangeToken(.synchronizedStartInSubscription))
+            observer.onNext(ChangeToken(.subscription))
         }
         
         return Disposables.create {

@@ -18,25 +18,24 @@ import RxSwift
 ///             return ...           // fetch some values
 ///         }
 public struct ChangeToken {
-    enum Mode {
-        case synchronizedStartInDatabase(Database)
-        case synchronizedStartInSubscription
-        case async(DatabaseWriter, Database)
+    /// Not public: the kind of change token
+    enum Kind {
+        /// Emitted synchronously upon subscription, from the database writer
+        /// dispatch queue.
+        case databaseSubscription(Database)
+        
+        /// Emitted synchronously upon subscription, from the subscription
+        /// dispatch queue.
+        case subscription
+        
+        /// Emitted from the database writer dispatch queue.
+        case change(DatabaseWriter, Database)
     }
     
-    var mode: Mode
+    var kind: Kind
     
-//    /// The database connection in which the change has just happened
-//    public var database: Database? {
-//        switch mode {
-//        case .initialDatabaseSync(let db): return db
-//        case .initialSubscriptionSync: return nil
-//        case .async(_, let db): return db
-//        }
-//    }
-    
-    init(_ mode: Mode) {
-        self.mode = mode
+    init(_ kind: Kind) {
+        self.kind = kind
     }
 }
 
