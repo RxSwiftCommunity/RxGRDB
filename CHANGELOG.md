@@ -9,6 +9,9 @@ Release Notes
 - Tracking of individual records ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-a-single-record))
 - Support for diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffs))
 
+### Fixed
+
+- Observables that emit fetched values used to emit their first element on the wrong dispatch queue when their `synchronizedStart` option is true. That first element is now correctly emitted on the subscription dispatch queue.
 
 ### Breaking Changes
 
