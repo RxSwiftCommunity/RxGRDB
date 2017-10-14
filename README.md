@@ -136,7 +136,7 @@ For example, if you track `Player.select(max(scoreColumn))`, then you'll get a n
 
 It is possible to avoid notifications of identical consecutive values. For example you can use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator of RxSwift. You can also let RxGRDB perform efficient deduplication at the database level: see the documentation of each reactive method for more information.
 
-**RxGRDB observables are based on GRDB's [TransactionObserver](https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol) protocol** If your application needs change notifications that are not built in RxGRDB, this versatile protocol may well provide a solution.
+**RxGRDB observables are based on GRDB's [TransactionObserver](https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol) protocol.** If your application needs change notifications that are not built in RxGRDB, this versatile protocol may well provide a solution.
 
 
 ## Observing a Single Record
