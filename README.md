@@ -332,7 +332,6 @@ When you need to fetch from several requests with the guarantee of consistent re
 - [Change Tokens](#change-tokens)
 - [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangeTokensinsynchronizedstart)
 - [`mapFetch` Operator](#observablefetchresultqueueelement)
-- [Advanced: Differences between `changeTokens.mapFetch` and `changes.map.observeOn`](#advanced-differences-between-changetokensmapfetch-and-changesmapobserveon)
 
 
 ---
@@ -417,7 +416,7 @@ dbQueue.rx
     }
 ```
 
-`changeTokens(in:)` emits *change tokens* for all database transactions that modifies some requests. Those change tokens are consumed by the `mapFetch` operator, which turns them into the fetched results of your choice.
+`changeTokens(in:)` emits *change tokens* for all database transactions that modifies some requests. Those change tokens are opaque values that are turned into the fetched results of your choice by the `mapFetch` operator.
 
 When a single request is involved, it is used as both the source of tracked changes, and the source of the fetched results. But you can observe some requests and fetch from other ones:
 
@@ -438,7 +437,6 @@ dbQueue.rx
 
 - [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangeTokensinsynchronizedstart)
 - [`mapFetch` Operator](#observablefetchresultqueueelement)
-- [Advanced: Differences between `changeTokens.mapFetch` and `changes.map.observeOn`](#advanced-differences-between-changetokensmapfetch-and-changesmapobserveon)
 
 
 ---
@@ -455,11 +453,9 @@ let teams = Team.all()
 let changeTokens = dbQueue.rx.changeTokens(in: [players, teams]) // or dbPool
 ```
 
-If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
-
-All elements are emitted on the database writer dispatch queue, serialized with all database updates. See [GRDB Concurrency Guide] for more information.
-
 A sequence of change tokens is designed to be consumed by the [mapFetch](#observablefetchresultqueueelement) operator.
+
+If you set `synchronizedStart` to true (the default value), then the `mapFetch` operator emits it first element synchronously, upon subscription.
 
 
 ---
@@ -504,46 +500,13 @@ dbQueue.rx
 ```
 
 
-
----
-
-### Advanced: Differences between `changeTokens.mapFetch` and `changes.map.observeOn`
-
-The two observables below are very similar:
-
-```swift
-// changeTokens.mapFetch
-dbQueue.rx
-    .changeTokens(in: [...])
-    .mapFetch { (db: Database) in
-        return ...
-    }
-
-// changes.map.observeOn
-dbQueue.rx
-    .changes(in: [...])
-    .map { (db: Database) in
-        return ...
-    }
-    .observeOn(MainScheduler.instance)
-```
-
-They produce exactly the same results. Yet they don't have the same runtime behavior:
-
-- `changes.map.observeOn` emits an initial value on subscription, which is *asynchronously* scheduled by the [MainScheduler](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md). The initial value of `changeTokens.mapFetch` is emitted *synchronously*, right on subscription.
-
-- `changeTokens.mapFetch` is more efficient than `changes.map.observeOn`, when you use a [database pool] and leverage the enhanced multithreading of SQLite's [WAL mode](https://www.sqlite.org/wal.html):
-    
-    `changes.map.observeOn` locks the database for the whole duration of the fetch, when `changeTokens.mapFetch` is able to release the database before the fetch starts, while preserving the desired isolation guarantees. See [Advanced DatabasePool] for more information and context.
-
-
 ## Diffs
 
 Since RxGRDB is able to track database changes, it is a natural desire to compute diffs between two consecutive request results.
 
 **There are several diff algorithms**: you'll have to pick the one that suits your needs.
 
-RxGRDB ships with a diff algorithm which computes the inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for collections whose order does not matter, such as annotations in a map view. See [`rx.primaryKeySortedDiff`](#typedrequestrxprimarykeysorteddiffininitialelements).
+RxGRDB ships with one diff algorithm which computes the inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for collections whose order does not matter, such as annotations in a map view. See [`rx.primaryKeySortedDiff`](#typedrequestrxprimarykeysorteddiffininitialelements).
 
 For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses Differ in order to animate the content of a table view.
 
@@ -586,7 +549,6 @@ The Diffable protocol has a default implementation of the `updated(with:)` metho
 
 Check the [demo application](Documentation/RxGRDBDemo) for an example app that uses `primaryKeySortedDiff` to synchronize the content of a map view with the content of the database.
 
-[Advanced DatabasePool]: https://github.com/groue/GRDB.swift/blob/master/README.md#advanced-databasepool
 [database connection]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-connections
 [database pool]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools
 [database queue]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-queues
