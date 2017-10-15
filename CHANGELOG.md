@@ -6,7 +6,6 @@ Release Notes
 ### New
 
 - Support for Swift 4
-- Tracking of individual records ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-a-single-record))
 - Support for diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffs))
 
 ### Fixed
@@ -16,15 +15,6 @@ Release Notes
 ### Breaking Changes
 
 - Requirements have changed: Xcode 9+, Swift 4, GRDB 2.0
-
-
-### API diff
-
-```diff
-+extension Observable where Element: RowConvertible & MutablePersistable {
-+    static func from(record: Element, in writer: DatabaseWriter, synchronizedStart: Bool = true, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable
-+}
-```
 
 
 ## v0.6.0
