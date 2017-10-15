@@ -193,9 +193,9 @@ try dbQueue.inTransaction { db in
 }
 ```
 
-If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
+If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription. Other elements are asynchronously emitted on `resultQueue`.
 
-Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
+To guarantee that results are emitted in the chronological order of transactions, this observable must be subscribed on `resultQueue`. It is `DispatchQueue.main` by default.
 
 **This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator in order to avoid duplicates:
 
@@ -226,10 +226,9 @@ try dbQueue.inDatabase { db in
 }
 ```
 
-If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
+If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription. Other elements are asynchronously emitted on `resultQueue`.
 
-Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
-
+To guarantee that results are emitted in the chronological order of transactions, this observable must be subscribed on `resultQueue`. It is `DispatchQueue.main` by default.
 
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
@@ -275,10 +274,9 @@ try dbQueue.inTransaction { db in
 }
 ```
 
-If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
+If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription. Other elements are asynchronously emitted on `resultQueue`.
 
-Other elements are asynchronously emitted on `resultQueue`, in chronological order of transactions. The queue is `DispatchQueue.main` by default.
-
+To guarantee that results are emitted in the chronological order of transactions, this observable must be subscribed on `resultQueue`. It is `DispatchQueue.main` by default.
 
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
@@ -331,7 +329,7 @@ When you need to fetch from several requests with the guarantee of consistent re
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinsynchronizedstart)
 - [Change Tokens](#change-tokens)
 - [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangeTokensinsynchronizedstart)
-- [`mapFetch` Operator](#observablefetchresultqueueelement)
+- [`Observable.mapFetch`](#observablemapfetchresultqueue)
 
 
 ---
@@ -365,7 +363,6 @@ try dbQueue.inTransaction { db in
 If you set `synchronizedStart` to true (the default value), the first element is emitted synchronously upon subscription.
 
 All elements are emitted on the database writer dispatch queue, serialized with all database updates. See [GRDB Concurrency Guide] for more information.
-
 
 **You can also track SQL requests:**
 
@@ -435,8 +432,8 @@ dbQueue.rx
     })
 ```
 
-- [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangeTokensinsynchronizedstart)
-- [`mapFetch` Operator](#observablefetchresultqueueelement)
+- [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinsynchronizedstart)
+- [`Observable.mapFetch`](#observablemapfetchresultqueue)
 
 
 ---
@@ -453,16 +450,14 @@ let teams = Team.all()
 let changeTokens = dbQueue.rx.changeTokens(in: [players, teams]) // or dbPool
 ```
 
-A sequence of change tokens is designed to be consumed by the [mapFetch](#observablefetchresultqueueelement) operator.
-
-If you set `synchronizedStart` to true (the default value), then the `mapFetch` operator emits it first element synchronously, upon subscription.
+A sequence of change tokens is designed to be consumed by the [mapFetch](#observablemapfetchresultqueue) operator.
 
 
 ---
 
-#### `mapFetch` Operator
+#### `Observable.mapFetch(resultQueue:_:)`
 
-Transforms a sequence of [change tokens](#change-tokens) into fetched values.
+The `mapFetch` operator transforms a sequence of [change tokens](#change-tokens) into fetched values.
 
 ```swift
 let changeTokens = ... // Observable<ChangeToken>
@@ -473,13 +468,9 @@ let players = changeTokens.mapFetch { (db: Database) in
 }
 ```
 
-If the source sequence of change tokens has been produced with the `synchronizedStart` option, the first fetched result is emitted synchronously upon subscription (see [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangeTokensinsynchronizedstart)).
+If the source sequence of change tokens has been produced with the `synchronizedStart` option (the default value), the first element is emitted synchronously upon subscription. Other elements are asynchronously emitted on `resultQueue`.
 
-Other elements are asynchronously emitted on the main dispatch queue by default. You can change the target queue:
-
-```swift
-changeTokens.mapFetch(resultQueue: ...) { ... }
-```
+To guarantee that results are emitted in the chronological order of transactions, this observable must be subscribed on `resultQueue`. It is `DispatchQueue.main` by default.
 
 **The closure provided to `mapFetch` is guaranteed an immutable view of the last committed state of the database.** This means that you can perform subsequent fetches without fearing eventual concurrent writes to mess with your application logic:
 
