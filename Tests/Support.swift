@@ -13,7 +13,7 @@ class Test {
     func run(_ writer: (_ path: String) throws -> DatabaseWriter) throws -> Self {
         // Create temp directory
         let fm = FileManager.default
-        let directoryURL = fm.temporaryDirectory
+        let directoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent("RxGRDBTests", isDirectory: true)
             .appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString, isDirectory: true)
         try fm.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
