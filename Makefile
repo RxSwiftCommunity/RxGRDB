@@ -1,18 +1,30 @@
-# Requirements
-# ============
+# Rules
+# =====
 #
-# CocoaPods ~> 1.2.0 - https://cocoapods.org
-
-POD := $(shell command -v pod)
-
-
-# Targets
-# =======
-#
-# make: run all tests
-# make test: run all tests
+# make test - Run all tests but performance tests
+# make distclean - Restore repository to a pristine state
 
 default: test
+
+
+# Configuration
+# =============
+
+GIT := $(shell command -v git)
+POD := $(shell command -v pod)
+XCRUN := $(shell command -v xcrun)
+XCODEBUILD := set -o pipefail && $(shell command -v xcodebuild)
+
+# Xcode Version Information
+XCODEVERSION_FULL := $(word 2, $(shell xcodebuild -version))
+XCODEVERSION_MAJOR := $(shell xcodebuild -version 2>&1 | grep Xcode | cut -d' ' -f2 | cut -d'.' -f1)
+XCODEVERSION_MINOR := $(shell xcodebuild -version 2>&1 | grep Xcode | cut -d' ' -f2 | cut -d'.' -f2)
+
+# The Xcode Version, containing only the "MAJOR.MINOR" (ex. "8.3" for Xcode 8.3, 8.3.1, etc.)
+XCODEVERSION := $(XCODEVERSION_MAJOR).$(XCODEVERSION_MINOR)
+
+# Used to determine if xcpretty is available
+XCPRETTY_PATH := $(shell command -v xcpretty 2> /dev/null)
 
 
 # Tests
@@ -21,27 +33,54 @@ default: test
 # xcodebuild actions to run test targets
 TEST_ACTIONS = clean build build-for-testing test-without-building
 
-# xcodebuild destination to run tests on latest iOS (Xcode 8.3)
-IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 7,OS=10.3"
+# xcodebuild destination to run tests on iOS 8.1 (requires a pre-installed simulator)
+MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=8.1"
+
+ifeq ($(XCODEVERSION),9.0)
+  # xcodebuild destination to run tests on latest iOS (Xcode 9.0)
+  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.0"
+else
+  # Xcode < 9.0 is not supported
+endif
+
+# If xcpretty is available, use it for xcodebuild output
+XCPRETTY = 
+ifdef XCPRETTY_PATH
+  XCPRETTY = | xcpretty -c
+  
+  # On Travis-CI, use xcpretty-travis-formatter
+  ifeq ($(TRAVIS),true)
+    XCPRETTY += -f `xcpretty-travis-formatter`
+  endif
+endif
 
 # We test framework test suites, and if RxGRBD can be installed in an application:
 test: test_framework test_install
 
 test_framework: test_framework_RxGRDB
 test_framework_RxGRDB: test_framework_RxGRDBmacOS test_framework_RxGRDBiOS
+test_framework_RxGRDBiOS: test_framework_RxGRDBiOS_minTarget test_framework_RxGRDBiOS_maxTarget
 test_install: test_CocoaPodsLint
 
 test_framework_RxGRDBmacOS: GRDB.swift RxSwift
-	xcodebuild \
+	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBmacOS \
 	  $(TEST_ACTIONS)
 
-test_framework_RxGRDBiOS: GRDB.swift RxSwift
-	xcodebuild \
+
+test_framework_RxGRDBiOS_minTarget: GRDB.swift RxSwift
+	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBiOS \
-	  -destination $(IOS_DESTINATION) \
+	  -destination $(MIN_IOS_DESTINATION) \
+	  $(TEST_ACTIONS)
+
+test_framework_RxGRDBiOS_maxTarget: GRDB.swift RxSwift
+	$(XCODEBUILD) \
+	  -project RxGRDB.xcodeproj \
+	  -scheme RxGRDBiOS \
+	  -destination $(MAX_IOS_DESTINATION) \
 	  $(TEST_ACTIONS)
 
 test_CocoaPodsLint:
@@ -66,4 +105,15 @@ RxSwift: Vendor/RxSwift/Tests
 Vendor/RxSwift/Tests:
 	git submodule update --init Vendor/RxSwift
 
-.PHONY: test GRDB.swift RxSwift
+
+# Cleanup
+# =======
+
+distclean:
+	$(GIT) reset --hard
+	$(GIT) clean -dffx .
+	rm -rf Vendor/GRDB.swift && $(GIT) checkout -- Vendor/GRDB.swift
+	rm -rf Vendor/RxSwift && $(GIT) checkout -- Vendor/RxSwift
+	rm -rf Documentation/RxGRDBDemo/Vendor/Differ && $(GIT) checkout -- Documentation/RxGRDBDemo/Vendor/Differ
+
+.PHONY: distclean test GRDB.swift RxSwift
