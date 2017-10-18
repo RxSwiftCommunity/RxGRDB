@@ -1,12 +1,15 @@
 Release Notes
 =============
 
-## Next Version
+## 0.7.0
+
+Released October 18, 2017 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.6.0...v0.7.0)
 
 ### New
 
 - Support for Swift 4
-- Support for diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffs))
+- Support for various diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffs))
+- New [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/Swift4/Documentation/RxGRDBDemo) for various diff algorithms.
 
 ### Fixed
 
@@ -17,7 +20,7 @@ Release Notes
 - Requirements have changed: Xcode 9+, Swift 4, GRDB 2.0
 
 
-## v0.6.0
+## 0.6.0
 
 Released July 13, 2017
 
@@ -25,7 +28,7 @@ Released July 13, 2017
 - **New**: GRDB dependency bumped to v1.2
 
 
-## v0.5.0
+## 0.5.0
 
 Released July 8, 2017
 
@@ -68,7 +71,7 @@ dbQueue.rx
 ```
 
 
-## v0.4.1
+## 0.4.1
 
 Released June 20, 2017
 
@@ -78,7 +81,7 @@ Released June 20, 2017
 - Added missing support for new AdaptedRequest and AdaptedTypedRequest of GRDB 1.0
 
 
-## v0.4.0
+## 0.4.0
 
 Released June 20, 2017
 
@@ -87,7 +90,7 @@ Released June 20, 2017
 - RxGRDB now requires GRDB v1.0
 
 
-## v0.3.0
+## 0.3.0
 
 Released May 22, 2017
 
@@ -111,7 +114,7 @@ Released May 22, 2017
     ```
 
 
-## v0.2.0
+## 0.2.0
 
 Released May 17, 2017
 
@@ -120,7 +123,7 @@ Released May 17, 2017
 - Support for SQLCipher.
 
 
-## v0.1.2
+## 0.1.2
 
 Released April 6, 2017
 
@@ -129,7 +132,7 @@ Released April 6, 2017
 - RxGRDB observables now support the `retry` operator, and no longer crash when disposed on a database queue.
 
 
-## v0.1.1
+## 0.1.1
 
 Released April 5, 2017
 
@@ -139,7 +142,7 @@ Released April 5, 2017
 - `Request.rx.fetchCount(in:synchronizedStart)`
 
 
-## v0.1.0
+## 0.1.0
 
 Released April 5, 2017
 
