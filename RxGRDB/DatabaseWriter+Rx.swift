@@ -44,10 +44,19 @@ extension Reactive where Base: DatabaseWriter {
     ///     // Prints "Number of persons: 4"
     ///
     /// - parameter requests: The observed requests.
-    /// - parameter synchronizedStart: Whether the first element should be
-    ///   emitted synchronously, on subscription.
+    /// - parameter synchronizedStart: When true (the default), the first
+    ///   element is emitted synchronously, on subscription.
     public func changes(in requests: [Request], synchronizedStart: Bool = true) -> Observable<Database> {
-        return changeTokens(in: requests, synchronizedStart: synchronizedStart).map { $0.database }
+        return changeTokens(in: requests, synchronizedStart: synchronizedStart)
+            .map { changeToken -> Database? in
+                switch changeToken.kind {
+                case .databaseSubscription(let db): return db
+                case .subscription: return nil
+                case .change(_, let db): return db
+                }
+            }
+            .filter { $0 != nil }
+            .map { $0! }
     }
     
     /// Returns an Observable that emits a change token after each committed
@@ -73,20 +82,17 @@ extension Reactive where Base: DatabaseWriter {
     ///         })
     ///
     /// - parameter requests: The observed requests.
-    /// - parameter synchronizedStart: Whether the first element should be
-    ///   emitted synchronously, on subscription.
+    /// - parameter synchronizedStart: When true (the default), the first
+    ///   element is emitted synchronously, on subscription.
     public func changeTokens(in requests: [Request], synchronizedStart: Bool = true) -> Observable<ChangeToken> {
-        let writer = base
-        
-        return ChangeTokensObserver.rx.observable(forTransactionsIn: writer) { (db, observer) in
-            if synchronizedStart {
-                observer.on(.next(ChangeToken(.initialSync(db))))
-            }
-            let selectionInfos: [SelectStatement.SelectionInfo] = try requests.map { request in
-                let (statement, _) = try request.prepare(db)
-                return statement.selectionInfo
-            }
-            return ChangeTokensObserver(writer: writer, selectionInfos: selectionInfos, observer: observer)
-        }
+        return SelectionInfoChangeTokensObservable(
+            writer: base,
+            synchronizedStart: synchronizedStart,
+            selectionInfos: { db -> [SelectStatement.SelectionInfo] in
+                try requests.map { request in
+                    let (statement, _) = try request.prepare(db)
+                    return statement.selectionInfo
+                }
+        }).asObservable()
     }
 }

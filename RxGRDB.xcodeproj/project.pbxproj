@@ -12,6 +12,14 @@
 		560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */; };
 		560F92D51E94DFCE0077EADF /* GRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650298B1E8FE0D200615A2C /* GRDB.framework */; };
 		560F92D61E94DFD50077EADF /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294C1E8FE05600615A2C /* RxSwift.framework */; };
+		561782571F655DAC00CEAA55 /* DiffSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782561F655DAC00CEAA55 /* DiffSupport.swift */; };
+		561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782561F655DAC00CEAA55 /* DiffSupport.swift */; };
+		5617825A1F65660800CEAA55 /* DiffObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782591F65660800CEAA55 /* DiffObservable.swift */; };
+		5617825B1F65660800CEAA55 /* DiffObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782591F65660800CEAA55 /* DiffObservable.swift */; };
+		5617825D1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift */; };
+		5617825E1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift */; };
+		561782631F65696200CEAA55 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782621F65696200CEAA55 /* Diff.swift */; };
+		561782641F65696200CEAA55 /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782621F65696200CEAA55 /* Diff.swift */; };
 		562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 560F92C31E94DF280077EADF /* RxGRDB.framework */; };
 		562756041E962C5B0035B653 /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
 		562756061E962C5B0035B653 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
@@ -29,16 +37,14 @@
 		565029C41E9130F600615A2C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
 		565029C61E91318F00615A2C /* TypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* TypedRequestTests.swift */; };
 		565933EE1F0D72A400707571 /* ChangeToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565933ED1F0D72A400707571 /* ChangeToken.swift */; };
-		565934121F0DF77E00707571 /* AnyDatabaseWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934111F0DF77E00707571 /* AnyDatabaseWriter.swift */; };
-		565934131F0DF77E00707571 /* AnyDatabaseWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934111F0DF77E00707571 /* AnyDatabaseWriter.swift */; };
-		565934181F0E157800707571 /* ChangeTokensObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934171F0E157800707571 /* ChangeTokensObserver.swift */; };
-		565934191F0E157800707571 /* ChangeTokensObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934171F0E157800707571 /* ChangeTokensObserver.swift */; };
+		565934181F0E157800707571 /* SelectionInfoChangeTokensObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934171F0E157800707571 /* SelectionInfoChangeTokensObservable.swift */; };
+		565934191F0E157800707571 /* SelectionInfoChangeTokensObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934171F0E157800707571 /* SelectionInfoChangeTokensObservable.swift */; };
 		565934451F0EB6BC00707571 /* DatabaseWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */; };
 		565934461F0EB6BC00707571 /* DatabaseWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */; };
 		565934481F0F419600707571 /* ChangeTokenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934471F0F419600707571 /* ChangeTokenTests.swift */; };
 		565934491F0F419600707571 /* ChangeTokenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934471F0F419600707571 /* ChangeTokenTests.swift */; };
-		56DBA50A1F0BACA800C90A18 /* TransactionObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5091F0BACA800C90A18 /* TransactionObservable.swift */; };
-		56DBA50B1F0BACA800C90A18 /* TransactionObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5091F0BACA800C90A18 /* TransactionObservable.swift */; };
+		567043E21F66A7B9000A44BA /* RowValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567043E11F66A7B9000A44BA /* RowValueTests.swift */; };
+		567043E31F66A7B9000A44BA /* RowValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567043E11F66A7B9000A44BA /* RowValueTests.swift */; };
 		56DBA52F1F0BB02200C90A18 /* MapFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA52E1F0BB02200C90A18 /* MapFetch.swift */; };
 		56DBA5301F0BB02200C90A18 /* MapFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA52E1F0BB02200C90A18 /* MapFetch.swift */; };
 		56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */; };
@@ -356,10 +362,21 @@
 			remoteGlobalIDString = C8A56AD61AD7424700B4673B;
 			remoteInfo = "RxSwift-iOS";
 		};
+		569D0D681F5086B5009DFAB7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 565029731E8FE0D200615A2C /* GRDB.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 56439B501F4CA1DC0066043F;
+			remoteInfo = GRDBOSXPerformanceComparisonTests;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		560F92C31E94DF280077EADF /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		561782561F655DAC00CEAA55 /* DiffSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffSupport.swift; sourceTree = "<group>"; };
+		561782591F65660800CEAA55 /* DiffObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffObservable.swift; sourceTree = "<group>"; };
+		5617825C1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryKeySortedDiff.swift; sourceTree = "<group>"; };
+		561782621F65696200CEAA55 /* Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
 		562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBmacOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		562756571E963C1B0035B653 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		565029151E8FDF5600615A2C /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -375,13 +392,12 @@
 		565029C31E9130F600615A2C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		565029C51E91318F00615A2C /* TypedRequestTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypedRequestTests.swift; sourceTree = "<group>"; };
 		565933ED1F0D72A400707571 /* ChangeToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeToken.swift; sourceTree = "<group>"; };
-		565934111F0DF77E00707571 /* AnyDatabaseWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyDatabaseWriter.swift; sourceTree = "<group>"; };
-		565934171F0E157800707571 /* ChangeTokensObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeTokensObserver.swift; sourceTree = "<group>"; };
+		565934171F0E157800707571 /* SelectionInfoChangeTokensObservable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectionInfoChangeTokensObservable.swift; sourceTree = "<group>"; };
 		565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseWriterTests.swift; sourceTree = "<group>"; };
 		565934471F0F419600707571 /* ChangeTokenTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeTokenTests.swift; sourceTree = "<group>"; };
+		567043E11F66A7B9000A44BA /* RowValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowValueTests.swift; sourceTree = "<group>"; };
 		56D65F031EF8F5740098466C /* RxGRDB.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = RxGRDB.podspec; sourceTree = "<group>"; };
 		56D65F261EF8F5C60098466C /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
-		56DBA5091F0BACA800C90A18 /* TransactionObservable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionObservable.swift; sourceTree = "<group>"; };
 		56DBA52E1F0BB02200C90A18 /* MapFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapFetch.swift; sourceTree = "<group>"; };
 		56DBA5311F0BC0C000C90A18 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GRDB+Rx.swift"; sourceTree = "<group>"; };
@@ -464,6 +480,7 @@
 			children = (
 				565933ED1F0D72A400707571 /* ChangeToken.swift */,
 				56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */,
+				561782621F65696200CEAA55 /* Diff.swift */,
 				56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */,
 				565029B91E91265A00615A2C /* Request+Rx.swift */,
 				565029B21E8FE12C00615A2C /* TypedRequestFetch+Rx.swift */,
@@ -480,6 +497,7 @@
 				565934471F0F419600707571 /* ChangeTokenTests.swift */,
 				565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */,
 				565029231E8FDF5600615A2C /* RequestTests.swift */,
+				567043E11F66A7B9000A44BA /* RowValueTests.swift */,
 				565029C31E9130F600615A2C /* Support.swift */,
 				565029C51E91318F00615A2C /* TypedRequestTests.swift */,
 				565934431F0EB29E00707571 /* Support */,
@@ -530,6 +548,7 @@
 				5650298B1E8FE0D200615A2C /* GRDB.framework */,
 				5650298D1E8FE0D200615A2C /* GRDBOSXTests.xctest */,
 				5650298F1E8FE0D200615A2C /* GRDBOSXPerformanceTests.xctest */,
+				569D0D691F5086B5009DFAB7 /* GRDBOSXPerformanceComparisonTests.xctest */,
 				565029911E8FE0D200615A2C /* GRDBOSXCrashTests.xctest */,
 				565029931E8FE0D200615A2C /* GRDBCipher.framework */,
 				565029951E8FE0D200615A2C /* GRDBCipherOSXTests.xctest */,
@@ -559,10 +578,11 @@
 		56DBA5691F0BF1EF00C90A18 /* Implementations */ = {
 			isa = PBXGroup;
 			children = (
-				565934111F0DF77E00707571 /* AnyDatabaseWriter.swift */,
-				565934171F0E157800707571 /* ChangeTokensObserver.swift */,
+				561782591F65660800CEAA55 /* DiffObservable.swift */,
+				561782561F655DAC00CEAA55 /* DiffSupport.swift */,
 				56DBA52E1F0BB02200C90A18 /* MapFetch.swift */,
-				56DBA5091F0BACA800C90A18 /* TransactionObservable.swift */,
+				5617825C1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift */,
+				565934171F0E157800707571 /* SelectionInfoChangeTokensObservable.swift */,
 			);
 			name = Implementations;
 			sourceTree = "<group>";
@@ -680,7 +700,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Gwendal Roué";
 				TargetAttributes = {
 					560F92C21E94DF280077EADF = {
@@ -1002,6 +1022,13 @@
 			remoteRef = 565029AA1E8FE0D200615A2C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		569D0D691F5086B5009DFAB7 /* GRDBOSXPerformanceComparisonTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = GRDBOSXPerformanceComparisonTests.xctest;
+			remoteRef = 569D0D681F5086B5009DFAB7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -1042,14 +1069,16 @@
 			files = (
 				56DBA5301F0BB02200C90A18 /* MapFetch.swift in Sources */,
 				562EA7F51F17A2A600FA528C /* ChangeToken.swift in Sources */,
+				5617825E1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift in Sources */,
+				561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
+				5617825B1F65660800CEAA55 /* DiffObservable.swift in Sources */,
 				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
-				565934191F0E157800707571 /* ChangeTokensObserver.swift in Sources */,
+				561782641F65696200CEAA55 /* Diff.swift in Sources */,
+				565934191F0E157800707571 /* SelectionInfoChangeTokensObservable.swift in Sources */,
 				562756591E963C1B0035B653 /* Result.swift in Sources */,
 				56DBA5681F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */,
-				565934131F0DF77E00707571 /* AnyDatabaseWriter.swift in Sources */,
 				56DBA5431F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
 				560F92CF1E94DF830077EADF /* TypedRequestFetch+Rx.swift in Sources */,
-				56DBA50B1F0BACA800C90A18 /* TransactionObservable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1057,6 +1086,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				567043E31F66A7B9000A44BA /* RowValueTests.swift in Sources */,
 				565934491F0F419600707571 /* ChangeTokenTests.swift in Sources */,
 				562756081E962C5B0035B653 /* TypedRequestTests.swift in Sources */,
 				565934461F0EB6BC00707571 /* DatabaseWriterTests.swift in Sources */,
@@ -1071,14 +1101,16 @@
 			files = (
 				56DBA52F1F0BB02200C90A18 /* MapFetch.swift in Sources */,
 				562756581E963C1B0035B653 /* Result.swift in Sources */,
-				565934121F0DF77E00707571 /* AnyDatabaseWriter.swift in Sources */,
+				5617825D1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift in Sources */,
+				561782571F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
+				5617825A1F65660800CEAA55 /* DiffObservable.swift in Sources */,
 				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
+				561782631F65696200CEAA55 /* Diff.swift in Sources */,
 				56DBA5671F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */,
 				56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
 				565933EE1F0D72A400707571 /* ChangeToken.swift in Sources */,
 				565029B31E8FE12C00615A2C /* TypedRequestFetch+Rx.swift in Sources */,
-				565934181F0E157800707571 /* ChangeTokensObserver.swift in Sources */,
-				56DBA50A1F0BACA800C90A18 /* TransactionObservable.swift in Sources */,
+				565934181F0E157800707571 /* SelectionInfoChangeTokensObservable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1086,6 +1118,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				567043E21F66A7B9000A44BA /* RowValueTests.swift in Sources */,
 				565934481F0F419600707571 /* ChangeTokenTests.swift in Sources */,
 				565029C41E9130F600615A2C /* Support.swift in Sources */,
 				565934451F0EB6BC00707571 /* DatabaseWriterTests.swift in Sources */,
@@ -1143,12 +1176,11 @@
 				INFOPLIST_FILE = RxGRDB/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDB;
 				PRODUCT_NAME = RxGRDB;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1165,12 +1197,11 @@
 				INFOPLIST_FILE = RxGRDB/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDB;
 				PRODUCT_NAME = RxGRDB;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1181,11 +1212,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1196,11 +1226,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1214,7 +1243,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -1222,7 +1253,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1246,7 +1281,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -1268,7 +1304,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -1276,7 +1314,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1294,7 +1336,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -1322,7 +1365,7 @@
 				PRODUCT_NAME = RxGRDB;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1342,7 +1385,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDB;
 				PRODUCT_NAME = RxGRDB;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1355,7 +1398,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1368,7 +1411,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};

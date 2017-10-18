@@ -1,7 +1,26 @@
 Release Notes
 =============
 
-## v0.6.0
+## 0.7.0
+
+Released October 18, 2017 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.6.0...v0.7.0)
+
+### New
+
+- Support for Swift 4
+- Support for various diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffs))
+- New [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/Swift4/Documentation/RxGRDBDemo) for various diff algorithms.
+
+### Fixed
+
+- Observables that emit fetched values used to emit their first element on the wrong dispatch queue when their `synchronizedStart` option is true. That first element is now correctly emitted on the subscription dispatch queue.
+
+### Breaking Changes
+
+- Requirements have changed: Xcode 9+, Swift 4, GRDB 2.0
+
+
+## 0.6.0
 
 Released July 13, 2017
 
@@ -9,11 +28,13 @@ Released July 13, 2017
 - **New**: GRDB dependency bumped to v1.2
 
 
-## v0.5.0
+## 0.5.0
 
 Released July 8, 2017
 
-**New**: RxGRDB has learned how to observe multiple requests and fetch from other requests. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-multiple-requests)
+### New
+
+RxGRDB has learned how to observe multiple requests and fetch from other requests. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-multiple-requests)
 
 To get a single notification when a transaction has modified several requests, use `DatabaseWriter.rx.changes`:
 
@@ -32,7 +53,7 @@ dbQueue.rx
     }
 ```
 
-**API diff**
+### API diff
 
 ```diff
 +extension Reactive where Base: DatabaseWriter {
@@ -50,28 +71,30 @@ dbQueue.rx
 ```
 
 
-## v0.4.1
+## 0.4.1
 
 Released June 20, 2017
 
-**Fixed**
+### Fixed
 
 - Podspec requirement for RxSwift changed to `~> 3.3`
 - Added missing support for new AdaptedRequest and AdaptedTypedRequest of GRDB 1.0
 
 
-## v0.4.0
+## 0.4.0
 
 Released June 20, 2017
 
-**RxGRDB now requires GRDB v1.0**
+### Breaking Changes
+
+- RxGRDB now requires GRDB v1.0
 
 
-## v0.3.0
+## 0.3.0
 
 Released May 22, 2017
 
-**New**
+### New
 
 - The new `distinctUntilChanged` parameter has RxGRDB avoid notifying consecutive identical values.
 
@@ -91,35 +114,35 @@ Released May 22, 2017
     ```
 
 
-## v0.2.0
+## 0.2.0
 
 Released May 17, 2017
 
-**New**
+### New
 
 - Support for SQLCipher.
 
 
-## v0.1.2
+## 0.1.2
 
 Released April 6, 2017
 
-**Fixed**
+### Fixed
 
 - RxGRDB observables now support the `retry` operator, and no longer crash when disposed on a database queue.
 
 
-## v0.1.1
+## 0.1.1
 
 Released April 5, 2017
 
-**New**
+### New
 
 - `synchronizedStart` option
 - `Request.rx.fetchCount(in:synchronizedStart)`
 
 
-## v0.1.0
+## 0.1.0
 
 Released April 5, 2017
 

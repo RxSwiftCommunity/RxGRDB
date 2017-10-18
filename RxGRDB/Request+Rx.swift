@@ -45,8 +45,8 @@ extension Reactive where Base: Request {
     ///     // Prints "Number of persons: 4"
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
-    /// - parameter synchronizedStart: Whether the first element should be
-    ///   emitted synchronously, on subscription.
+    /// - parameter synchronizedStart: When true (the default), the first
+    ///   element is emitted synchronously, on subscription.
     public func changes(in writer: DatabaseWriter, synchronizedStart: Bool = true) -> Observable<Database> {
         return AnyDatabaseWriter(writer).rx.changes(in: [base], synchronizedStart: synchronizedStart)
     }
@@ -82,8 +82,8 @@ extension Reactive where Base: Request {
     ///     // Prints "Number of persons: 4"
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
-    /// - parameter synchronizedStart: Whether the first element should be
-    ///   emitted synchronously, on subscription.
+    /// - parameter synchronizedStart: When true (the default), the first
+    ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
     public func fetchCount(in writer: DatabaseWriter, synchronizedStart: Bool = true, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Int> {
         let request = base

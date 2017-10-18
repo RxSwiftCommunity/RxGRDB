@@ -11,4 +11,7 @@
    <FileRef
       location = "group:RxGRDB.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Documentation/RxGRDBDemo/RxGRDBDemo.xcodeproj">
+   </FileRef>
 </Workspace>

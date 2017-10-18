@@ -32,35 +32,38 @@ class MapFetch<ResultType> : ObservableType {
         // Makes sure fetched results are ordered like change tokens
         let orderingQueue = DispatchQueue(label: "RxGRDB.MapFetch")
         
-        // Prevent user from feeding several .initialSync change tokens, because
-        // we haven't guaranteed yet that this does not mess with the ordering of
-        // fetched results.
-        var allowsInitialSync = true
+        // Be ready to handle subscription tokens
+        var subscriptionDone = false
+        var subscriptionElement: E? = nil
         
         dbSubscription = changeTokens.subscribe { event in
             switch event {
             case .error(let error): observer.on(.error(error))
             case .completed: observer.on(.completed)
             case .next(let changeToken):
-                switch changeToken.mode {
+                switch changeToken.kind {
                     
-                case .initialSync(let db):
-                    guard allowsInitialSync else {
-                        fatalError("Wrong scheduling: synchronized start must happen first or never")
+                case .databaseSubscription(let db):
+                    if subscriptionDone {
+                        fatalError("Scheduling error: databaseSubscription token must happen first and once, or never")
                     }
-                    // No more initialSync allowed
-                    allowsInitialSync = false
+                    subscriptionDone = true
                     
                     do {
-                        let element = try self.fetch(db)
-                        observer.on(.next(element))
+                        subscriptionElement = try self.fetch(db)
                     } catch {
                         observer.on(.error(error))
                     }
                     
-                case .async(let writer, _):
-                    // No more initialSync allowed
-                    allowsInitialSync = false
+                case .subscription:
+                    guard let element = subscriptionElement else {
+                        fatalError("Scheduling error: subscription token must happen after databaseSubscription token")
+                    }
+                    subscriptionElement = nil
+                    observer.onNext(element)
+
+                case .change(let writer, _):
+                    subscriptionDone = true
                     
                     // We only need a read access to fetch values, and thus want
                     // to release the writer queue as soon as possible. This is

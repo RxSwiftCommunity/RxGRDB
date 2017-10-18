@@ -1,30 +1,35 @@
 import XCTest
 import GRDB
 import RxSwift
-import RxGRDB
+@testable import RxGRDB // @testable to get PrimaryKeySortedDiff initializer
 
 class TypedRequestTests : XCTestCase { }
 
 extension TypedRequestTests {
     func setUpDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
-            try db.create(table: "persons") { t in
+            try db.create(table: "players") { t in
                 t.column("id", .integer).primaryKey()
                 t.column("name", .text)
                 t.column("email", .text)
             }
-            try Person(id: nil, name: "Arthur", email: "arthur@example.com").insert(db)
-            try Person(id: nil, name: "Barbara", email: nil).insert(db)
+            var player = Player(id: nil, name: "Arthur", email: "arthur@example.com")
+            try player.insert(db)
+            player = Player(id: nil, name: "Barbara", email: nil)
+            try player.insert(db)
         }
     }
     
     func modifyDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
-            try db.execute("UPDATE persons SET name = name")
-            _ = try Person.deleteAll(db)
+            try db.execute("UPDATE players SET name = name")
+            try db.execute("UPDATE players SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
+            _ = try Player.deleteAll(db)
             try db.inTransaction {
-                try Person(id: nil, name: "Craig", email: nil).insert(db)
-                try Person(id: nil, name: "David", email: "david@example.com").insert(db)
+                var player = Player(id: nil, name: "Craig", email: nil)
+                try player.insert(db)
+                player = Player(id: nil, name: "David", email: "david@example.com")
+                try player.insert(db)
                 return .commit
             }
         }
@@ -41,23 +46,24 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRecords(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("name"))
+        let request = Player.order(Column("name"))
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<[Person]>(expectedEventCount: expectedNames.count)
+        let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -75,22 +81,23 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRecordsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("name"))
+        let request = Player.order(Column("name"))
         let expectedNames = [
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<[Person]>(expectedEventCount: expectedNames.count)
+        let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -108,8 +115,9 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRecord(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("name"))
+        let request = Player.order(Column("name"))
         let expectedNames = [
+            "Arthur",
             "Arthur",
             "Arthur",
             nil,
@@ -117,14 +125,14 @@ extension TypedRequestTests {
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<Person?>(expectedEventCount: expectedNames.count)
+        let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -142,7 +150,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRecordDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Person.order(Column("name"))
+        let request = Player.order(Column("name"))
         let expectedNames = [
             "Arthur",
             nil,
@@ -150,14 +158,14 @@ extension TypedRequestTests {
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<Person?>(expectedEventCount: expectedNames.count)
+        let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -177,10 +185,11 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
@@ -189,16 +198,16 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!.map { $0.value(named: "name") as String }, names)
+            XCTAssertEqual(event.element!.map { $0["name"] as String }, names)
         }
     }
 }
@@ -211,9 +220,10 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRowsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
@@ -222,16 +232,16 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
         for (event, names) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!.map { $0.value(named: "name") as String }, names)
+            XCTAssertEqual(event.element!.map { $0["name"] as String }, names)
         }
     }
 }
@@ -244,8 +254,9 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
+            "Arthur",
             "Arthur",
             "Arthur",
             nil,
@@ -256,16 +267,16 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!?.value(named: "name") as String?, name)
+            XCTAssertEqual(event.element!?["name"] as String?, name)
         }
     }
 }
@@ -278,7 +289,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRowDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM persons ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
         let expectedNames = [
             "Arthur",
             nil,
@@ -289,16 +300,16 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
         for (event, name) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!?.value(named: "name") as String?, name)
+            XCTAssertEqual(event.element!?["name"] as String?, name)
         }
     }
 }
@@ -313,10 +324,11 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
@@ -325,11 +337,11 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -347,9 +359,10 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             ["Arthur", "Barbara"],
+            ["Arthur", "Barbie"],
             [],
             ["Craig", "David"],
             ]
@@ -358,11 +371,11 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -380,8 +393,9 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
+            "Arthur",
             "Arthur",
             "Arthur",
             nil,
@@ -392,11 +406,11 @@ extension TypedRequestTests {
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -414,7 +428,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneDatabaseValueDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM persons ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
         let expectedNames = [
             "Arthur",
             nil,
@@ -425,11 +439,11 @@ extension TypedRequestTests {
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -449,8 +463,9 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT email FROM persons ORDER BY name").asRequest(of: Optional<String>.self)
+        let request = SQLRequest("SELECT email FROM players ORDER BY name").asRequest(of: Optional<String>.self)
         let expectedNames = [
+            ["arthur@example.com", nil],
             ["arthur@example.com", nil],
             ["arthur@example.com", nil],
             [],
@@ -461,11 +476,11 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -487,7 +502,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT email FROM persons ORDER BY name").asRequest(of: Optional<String>.self)
+        let request = SQLRequest("SELECT email FROM players ORDER BY name").asRequest(of: Optional<String>.self)
         let expectedNames = [
             ["arthur@example.com", nil],
             [],
@@ -498,11 +513,11 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the main thread
-                XCTAssertTrue(Thread.isMainThread)
+                // events are expected to be delivered on the subscription queue
+                assertMainQueue()
                 recorder.on(event)
             }
-            .addDisposableTo(disposeBag)
+            .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
         wait(for: recorder, timeout: 1)
         
@@ -516,9 +531,62 @@ extension TypedRequestTests {
     }
 }
 
+extension TypedRequestTests {
+    func testPrimaryKeySortedDiff() throws {
+        try Test(testPrimaryKeySortedDiff)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testPrimaryKeySortedDiff(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        let request = Player.order(Column("id"))
+        let expectedDiffs = [
+            PrimaryKeySortedDiff<Player>(
+                inserted: [
+                    Player(id: 1, name: "Arthur", email: "arthur@example.com"),
+                    Player(id: 2, name: "Barbara", email: nil)],
+                updated: [],
+                deleted: []),
+            PrimaryKeySortedDiff<Player>(
+                inserted: [],
+                updated: [Player(id: 2, name: "Barbie", email: nil)],
+                deleted: []),
+            PrimaryKeySortedDiff<Player>(
+                inserted: [],
+                updated: [],
+                deleted: [
+                    Player(id: 1, name: "Arthur", email: "arthur@example.com"),
+                    Player(id: 2, name: "Barbie", email: nil)]),
+            PrimaryKeySortedDiff<Player>(
+                inserted: [
+                    Player(id: 1, name: "Craig", email: nil),
+                    Player(id: 2, name: "David", email: "david@example.com")
+                ],
+                updated: [],
+                deleted: []),
+            ]
+        
+        try setUpDatabase(in: writer)
+        let recorder = EventRecorder<PrimaryKeySortedDiff<Player>>(expectedEventCount: expectedDiffs.count)
+        request.rx
+            .primaryKeySortedDiff(in: writer, initialElements: [])
+            .subscribe(recorder)
+            .disposed(by: disposeBag)
+        try modifyDatabase(in: writer)
+        wait(for: recorder, timeout: 1)
+        
+        for (event, expectedDiff) in zip(recorder.recordedEvents, expectedDiffs) {
+            let diff = event.element!
+            XCTAssertEqual(diff.inserted, expectedDiff.inserted)
+            XCTAssertEqual(diff.updated, expectedDiff.updated)
+            XCTAssertEqual(diff.deleted, expectedDiff.deleted)
+        }
+    }
+}
+
 // MARK: - Support
 
-private class Person: Record {
+private struct Player : RowConvertible, MutablePersistable {
     var id: Int64?
     var name: String
     var email: String?
@@ -527,25 +595,34 @@ private class Person: Record {
         self.id = id
         self.name = name
         self.email = email
-        super.init()
     }
     
-    required init(row: Row) {
-        id = row.value(named: "id")
-        name = row.value(named: "name")
-        email = row.value(named: "email")
-        super.init(row: row)
+    init(row: Row) {
+        id = row["id"]
+        name = row["name"]
+        email = row["email"]
     }
     
-    override class var databaseTableName: String { return "persons" }
+    static var databaseTableName = "players"
     
-    override func encode(to container: inout PersistenceContainer) {
+    func encode(to container: inout PersistenceContainer) {
         container["id"] = id
         container["name"] = name
         container["email"] = email
     }
     
-    override func didInsert(with rowID: Int64, for column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
+    }
+}
+
+extension Player : Diffable { } // Diffable implementation is derived from RowConvertible
+
+extension Player : Equatable {
+    static func == (lhs: Player, rhs: Player) -> Bool {
+        if lhs.id != rhs.id { return false }
+        if lhs.name != rhs.name { return false }
+        if lhs.email != rhs.email { return false }
+        return true
     }
 }

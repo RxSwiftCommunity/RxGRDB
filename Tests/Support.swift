@@ -13,7 +13,7 @@ class Test {
     func run(_ writer: (_ path: String) throws -> DatabaseWriter) throws -> Self {
         // Create temp directory
         let fm = FileManager.default
-        let directoryURL = fm.temporaryDirectory
+        let directoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent("RxGRDBTests", isDirectory: true)
             .appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString, isDirectory: true)
         try fm.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
@@ -37,7 +37,7 @@ class EventRecorder<E> : ObserverType {
     
     init(expectedEventCount: Int, description: String = "") {
         expectation = XCTestExpectation(description: description)
-        expectation.expectedFulfillmentCount = UInt(expectedEventCount)
+        expectation.expectedFulfillmentCount = expectedEventCount
         expectation.assertForOverFulfill = true
     }
     
@@ -51,6 +51,13 @@ extension XCTestCase {
     func wait<E>(for recorder: EventRecorder<E>, timeout seconds: TimeInterval) {
         wait(for: [recorder.expectation], timeout: seconds)
     }
+}
+
+
+fileprivate let mainQueueKey = DispatchSpecificKey<Void>()
+func assertMainQueue(_ message: @autoclosure () -> String = "Not on the main dispatch queue", file: StaticString = #file, line: UInt = #line) {
+    DispatchQueue.main.setSpecific(key: mainQueueKey, value: ())
+    XCTAssertNotNil(DispatchQueue.getSpecific(key: mainQueueKey), message, file: file, line: line)
 }
 
 class AnyDatabaseWriter : DatabaseWriter, ReactiveCompatible {
