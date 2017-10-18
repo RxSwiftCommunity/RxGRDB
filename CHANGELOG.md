@@ -9,7 +9,7 @@ Released October 18, 2017 &bull; [diff](https://github.com/RxSwiftCommunity/RxGR
 
 - Support for Swift 4
 - Support for various diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffs))
-- New [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/Swift4/Documentation/RxGRDBDemo) for various diff algorithms.
+- New [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) for various diff algorithms.
 
 ### Fixed
 
