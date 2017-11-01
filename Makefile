@@ -90,6 +90,7 @@ test_framework_RxGRDBiOS_maxTarget: GRDB.swift RxSwift
 
 test_CocoaPodsLint:
 ifdef POD
+	$(POD) repo update
 	$(POD) lib lint --allow-warnings
 else
 	@echo CocoaPods must be installed for test_CocoaPodsLint
