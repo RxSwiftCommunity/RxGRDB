@@ -1,3 +1,4 @@
 - [ ] Test observation of several requests at the same time
 - [ ] Use schedulers with mapFetch, and force the same scheduler on both subscription and observation.
-- [ ] Allow one can pause values observation, and restart with fresh values
+- [ ] Think about back pressure: with database pools, transactions can be committed faster than observers can consume them
+- [ ] Allow one to pause values observation, and restart with fresh values
