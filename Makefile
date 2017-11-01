@@ -36,8 +36,11 @@ TEST_ACTIONS = clean build build-for-testing test-without-building
 # xcodebuild destination to run tests on iOS 8.1 (requires a pre-installed simulator)
 MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=8.1"
 
-ifeq ($(XCODEVERSION),9.0)
-  # xcodebuild destination to run tests on latest iOS (Xcode 9.0)
+ifeq ($(XCODEVERSION),9.2)
+  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.2"
+else ifeq ($(XCODEVERSION),9.1)
+ MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.1"
+else ifeq ($(XCODEVERSION),9.0)
   MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.0"
 else
   # Xcode < 9.0 is not supported
@@ -54,6 +57,12 @@ ifdef XCPRETTY_PATH
   endif
 endif
 
+# Avoid the "No output has been received in the last 10m0s" error on Travis:
+COCOAPODS_EXTRA_TIME =
+ifeq ($(TRAVIS),true)
+  COCOAPODS_EXTRA_TIME = --verbose
+endif
+
 # We test framework test suites, and if RxGRBD can be installed in an application:
 test: test_framework test_install
 
@@ -66,26 +75,29 @@ test_framework_RxGRDBmacOS: GRDB.swift RxSwift
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBmacOS \
-	  $(TEST_ACTIONS)
-
+	  $(TEST_ACTIONS) \
+	  $(XCPRETTY)
 
 test_framework_RxGRDBiOS_minTarget: GRDB.swift RxSwift
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBiOS \
 	  -destination $(MIN_IOS_DESTINATION) \
-	  $(TEST_ACTIONS)
+	  $(TEST_ACTIONS) \
+	  $(XCPRETTY)
 
 test_framework_RxGRDBiOS_maxTarget: GRDB.swift RxSwift
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBiOS \
 	  -destination $(MAX_IOS_DESTINATION) \
-	  $(TEST_ACTIONS)
+	  $(TEST_ACTIONS) \
+	  $(XCPRETTY)
 
 test_CocoaPodsLint:
 ifdef POD
-	$(POD) lib lint --allow-warnings
+	$(POD) repo update
+	$(POD) lib lint --allow-warnings $(COCOAPODS_EXTRA_TIME)
 else
 	@echo CocoaPods must be installed for test_CocoaPodsLint
 	@exit 1
