@@ -69,22 +69,24 @@ test_framework_RxGRDBmacOS: GRDB.swift RxSwift
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBmacOS \
-	  $(TEST_ACTIONS)
-
+	  $(TEST_ACTIONS) \
+	  $(XCPRETTY)
 
 test_framework_RxGRDBiOS_minTarget: GRDB.swift RxSwift
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBiOS \
 	  -destination $(MIN_IOS_DESTINATION) \
-	  $(TEST_ACTIONS)
+	  $(TEST_ACTIONS) \
+	  $(XCPRETTY)
 
 test_framework_RxGRDBiOS_maxTarget: GRDB.swift RxSwift
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBiOS \
 	  -destination $(MAX_IOS_DESTINATION) \
-	  $(TEST_ACTIONS)
+	  $(TEST_ACTIONS) \
+	  $(XCPRETTY)
 
 test_CocoaPodsLint:
 ifdef POD
