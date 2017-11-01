@@ -57,6 +57,12 @@ ifdef XCPRETTY_PATH
   endif
 endif
 
+# Avoid the "No output has been received in the last 10m0s" error on Travis:
+COCOAPODS_EXTRA_TIME =
+ifeq ($(TRAVIS),true)
+  COCOAPODS_EXTRA_TIME = --verbose
+endif
+
 # We test framework test suites, and if RxGRBD can be installed in an application:
 test: test_framework test_install
 
@@ -91,7 +97,7 @@ test_framework_RxGRDBiOS_maxTarget: GRDB.swift RxSwift
 test_CocoaPodsLint:
 ifdef POD
 	$(POD) repo update
-	$(POD) lib lint --allow-warnings
+	$(POD) lib lint --allow-warnings $(COCOAPODS_EXTRA_TIME)
 else
 	@echo CocoaPods must be installed for test_CocoaPodsLint
 	@exit 1
