@@ -47,11 +47,15 @@ extension ObservableType where E == ChangeToken {
     /// - parameter fetch: A function that accepts a database connection.
     /// - returns: An observable sequence whose elements are the result of
     ///   invoking the fetch function.
-    public func mapFetch<R>(resultQueue: DispatchQueue = DispatchQueue.main, _ fetch: @escaping (Database) throws -> R) -> Observable<R> {
+    public func mapFetch<R>(
+        resultQueue: DispatchQueue = DispatchQueue.main,
+        _ fetch: @escaping (Database) throws -> R)
+        -> Observable<R>
+    {
         return MapFetch(
             source: asObservable(),
-            fetch: fetch,
-            resultQueue: resultQueue)
+            resultQueue: resultQueue,
+            fetch: fetch)
             .asObservable()
     }
 }

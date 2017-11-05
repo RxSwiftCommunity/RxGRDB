@@ -85,7 +85,12 @@ extension Reactive where Base: Request {
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchCount(in writer: DatabaseWriter, synchronizedStart: Bool = true, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Int> {
+    public func fetchCount(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<Int>
+    {
         let request = base
         return AnyDatabaseWriter(writer).rx
             .changeTokens(in: [request], synchronizedStart: synchronizedStart)

@@ -46,7 +46,11 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter requests: The observed requests.
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    public func changes(in requests: [Request], synchronizedStart: Bool = true) -> Observable<Database> {
+    public func changes(
+        in requests: [Request],
+        synchronizedStart: Bool = true)
+        -> Observable<Database>
+    {
         return changeTokens(in: requests, synchronizedStart: synchronizedStart)
             .map { changeToken -> Database? in
                 switch changeToken.kind {
@@ -84,7 +88,11 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter requests: The observed requests.
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    public func changeTokens(in requests: [Request], synchronizedStart: Bool = true) -> Observable<ChangeToken> {
+    public func changeTokens(
+        in requests: [Request],
+        synchronizedStart: Bool = true)
+        -> Observable<ChangeToken>
+    {
         return SelectionInfoChangeTokensObservable(
             writer: base,
             synchronizedStart: synchronizedStart,

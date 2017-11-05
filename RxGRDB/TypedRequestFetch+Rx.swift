@@ -21,7 +21,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.RowDecoder]> {
+    public func fetchAll(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<[Base.RowDecoder]>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
@@ -47,7 +53,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.RowDecoder?> {
+    public func fetchOne(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<Base.RowDecoder?>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
@@ -77,7 +89,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Row]> {
+    public func fetchAll(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<[Row]>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
@@ -102,7 +120,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Row?> {
+    public func fetchOne(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<Row?>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
@@ -132,7 +156,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.RowDecoder]> {
+    public func fetchAll(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<[Base.RowDecoder]>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
@@ -158,7 +188,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.RowDecoder?> {
+    public func fetchOne(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<Base.RowDecoder?>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
@@ -196,7 +232,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol,
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.RowDecoder._Wrapped?]> {
+    public func fetchAll(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<[Base.RowDecoder._Wrapped?]>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
@@ -226,7 +268,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchAll(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<[Base.RowDecoder]> {
+    public func fetchAll(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<[Base.RowDecoder]>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
@@ -252,7 +300,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter resultQueue: A DispatchQueue (default is the main queue).
-    public func fetchOne(in writer: DatabaseWriter, synchronizedStart: Bool = true, distinctUntilChanged: Bool = false, resultQueue: DispatchQueue = DispatchQueue.main) -> Observable<Base.RowDecoder?> {
+    public func fetchOne(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true,
+        distinctUntilChanged: Bool = false,
+        resultQueue: DispatchQueue = DispatchQueue.main)
+        -> Observable<Base.RowDecoder?>
+    {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx

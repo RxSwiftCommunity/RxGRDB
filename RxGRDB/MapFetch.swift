@@ -7,8 +7,6 @@ import RxSwift
 
 /// An observable that fetches results from database connections and emits
 /// them asynchronously.
-///
-/// TODO: tell how to create one
 class MapFetch<ResultType> : ObservableType {
     typealias E = ResultType
     
@@ -16,11 +14,22 @@ class MapFetch<ResultType> : ObservableType {
     private let resultQueue: DispatchQueue
     private let fetch: (Database) throws -> ResultType
     
-    /// TODO
-    init(source changeTokens: Observable<ChangeToken>, fetch: @escaping (Database) throws -> ResultType, resultQueue: DispatchQueue) {
+    /// Creates a MapFetch observable.
+    ///
+    /// - precondition: This observable must be subscribed on resultQueue.
+    ///
+    /// - parameters:
+    ///   - source: An observable sequence of ChangeToken
+    ///   - fetch: A closure that fetches elements
+    ///   - resultQueue: The dispatch queue where elements are emitted.
+    init(
+        source changeTokens: Observable<ChangeToken>,
+        resultQueue: DispatchQueue,
+        fetch: @escaping (Database) throws -> ResultType)
+    {
         self.changeTokens = changeTokens
-        self.fetch = fetch
         self.resultQueue = resultQueue
+        self.fetch = fetch
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
@@ -29,12 +38,11 @@ class MapFetch<ResultType> : ObservableType {
             dbSubscription.dispose()
         }
         
+        // The value eventually fetched on subscription
+        var initialResult: Result<ResultType>? = nil
+        
         // Makes sure fetched results are ordered like change tokens
         let orderingQueue = DispatchQueue(label: "RxGRDB.MapFetch")
-        
-        // Be ready to handle subscription tokens
-        var subscriptionDone = false
-        var subscriptionElement: E? = nil
         
         dbSubscription = changeTokens.subscribe { event in
             switch event {
@@ -44,40 +52,37 @@ class MapFetch<ResultType> : ObservableType {
                 switch changeToken.kind {
                     
                 case .databaseSubscription(let db):
-                    if subscriptionDone {
-                        fatalError("Scheduling error: databaseSubscription token must happen first and once, or never")
-                    }
-                    subscriptionDone = true
-                    
-                    do {
-                        subscriptionElement = try self.fetch(db)
-                    } catch {
-                        observer.on(.error(error))
-                    }
+                    // Current dispatch queue: the database writer dispatch queue
+                    // This token is emitted synchronously upon subscription.
+                    initialResult = Result { try self.fetch(db) }
                     
                 case .subscription:
-                    guard let element = subscriptionElement else {
-                        fatalError("Scheduling error: subscription token must happen after databaseSubscription token")
-                    }
-                    subscriptionElement = nil
-                    observer.onNext(element)
-
-                case .change(let writer, _):
-                    subscriptionDone = true
+                    // Current dispatch queue: the subscription dispatch queue,
+                    // which happens to be `resultQueue`, per precondition.
+                    //
+                    // This token is emitted synchronously upon subscription,
+                    // after `databaseSubscription`.
+                    //
+                    // NB: this code executes concurrently with database writes.
+                    // Several `change` token may have already been received.
+                    observer.onResult(initialResult!)
                     
-                    // We only need a read access to fetch values, and thus want
-                    // to release the writer queue as soon as possible. This is
-                    // the exact job of the writer.readFromCurrentState
-                    // method.
+                case .change(let writer, _):
+                    // Current dispatch queue: the database writer dispatch queue
+                    // This token is emitted after a transaction has been committed.
                     //
-                    // This method can be synchronous, or asynchrounous,
-                    // depending on the actual type of database writer.
+                    // We need a read access to fetch values, and we should
+                    // release the writer queue as soon as possible.
                     //
-                    // Finally, we want to emit the fetched results in the
-                    // same order as the database changes.
+                    // This is the exact job of the writer.readFromCurrentState
+                    // method. This method can be synchronous, or
+                    // asynchrounous, depending on the actual type of
+                    // database writer (DatabaseQueue or DatabasePool).
                     //
-                    // => A semaphore notifies when the fetch is done, and the
-                    // serial orderingQueue takes care of ordering:
+                    // Elements must be emitted in the same order as the
+                    // change tokens: the serial orderingQueue takes care of
+                    // FIFO ordering, and a semaphore notifies when the
+                    // fetch is done.
                     
                     let semaphore = DispatchSemaphore(value: 0)
                     var result: Result<E>? = nil
@@ -101,17 +106,13 @@ class MapFetch<ResultType> : ObservableType {
                         
                         self.resultQueue.async {
                             guard !subscription.isDisposed else { return }
-                            switch result {
-                            case .success(let results):
-                                observer.on(.next(results))
-                            case .failure(let error):
-                                observer.on(.error(error))
-                            }
+                            observer.onResult(result)
                         }
                     }
                 }
             }
         }
+        
         return subscription
     }
 }
