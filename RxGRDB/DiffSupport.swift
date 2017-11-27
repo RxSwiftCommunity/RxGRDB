@@ -7,6 +7,7 @@
 /// A "row value" https://www.sqlite.org/rowvalue.html
 ///
 /// WARNING: the Comparable conformance does not handle database collations.
+/// FIXME: collation is available through https://www.sqlite.org/c3ref/table_column_metadata.html
 struct RowValue {
     let dbValues: [DatabaseValue]
 }
