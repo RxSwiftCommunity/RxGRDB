@@ -222,18 +222,22 @@ request.rx.fetchCount(in: dbQueue).distinctUntilChanged()...
 Emits a value after each [impactful](#what-is-database-observation) database transaction:
 
 ```swift
-let request = Player.filter(Column("name") == "Arthur")
+let playerId = 42
+let request = Player.filter(key: playerId)
 request.rx.fetchOne(in: dbQueue) // or dbPool
     .subscribe(onNext: { player: Player? in
-        print(player?.name ?? "nil")
+        print("Player has changed")
     })
 
 try dbQueue.inDatabase { db in
-    try Player.deleteAll(db)
-    // Eventually prints "nil"
+    guard let player = Player.fetchOne(key: playerId) else { return }
     
-    try Player(name: "Arthur").insert(db)
-    // Eventually prints "Arthur"
+    player.score += 100
+    try player.update(db)
+    // Eventually prints "Player has changed"
+    
+    try player.delete(db)
+    // Eventually prints "Player has changed"
 }
 ```
 
