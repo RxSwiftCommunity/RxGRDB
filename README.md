@@ -22,12 +22,18 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-4-orange.svg?style=flat)](ht
 RxGRDB produces observable sequences from database requests. For example:
 
 ```swift
-let request = Player.order(score.desc).limit(10)
-
-request.rx
+Player.order(score.desc).limit(10)
+    .rx
     .fetchAll(in: dbQueue)
     .subscribe(onNext: { players: [Player] in
         print("Best ten players have changed")
+    })
+
+Player.filter(key: 1)
+    .rx
+    .fetchOne(in: dbQueue)
+    .subscribe(onNext: { player: Player? in
+        print("Player 1 has changed")
     })
 ```
 
