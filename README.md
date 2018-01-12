@@ -182,6 +182,8 @@ try dbQueue.inDatabase { db in
 }
 ```
 
+> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
+
 
 ---
 
@@ -257,6 +259,7 @@ request.rx.fetchOne(in: dbQueue)
 
 When tracking a *value*, you get nil in two cases: either the request yielded no database row, or one row with a NULL value.
 
+> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
 
 **This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
 
@@ -313,6 +316,7 @@ request.rx.fetchAll(in: dbQueue)
     })
 ```
 
+> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
 
 **This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
 
@@ -395,6 +399,7 @@ try dbQueue.inDatabase { db in
 }
 ```
 
+> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
 
 
 ---
@@ -560,4 +565,5 @@ Check the [demo application](Documentation/RxGRDBDemo) for an example app that u
 [database queue]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-queues
 [GRDB Concurrency Guide]: https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency
 [query interface]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
+[GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [TransactionObserver]: https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol
