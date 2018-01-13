@@ -20,25 +20,26 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<[Base.RowDecoder]>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try Row.fetchAll($0, request) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try Row.fetchAll($0, request) }
                 .distinctUntilChanged(==)
                 .map { (rows: [Row]) in rows.map { Base.RowDecoder.init(row: $0) } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchAll($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchAll($0) }
         }
     }
     
@@ -52,25 +53,26 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchOne(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<Base.RowDecoder?>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try Row.fetchOne($0, request) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try Row.fetchOne($0, request) }
                 .distinctUntilChanged(==)
                 .map { (row: Row?) in row.map { Base.RowDecoder.init(row: $0) } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchOne($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchOne($0) }
         }
     }
 }
@@ -88,24 +90,25 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<[Row]>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchAll($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchAll($0) }
                 .distinctUntilChanged(==)
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchAll($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchAll($0) }
         }
     }
     
@@ -119,24 +122,25 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchOne(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<Row?>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchOne($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchOne($0) }
                 .distinctUntilChanged(==)
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchOne($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchOne($0) }
         }
         
     }
@@ -155,25 +159,26 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<[Base.RowDecoder]>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try DatabaseValue.fetchAll($0, request) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try DatabaseValue.fetchAll($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValues: [DatabaseValue]) in dbValues.map { $0.losslessConvert() as Base.RowDecoder } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchAll($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchAll($0) }
         }
     }
     
@@ -187,25 +192,26 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchOne(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<Base.RowDecoder?>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try DatabaseValue.fetchOne($0, request) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try DatabaseValue.fetchOne($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValue: DatabaseValue?) in dbValue.map { $0.losslessConvert() as Base.RowDecoder? } ?? nil }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchOne($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchOne($0) }
         }
     }
 }
@@ -231,25 +237,26 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol,
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<[Base.RowDecoder._Wrapped?]>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try DatabaseValue.fetchAll($0, request) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try DatabaseValue.fetchAll($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValues: [DatabaseValue]) in dbValues.map { $0.losslessConvert() as Base.RowDecoder._Wrapped? } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try Optional<Base.RowDecoder._Wrapped>.fetchAll($0, request) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try Optional<Base.RowDecoder._Wrapped>.fetchAll($0, request) }
         }
     }
 }
@@ -267,25 +274,26 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<[Base.RowDecoder]>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try DatabaseValue.fetchAll($0, request) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try DatabaseValue.fetchAll($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValues: [DatabaseValue]) in dbValues.map { $0.losslessConvert() as Base.RowDecoder } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchAll($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchAll($0) }
         }
     }
     
@@ -299,25 +307,26 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    //    (default is MainScheduler.instance).
     public func fetchOne(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        distinctUntilChanged: Bool = false,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        distinctUntilChanged: Bool = false)
         -> Observable<Base.RowDecoder?>
     {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try DatabaseValue.fetchOne($0, request) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try DatabaseValue.fetchOne($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValue: DatabaseValue?) in dbValue.map { $0.losslessConvert() as Base.RowDecoder? } ?? nil }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-                .mapFetch(resultQueue: resultQueue) { try request.fetchOne($0) }
+                .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+                .mapFetch { try request.fetchOne($0) }
         }
     }
 }

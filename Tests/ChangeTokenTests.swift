@@ -41,7 +41,7 @@ extension ChangeTokenTests {
                 return (strings, int)
             }
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }

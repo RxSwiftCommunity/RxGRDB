@@ -38,10 +38,12 @@ extension RequestTests {
         for (index, request) in requests.enumerated() {
             request.rx
                 .changes(in: writer)
-                .subscribe(onNext: { _ in changes[index] = true })
+                .subscribe(onNext: { _ in
+                    changes[index] = true
+                })
                 .disposed(by: disposeBag)
         }
-        
+
         // Subscription immediately triggers an event
         XCTAssertEqual(changes, [true, true, true])
         
@@ -88,7 +90,7 @@ extension RequestTests {
 extension RequestTests {
     func testChangesRetry() throws {
         try Test(testChangesRetry)
-            .run { try DatabaseQueue(path: $0) }
+//            .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
@@ -163,7 +165,7 @@ extension RequestTests {
         let request = Person.all()
         request.rx.fetchCount(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }

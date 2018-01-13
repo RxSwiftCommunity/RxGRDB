@@ -59,7 +59,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -93,7 +93,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -128,7 +128,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -161,7 +161,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -198,7 +198,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -232,7 +232,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -267,7 +267,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -300,7 +300,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -337,7 +337,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -371,7 +371,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -406,7 +406,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -439,7 +439,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -476,7 +476,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -513,7 +513,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }

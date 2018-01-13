@@ -26,11 +26,11 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
                 let primaryKey = try writer.unsafeReentrantRead {
                     try request.primaryKey($0)
                 }
-                let diffQueue = DispatchQueue(label: "RxGRDB.diff")
+                let diffScheduler = SerialDispatchQueueScheduler(qos: .default)
                 return request
                     .asRequest(of: Row.self)
                     .rx
-                    .fetchAll(in: writer, resultQueue: diffQueue)
+                    .fetchAll(in: writer, scheduler: diffScheduler)
                     .diff(
                         primaryKey: primaryKey,
                         initialElements: initialElements,
