@@ -3,7 +3,7 @@ Release Notes
 
 ## Next Version
 
-This version enhances the scheduling of database notification, and provides a general protocol for computing diffs.
+This version enhances the scheduling of database notifications, and provides a general protocol for computing diffs of database values.
 
 ### New
 
@@ -12,7 +12,7 @@ This version enhances the scheduling of database notification, and provides a ge
 ### Breaking Changes
 
 - The `Diffable` protocol that would support diff strategies has been removed
-- Database observation scheduling used to be managed through raw dispatch queues. One now uses regular RxSwift schedulers in order to control the scheduling of database notifications.
+- Database observation scheduling used to be managed through raw dispatch queues. One now uses regular RxSwift schedulers.
 
 ### API diff
 
