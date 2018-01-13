@@ -22,6 +22,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
     public func primaryKeySortedDiff(
         in writer: DatabaseWriter,
         initialElements: [Base.RowDecoder] = [],
+        synchronizedStart: Bool = true,
         scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
         -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>>
     {
@@ -39,6 +40,8 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
                     .diff(
                         primaryKey: primaryKey,
                         initialElements: initialElements,
+                        synchronizedStart: synchronizedStart,
+                        scheduler: scheduler,
                         stategy: PrimaryKeySortedDiffStrategy<Base.RowDecoder>.self)
                     .subscribe(observer)
             } catch {
