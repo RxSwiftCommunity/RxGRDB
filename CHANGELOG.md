@@ -9,7 +9,7 @@ This version enhances the scheduling of database notifications, and provides a g
 
 - RxGRDB observables used to require subscription and observation to happen on the same dispatch queue. It was easy to fail this precondition, and misuse the library. This has been fixed, while preserving complete user control over notifications scheduling.
 - The [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) used to misuse MKMapView by converting database changes into annotation coordinate updates on the wrong dispatch queue. This has been fixed.
-- The [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) used to synchronize the content of a table view with the results of a fetch request by computing diffs on the wrong dispaatch queue. This has been fixed as well.
+- The [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) used to synchronize the content of a table view with the results of a fetch request by computing diffs on the wrong dispatch queue. This has been fixed as well.
 
 ### New
 

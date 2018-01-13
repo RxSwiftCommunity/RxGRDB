@@ -1,5 +1,4 @@
-- [ ] Test observation of several requests at the same time
-- [ ] Use schedulers with mapFetch, and force the same scheduler on both subscription and observation.
+- [ ] Rebuild diffs on top of scan
 - [ ] Allow one to pause values observation, and restart with fresh values
 - [ ] Single record observation
 

@@ -514,7 +514,6 @@ RxGRDB ships with one diff algorithm which computes the inserted, updated, and d
 
 For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses Differ in order to animate the content of a table view.
 
-Since computing diffs can be expensive, one may want to compute them on some background thread. Check out the [DiffStrategy](#diffstrategy-protocol) protocol for dedicated support.
 
 ---
 
@@ -556,10 +555,6 @@ Annotations.order(Annotation.Columns.id)
     })
 ```
 
-
-### DiffStrategy Protocol
-
-TODO
 
 [database connection]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-connections
 [database pool]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools

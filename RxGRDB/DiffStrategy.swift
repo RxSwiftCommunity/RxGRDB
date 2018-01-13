@@ -1,12 +1,20 @@
 import RxSwift
 
-/// TODO
+/// The DiffStrategy helps building observables that emit diffs out of a
+/// sequence of values.
+///
+/// For example,
 public protocol DiffStrategy {
-    /// TODO
+    /// The type of input values
     associatedtype Value
-    /// TODO
+    
+    /// The type of diffs between two values
     associatedtype Diff
-    /// TODO
+    
+    /// Returns the diff from the previous value.
+    ///
+    /// The result is nil if and only if the new value is identical to the
+    /// previous value.
     mutating func diff(_ value: Value) throws -> Diff?
 }
 
