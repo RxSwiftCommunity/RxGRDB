@@ -1,6 +1,122 @@
 Release Notes
 =============
 
+## Next Version
+
+This version enhances the scheduling of database notification, and provides a general protocol for computing diffs.
+
+### New
+
+- The `DiffStrategy` protocol helps you computing any kind of diffs out of database notifications ([documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffstrategy-protocol)). Check out the [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) for an example of integration.
+
+### Breaking Changes
+
+- The `Diffable` protocol that would support diff strategies has been removed
+- Database observation scheduling used to be managed through raw dispatch queues. One now uses regular RxSwift schedulers in order to control the scheduling of database notifications.
+
+### API diff
+
+```diff
+ extension Reactive where Base: Request {
+-    func fetchCount(
+-        in writer: DatabaseWriter,
+-        synchronizedStart: Bool = true,
+-        resultQueue: DispatchQueue = DispatchQueue)
+-        -> Observable<Int>
++    func fetchCount(
++        in writer: DatabaseWriter,
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
++        -> Observable<Int>
+ }
+
+ extension Reactive where Base: TypedRequest {
+-    func fetchAll(
+-        in writer: DatabaseWriter,
+-        synchronizedStart: Bool = true,
+-        resultQueue: DispatchQueue = DispatchQueue,
+-        distinctUntilChanged: Bool = false)
+-        -> Observable<[Base.RowDecoder]>
++    func fetchAll(
++        in writer: DatabaseWriter,
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
++        distinctUntilChanged: Bool = false)
++        -> Observable<[Base.RowDecoder]>
+-    func fetchOne(
+-        in writer: DatabaseWriter,
+-        synchronizedStart: Bool = true,
+-        resultQueue: DispatchQueue = DispatchQueue,
+-        distinctUntilChanged: Bool = false)
+-        -> Observable<Base.RowDecoder?>
++    func fetchOne(
++        in writer: DatabaseWriter,
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
++        distinctUntilChanged: Bool = false)
++        -> Observable<Base.RowDecoder?>
+ }
+
+ extension ObservableType where E == ChangeToken {
+-    func mapFetch<R>(
+-        resultQueue: DispatchQueue = DispatchQueue.main,
+-        _ fetch: @escaping (Database) throws -> R)
+-        -> Observable<R>
++    func mapFetch<R>(_ fetch: @escaping (Database) throws -> R) -> Observable<R>
+ }
+
+ extension Reactive where Base: DatabaseWriter {
+-    func changeTokens(
+-        in requests: [Request],
+-        synchronizedStart: Bool = true)
+-        -> Observable<ChangeToken>
++    func changeTokens(
++        in requests: [Request],
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
++        -> Observable<ChangeToken>
+ }
+
+-protocol Diffable {
+-    func updated(with row: Row) -> Self
+-}
+-extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & MutablePersistable & Diffable {
+-    func primaryKeySortedDiff(
+-        in writer: DatabaseWriter,
+-        initialElements: [Base.RowDecoder] = [])
+-        -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>>
+-}
++extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & MutablePersistable {
++    func primaryKeySortedDiff(
++        in writer: DatabaseWriter,
++        initialElements: [Base.RowDecoder] = [],
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
++        diffQoS: DispatchQoS = .default)
++        -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>>
++}
+ struct PrimaryKeySortedDiff<Element> {
+-    let updated: [Element]
++    let updated: [(old: Element, new:Element)]
+ }
+
++protocol DiffStrategy {
++    associatedtype Value
++    associatedtype Diff
++    mutating func diff(_ value: Value) throws -> Diff?
++}
++
++extension ObservableType {
++    func diff<Strategy>(
++        strategy: Strategy,
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
++        diffQoS: DispatchQoS = .default)
++        -> Observable<Strategy.Diff>
++        where Strategy: DiffStrategy, Strategy.Value == E
++}
+```
+
 ## 0.7.0
 
 Released October 18, 2017 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.6.0...v0.7.0)
