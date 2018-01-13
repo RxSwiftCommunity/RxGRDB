@@ -17,6 +17,11 @@ final class PlaceAnnotation: NSObject, MKAnnotation {
     init(place: Place) {
         self.place = place
     }
+    
+    func update(from other: PlaceAnnotation) {
+        // Triggers key-value observing
+        place.coordinate = other.coordinate
+    }
 }
 
 // Have PlaceAnnotation adopt RowConvertible, Persistable, and Diffable, so
@@ -36,12 +41,3 @@ extension PlaceAnnotation: Persistable {
     }
 }
 
-extension PlaceAnnotation: Diffable {
-    // The `primaryKeySortedDiff` observable documents that this method should
-    // return self if we wish elements to be reused during the computation of
-    // the diff.
-    func updated(with row: Row) -> Self {
-        place = Place(row: row)
-        return self
-    }
-}
