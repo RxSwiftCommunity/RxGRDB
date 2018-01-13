@@ -339,7 +339,7 @@ When you need to fetch from several requests with the guarantee of consistent re
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinsynchronizedstart)
 - [Change Tokens](#change-tokens)
 - [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinsynchronizedstartscheduler)
-- [`Observable.mapFetch`](#observablemapfetch)
+- [`Observable.mapFetch`](#observablemapfetch_)
 
 
 ---
@@ -442,7 +442,7 @@ dbQueue.rx
 ```
 
 - [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinsynchronizedstartscheduler)
-- [`Observable.mapFetch`](#observablemapfetch)
+- [`Observable.mapFetch`](#observablemapfetch_)
 
 
 ---
@@ -459,7 +459,7 @@ let teams = Team.all()
 let changeTokens = dbQueue.rx.changeTokens(in: [players, teams]) // or dbPool
 ```
 
-Change tokens are opaque values: you can't use them directly. Instead, sequences of change tokens are designed to be consumed by the [mapFetch](#observablemapfetch) operator.
+Change tokens are opaque values: you can't use them directly. Instead, sequences of change tokens are designed to be consumed by the [mapFetch](#observablemapfetch_) operator.
 
 The `scheduler` and `synchronizedStart` parameters are used to control the delivery of fetched elements by the mapFetch operator. See below.
 
