@@ -19,18 +19,23 @@ extension Diffable where Self: RowConvertible {
 
 extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & MutablePersistable & Diffable {
     /// TODO
-    public func primaryKeySortedDiff(in writer: DatabaseWriter, initialElements: [Base.RowDecoder] = []) -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>> {
+    public func primaryKeySortedDiff(
+        in writer: DatabaseWriter,
+        initialElements: [Base.RowDecoder] = [],
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
+        -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>>
+    {
         let request = base
         return Observable.create { observer in
             do {
                 let primaryKey = try writer.unsafeReentrantRead {
                     try request.primaryKey($0)
                 }
-                let diffScheduler = SerialDispatchQueueScheduler(qos: .default)
                 return request
                     .asRequest(of: Row.self)
                     .rx
-                    .fetchAll(in: writer, scheduler: diffScheduler)
+                    .fetchAll(in: writer, scheduler: scheduler)
+                    /// TODO: compute diff on some other queue
                     .diff(
                         primaryKey: primaryKey,
                         initialElements: initialElements,
