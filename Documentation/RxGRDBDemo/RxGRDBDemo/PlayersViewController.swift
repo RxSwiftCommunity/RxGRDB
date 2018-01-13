@@ -131,8 +131,8 @@ extension PlayersViewController {
     // MARK: - Table View
     
     private func setupTableView() {
-        // We'll compute diffs in a background thread
-        let diffQueue = DispatchQueue(label: "diff")
+        // Our custom RxGRDB diff strategy that uses Differ's extendedDiff algorithm
+        let extendedDiffStrategy = ExtendedDiffStrategy()
         
         // Track player ordering
         ordering.asObservable()
@@ -144,14 +144,13 @@ extension PlayersViewController {
                 let rowRequest = ordering.request.asRequest(of: Row.self)
                 
                 // Emits a new row array each time the database changes
-                return rowRequest.rx.fetchAll(in: dbPool, resultQueue: diffQueue)
+                return rowRequest.rx.fetchAll(in: dbPool)
             }
             
-            // Compute diff
-            .extendedDiff()
+            // Compute diff between fetched rows
+            .diff(strategy: extendedDiffStrategy)
             
             // Apply diff to the table view
-            .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] (playerRows, diff) in
                 guard let strongSelf = self else { return }
                 strongSelf.players = playerRows.map { Player(row: $0) }
@@ -184,3 +183,26 @@ extension PlayersViewController {
     }
 }
 
+struct ExtendedDiffStrategy: RxGRDB.DiffStrategy {
+    var rows: [Row]? = nil
+    
+    mutating func diff(_ newRows: [Row]) throws -> (rows: [Row], diff: ExtendedDiff?)? {
+        defer {
+            // Prepare for next diff
+            rows = newRows
+        }
+        
+        guard let rows = rows else {
+            // There is no initial diff
+            return (rows: newRows, diff: nil)
+        }
+        
+        let diff = rows.extendedDiff(newRows)
+        if diff.elements.isEmpty {
+            // No diff
+            return nil
+        }
+        
+        return (newRows, diff)
+    }
+}

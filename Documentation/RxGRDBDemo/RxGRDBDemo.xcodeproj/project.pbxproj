@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		56019BCC1F81143C004C8B11 /* ExtendedDiff+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56019BCB1F81143C004C8B11 /* ExtendedDiff+Rx.swift */; };
 		563BD2CE1F81363A006A5390 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2CD1F81363A006A5390 /* Place.swift */; };
 		563BD2D11F81369D006A5390 /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */; };
 		563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2D21F81395F006A5390 /* PlacesViewController.swift */; };
@@ -329,7 +328,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		56019BCB1F81143C004C8B11 /* ExtendedDiff+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExtendedDiff+Rx.swift"; sourceTree = "<group>"; };
 		563BD2CD1F81363A006A5390 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
 		563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
 		563BD2D21F81395F006A5390 /* PlacesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesViewController.swift; sourceTree = "<group>"; };
@@ -443,7 +441,6 @@
 				564979A61F829726005CE4D7 /* RxGRDB.xcodeproj */,
 				56E1F9931F81021300793BFA /* AppDatabase.swift */,
 				56E1F97C1F8101EE00793BFA /* AppDelegate.swift */,
-				56019BCB1F81143C004C8B11 /* ExtendedDiff+Rx.swift */,
 				563BD2CD1F81363A006A5390 /* Place.swift */,
 				563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */,
 				563BD2D21F81395F006A5390 /* PlacesViewController.swift */,
@@ -819,7 +816,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				56E1F9961F81033200793BFA /* Player.swift in Sources */,
-				56019BCC1F81143C004C8B11 /* ExtendedDiff+Rx.swift in Sources */,
 				56E1F9941F81021300793BFA /* AppDatabase.swift in Sources */,
 				563BD2CE1F81363A006A5390 /* Place.swift in Sources */,
 				563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */,
