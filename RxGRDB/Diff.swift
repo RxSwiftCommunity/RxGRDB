@@ -33,7 +33,9 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
                 let primaryKey = try writer.unsafeReentrantRead {
                     try request.primaryKey($0)
                 }
+                
                 let strategy = PrimaryKeySortedDiffStrategy<Base.RowDecoder>(primaryKey: primaryKey, initialElements: initialElements)
+                
                 return request
                     .asRequest(of: Row.self)
                     .rx

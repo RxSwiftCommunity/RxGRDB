@@ -5,12 +5,6 @@
 #endif
 import RxSwift
 
-protocol DiffStrategy {
-    associatedtype Value
-    associatedtype Diff
-    mutating func diff(_ value: Value) throws -> Diff?
-}
-
 extension DiffStrategy {
     mutating func diffEvent(_ value: Value) -> Event<Diff>? {
         do {
@@ -22,25 +16,6 @@ extension DiffStrategy {
         } catch {
             return .error(error)
         }
-    }
-}
-
-extension ObservableType {
-    func diff<Strategy>(
-        strategy: Strategy,
-        synchronizedStart: Bool,
-        scheduler: SerialDispatchQueueScheduler,
-        diffQoS: DispatchQoS)
-        -> Observable<Strategy.Diff>
-        where Strategy: DiffStrategy, Strategy.Value == E
-    {
-        return DiffObservable(
-            values: asObservable(),
-            strategy: strategy,
-            synchronizedStart: synchronizedStart,
-            scheduler: scheduler,
-            diffQoS: diffQoS)
-            .asObservable()
     }
 }
 
