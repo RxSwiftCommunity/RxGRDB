@@ -549,7 +549,8 @@ extension TypedRequestTests {
                 deleted: []),
             PrimaryKeySortedDiff<Player>(
                 inserted: [],
-                updated: [Player(id: 2, name: "Barbie", email: nil)],
+                updated: [(old: Player(id: 2, name: "Barbara", email: nil),
+                           new: Player(id: 2, name: "Barbie", email: nil))],
                 deleted: []),
             PrimaryKeySortedDiff<Player>(
                 inserted: [],
@@ -577,8 +578,16 @@ extension TypedRequestTests {
         
         for (event, expectedDiff) in zip(recorder.recordedEvents, expectedDiffs) {
             let diff = event.element!
+            
             XCTAssertEqual(diff.inserted, expectedDiff.inserted)
-            XCTAssertEqual(diff.updated, expectedDiff.updated)
+            
+            // Use XCTAssertEqual(diff.updated, expectedDiff.updated) when array of tuples become equatable
+            XCTAssertEqual(diff.updated.count, expectedDiff.updated.count)
+            for ((old: old, new: new), (old: expectedOld, new: expectedNew)) in zip(diff.updated, expectedDiff.updated) {
+                XCTAssertEqual(old, expectedOld)
+                XCTAssertEqual(new, expectedNew)
+            }
+            
             XCTAssertEqual(diff.deleted, expectedDiff.deleted)
         }
     }
@@ -615,8 +624,6 @@ private struct Player : RowConvertible, MutablePersistable {
         id = rowID
     }
 }
-
-extension Player : Diffable { } // Diffable implementation is derived from RowConvertible
 
 extension Player : Equatable {
     static func == (lhs: Player, rhs: Player) -> Bool {

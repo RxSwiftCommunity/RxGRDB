@@ -49,14 +49,12 @@ extension Reactive where Base: Request {
     ///   element is emitted synchronously, on subscription.
     public func changes(
         in writer: DatabaseWriter,
-        synchronizedStart: Bool = true,
-        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
+        synchronizedStart: Bool = true)
         -> Observable<Database>
     {
         return AnyDatabaseWriter(writer).rx.changes(
             in: [base],
-            synchronizedStart: synchronizedStart,
-            scheduler: scheduler)
+            synchronizedStart: synchronizedStart)
     }
     
     /// Returns an Observable that emits after each committed database

@@ -30,7 +30,7 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
     /// emitted after `.databaseSubscription`, and before `.subscription`.
     init(
         writer: DatabaseWriter,
-        synchronizedStart: Bool = true,
+        synchronizedStart: Bool,
         scheduler: SerialDispatchQueueScheduler,
         selectionInfos: @escaping (Database) throws -> [SelectStatement.SelectionInfo])
     {
@@ -48,9 +48,8 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
                         observer.onNext(ChangeToken(kind: .databaseSubscription(db), scheduler: scheduler))
                     }
                     
-                    let selectionInfos = try self.selectionInfos(db)
-                    let transactionObserver = SelectionInfoChangeObserver(
-                        selectionInfos: selectionInfos,
+                    let transactionObserver = try SelectionInfoChangeObserver(
+                        selectionInfos: self.selectionInfos(db),
                         onChange: { observer.onNext(ChangeToken(kind: .change(writer, db), scheduler: scheduler)) })
                     db.add(transactionObserver: transactionObserver)
                     return transactionObserver
@@ -73,40 +72,3 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
     }
 }
 
-private final class SelectionInfoChangeObserver : TransactionObserver {
-    var changed: Bool = false
-    let selectionInfos: [SelectStatement.SelectionInfo]
-    let change: () -> Void
-    
-    init(selectionInfos: [SelectStatement.SelectionInfo], onChange change: @escaping () -> Void) {
-        self.selectionInfos = selectionInfos
-        self.change = change
-    }
-    
-    func observes(eventsOfKind eventKind: DatabaseEventKind) -> Bool {
-        return selectionInfos.contains { eventKind.impacts($0) }
-    }
-    
-    func databaseDidChange(with event: DatabaseEvent) {
-        changed = true
-    }
-    
-    func databaseWillCommit() { }
-    
-    func databaseDidCommit(_ db: Database) {
-        // Avoid reentrancy bugs
-        let changed = self.changed
-        self.changed = false
-        if changed {
-            change()
-        }
-    }
-    
-    func databaseDidRollback(_ db: Database) {
-        changed = false
-    }
-    
-    #if SQLITE_ENABLE_PREUPDATE_HOOK
-    func databaseWillChange(with event: DatabasePreUpdateEvent) { }
-    #endif
-}
