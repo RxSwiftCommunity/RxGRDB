@@ -33,17 +33,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
                 let primaryKey = try writer.unsafeReentrantRead {
                     try request.primaryKey($0)
                 }
+                let strategy = PrimaryKeySortedDiffStrategy<Base.RowDecoder>(primaryKey: primaryKey, initialElements: initialElements)
                 return request
                     .asRequest(of: Row.self)
                     .rx
                     .fetchAll(in: writer, scheduler: scheduler)
-                    /// TODO: compute diff on some other queue
                     .diff(
-                        primaryKey: primaryKey,
-                        initialElements: initialElements,
+                        strategy: strategy,
                         synchronizedStart: synchronizedStart,
                         scheduler: scheduler,
-                        stategy: PrimaryKeySortedDiffStrategy<Base.RowDecoder>.self,
                         diffQoS: diffQoS)
                     .subscribe(observer)
             } catch {

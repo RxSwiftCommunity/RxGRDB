@@ -16,24 +16,19 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
     }
     
     init(primaryKey: @escaping (Row) -> RowValue, initialElements: [Element]) {
-        let references = initialElements.map { element -> Reference in
+        self.primaryKey = primaryKey
+        self.references = initialElements.map { element -> Reference in
             let row = Row(element.databaseDictionary)
             return Reference(
                 primaryKey: primaryKey(row),
                 row: row,
                 element: element)
         }
-        self.init(primaryKey: primaryKey, references: references)
     }
     
-    private init(primaryKey: @escaping (Row) -> RowValue, references: [Reference]) {
-        self.primaryKey = primaryKey
-        self.references = references
-    }
-
-    mutating func diff(from rows: [Row]) throws -> PrimaryKeySortedDiff<Element>? {
+    mutating func diff(_ value: [Row]) throws -> PrimaryKeySortedDiff<Element>? {
         let primaryKey = self.primaryKey
-        let newElements = Array(rows.map { (primaryKey: primaryKey($0), row: $0) })
+        let newElements = value.map { (primaryKey: primaryKey($0), row: $0) }
 
         var inserted: [Element] = []
         var updated: [Element] = []

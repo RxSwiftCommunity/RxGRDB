@@ -6,16 +6,15 @@
 import RxSwift
 
 protocol DiffStrategy {
-    associatedtype Element
-    associatedtype DiffType
-    init(primaryKey: @escaping (Row) -> RowValue, initialElements: [Element])
-    mutating func diff(from rows: [Row]) throws -> DiffType?
+    associatedtype Value
+    associatedtype Diff
+    mutating func diff(_ value: Value) throws -> Diff?
 }
 
 extension DiffStrategy {
-    mutating func diffEvent(from rows: [Row]) -> Event<DiffType>? {
+    mutating func diffEvent(_ value: Value) -> Event<Diff>? {
         do {
-            if let diff = try self.diff(from: rows) {
+            if let diff = try self.diff(value) {
                 return .next(diff)
             } else {
                 return nil
@@ -26,21 +25,18 @@ extension DiffStrategy {
     }
 }
 
-extension ObservableType where E == [Row] {
+extension ObservableType {
     func diff<Strategy>(
-        primaryKey: @escaping (Row) -> RowValue,
-        initialElements: [Strategy.Element],
+        strategy: Strategy,
         synchronizedStart: Bool,
         scheduler: SerialDispatchQueueScheduler,
-        stategy: Strategy.Type,
         diffQoS: DispatchQoS)
-        -> Observable<Strategy.DiffType>
-        where Strategy: DiffStrategy
+        -> Observable<Strategy.Diff>
+        where Strategy: DiffStrategy, Strategy.Value == E
     {
-        return DiffObservable<Strategy>(
-            rows: asObservable(),
-            primaryKey: primaryKey,
-            initialElements: initialElements,
+        return DiffObservable(
+            values: asObservable(),
+            strategy: strategy,
             synchronizedStart: synchronizedStart,
             scheduler: scheduler,
             diffQoS: diffQoS)
@@ -49,58 +45,47 @@ extension ObservableType where E == [Row] {
 }
 
 final class DiffObservable<Strategy: DiffStrategy> : ObservableType {
-    typealias Element = Strategy.Element
-    typealias E = Strategy.DiffType
+    typealias E = Strategy.Diff
     
-    let rows: Observable<[Row]>
-    let primaryKey: (Row) -> RowValue
-    let initialElements: [Element]
+    let values: Observable<Strategy.Value>
+    let strategy: Strategy
     let synchronizedStart: Bool
     let scheduler: SerialDispatchQueueScheduler
     let diffQoS: DispatchQoS
     
     init(
-        rows: Observable<[Row]>,
-        primaryKey: @escaping (Row) -> RowValue,
-        initialElements: [Element],
+        values: Observable<Strategy.Value>,
+        strategy: Strategy,
         synchronizedStart: Bool,
         scheduler: SerialDispatchQueueScheduler,
         diffQoS: DispatchQoS)
     {
-        self.rows = rows
-        self.primaryKey = primaryKey
-        self.initialElements = initialElements
+        self.values = values
+        self.strategy = strategy
         self.synchronizedStart = synchronizedStart
         self.scheduler = scheduler
         self.diffQoS = diffQoS
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
-        var strategy: Strategy! = nil
-        let synchronizedStart = self.synchronizedStart
+        var strategy: Strategy = self.strategy
+        var synchronizedStart = self.synchronizedStart
         let scheduler = self.scheduler
         let diffScheduler = SerialDispatchQueueScheduler(qos: diffQoS)
 
-        let disposable = rows.subscribe { event in
+        let disposable = values.subscribe { event in
             switch event {
             case .completed: observer.on(.completed)
             case .error(let error): observer.on(.error(error))
-            case .next(let rows):
-                let start: Bool
-                if strategy == nil {
-                    start = true
-                    strategy = Strategy(primaryKey: self.primaryKey, initialElements: self.initialElements)
-                } else {
-                    start = false
-                }
-                
-                if start && synchronizedStart {
-                    if let event = strategy.diffEvent(from: rows) {
+            case .next(let value):
+                if synchronizedStart {
+                    synchronizedStart = false
+                    if let event = strategy.diffEvent(value) {
                         observer.on(event)
                     }
                 } else {
-                    _ = diffScheduler.schedule((observer, rows)) { (observer, rows) in
-                        guard let event = strategy.diffEvent(from: rows) else {
+                    _ = diffScheduler.schedule((observer, value)) { (observer, value) in
+                        guard let event = strategy.diffEvent(value) else {
                             return Disposables.create()
                         }
                         return scheduler.schedule((observer, event)) { (observer, event) in
