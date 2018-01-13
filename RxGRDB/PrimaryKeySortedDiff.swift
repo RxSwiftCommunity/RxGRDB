@@ -5,7 +5,7 @@
 #endif
 import RxSwift
 
-struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable & Diffable> : DiffStrategy {
+struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable> : DiffStrategy {
     private let primaryKey: (Row) -> RowValue
     private var references: [Reference]
     
@@ -31,7 +31,7 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
         let newElements = value.map { (primaryKey: primaryKey($0), row: $0) }
 
         var inserted: [Element] = []
-        var updated: [Element] = []
+        var updated: [(old: Element, new:Element)] = []
         var deleted: [Element] = []
 
         let mergeSteps = sortedMerge(
@@ -58,8 +58,8 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
                 if sameRows {
                     nextReferences.append(previous)
                 } else {
-                    let newElement = previous.element.updated(with: new.row)
-                    updated.append(newElement)
+                    let newElement = Element(row: new.row)
+                    updated.append((old: previous.element, new: newElement))
                     nextReferences.append(Reference(primaryKey: previous.primaryKey, row: new.row, element: newElement))
                 }
             case .right(let new):

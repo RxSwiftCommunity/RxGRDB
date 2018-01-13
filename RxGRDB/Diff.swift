@@ -5,19 +5,7 @@
 #endif
 import RxSwift
 
-/// The protocol for records that suit diff algorithms.
-public protocol Diffable {
-    /// Returns a record updated with the given row.
-    func updated(with row: Row) -> Self
-}
-
-extension Diffable where Self: RowConvertible {
-    public func updated(with row: Row) -> Self {
-        return Self(row: row)
-    }
-}
-
-extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & MutablePersistable & Diffable {
+extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & MutablePersistable {
     /// TODO
     public func primaryKeySortedDiff(
         in writer: DatabaseWriter,
@@ -56,6 +44,6 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
 
 public struct PrimaryKeySortedDiff<Element> {
     public let inserted: [Element]
-    public let updated: [Element]
+    public let updated: [(old: Element, new:Element)]
     public let deleted: [Element]
 }
