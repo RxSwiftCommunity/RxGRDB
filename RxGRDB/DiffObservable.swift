@@ -32,7 +32,8 @@ extension ObservableType where E == [Row] {
         initialElements: [Strategy.Element],
         synchronizedStart: Bool,
         scheduler: SerialDispatchQueueScheduler,
-        stategy: Strategy.Type)
+        stategy: Strategy.Type,
+        diffQoS: DispatchQoS)
         -> Observable<Strategy.DiffType>
         where Strategy: DiffStrategy
     {
@@ -41,7 +42,8 @@ extension ObservableType where E == [Row] {
             primaryKey: primaryKey,
             initialElements: initialElements,
             synchronizedStart: synchronizedStart,
-            scheduler: scheduler)
+            scheduler: scheduler,
+            diffQoS: diffQoS)
             .asObservable()
     }
 }
@@ -55,26 +57,30 @@ final class DiffObservable<Strategy: DiffStrategy> : ObservableType {
     let initialElements: [Element]
     let synchronizedStart: Bool
     let scheduler: SerialDispatchQueueScheduler
+    let diffQoS: DispatchQoS
     
     init(
         rows: Observable<[Row]>,
         primaryKey: @escaping (Row) -> RowValue,
         initialElements: [Element],
         synchronizedStart: Bool,
-        scheduler: SerialDispatchQueueScheduler)
+        scheduler: SerialDispatchQueueScheduler,
+        diffQoS: DispatchQoS)
     {
         self.rows = rows
         self.primaryKey = primaryKey
         self.initialElements = initialElements
         self.synchronizedStart = synchronizedStart
         self.scheduler = scheduler
+        self.diffQoS = diffQoS
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == E {
         var strategy: Strategy! = nil
         let synchronizedStart = self.synchronizedStart
         let scheduler = self.scheduler
-        
+        let diffScheduler = SerialDispatchQueueScheduler(qos: diffQoS)
+
         let disposable = rows.subscribe { event in
             switch event {
             case .completed: observer.on(.completed)
@@ -93,11 +99,14 @@ final class DiffObservable<Strategy: DiffStrategy> : ObservableType {
                         observer.on(event)
                     }
                 } else {
-                    _ = scheduler.schedule((observer, rows)) { (observer, rows) in
-                        if let event = strategy.diffEvent(from: rows) {
-                            observer.on(event)
+                    _ = diffScheduler.schedule((observer, rows)) { (observer, rows) in
+                        guard let event = strategy.diffEvent(from: rows) else {
+                            return Disposables.create()
                         }
-                        return Disposables.create()
+                        return scheduler.schedule((observer, event)) { (observer, event) in
+                            observer.on(event)
+                            return Disposables.create()
+                        }
                     }
                 }
             }

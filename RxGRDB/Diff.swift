@@ -23,7 +23,8 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
         in writer: DatabaseWriter,
         initialElements: [Base.RowDecoder] = [],
         synchronizedStart: Bool = true,
-        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+        diffQoS: DispatchQoS = .default)
         -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>>
     {
         let request = base
@@ -42,7 +43,8 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & M
                         initialElements: initialElements,
                         synchronizedStart: synchronizedStart,
                         scheduler: scheduler,
-                        stategy: PrimaryKeySortedDiffStrategy<Base.RowDecoder>.self)
+                        stategy: PrimaryKeySortedDiffStrategy<Base.RowDecoder>.self,
+                        diffQoS: diffQoS)
                     .subscribe(observer)
             } catch {
                 observer.on(.error(error))
