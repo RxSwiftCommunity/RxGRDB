@@ -11,22 +11,12 @@ final class SelectionInfoDatabaseObservable : ObservableType {
     let synchronizedStart: Bool
     let selectionInfos: (Database) throws -> [SelectStatement.SelectionInfo]
     
-    /// Creates an observable that emits `.change` tokens on the database writer
-    /// queue when a transaction has modified the database in a way that impacts
-    /// some requests' selections.
+    /// Creates an observable that emits writer database connections on their
+    /// dedicated dispatch queue when a transaction has modified the database
+    /// in a way that impacts some requests' selections.
     ///
     /// When the `synchronizedStart` argument is true, the observable also emits
-    /// one `.databaseSubscription` and one `.subscription` token upon
-    /// subscription, synchronously.
-    ///
-    /// The `.databaseSubscription` token is emitted from the database writer
-    /// queue, and the `.subscription` token is emitted from the subscription
-    /// dispatch queue.
-    ///
-    /// It is possible for concurrent threads to commit database transactions
-    /// that modify the database between the `.databaseSubscription` token and
-    /// the `.subscription` token. When this happens, `.change` tokens are
-    /// emitted after `.databaseSubscription`, and before `.subscription`.
+    /// a database connection, synchronously.
     init(
         writer: DatabaseWriter,
         synchronizedStart: Bool,
