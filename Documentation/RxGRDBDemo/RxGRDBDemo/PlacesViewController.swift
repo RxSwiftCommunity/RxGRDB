@@ -92,26 +92,26 @@ extension PlacesViewController {
         
         placeAnnotations.rx
             .primaryKeySortedDiff(in: dbPool)
-            .subscribe(onNext: { [weak self] (diff) in
-                guard let strongSelf = self else { return }
-                
-                // Remove deleted annotation
-                strongSelf.mapView.removeAnnotations(diff.deleted)
-                
-                // Add inserted annotation
-                strongSelf.mapView.addAnnotations(diff.inserted)
-                
-                // Update updated annotations. This triggers key-value observing
-                // notifications on the annotation coordinates. It is important
-                // that those KVO notifications happens on the main thread, or
-                // the map view would complain.
-                for (oldPlace, newPlace) in diff.updated {
-                    oldPlace.update(from: newPlace)
-                }
-                
-                strongSelf.zoomOnPlaces(animated: true)
-            })
+            .subscribe(onNext: { [weak self] in self?.updateMapView($0) })
             .disposed(by: disposeBag)
+    }
+    
+    private func updateMapView(_ diff: PrimaryKeySortedDiff<PlaceAnnotation>) {
+        // Remove deleted annotation
+        mapView.removeAnnotations(diff.deleted)
+        
+        // Add inserted annotation
+        mapView.addAnnotations(diff.inserted)
+        
+        // Update updated annotations. This triggers key-value observing
+        // notifications on the annotation coordinates. It is important
+        // that those KVO notifications happens on the main thread, or
+        // the map view would complain.
+        for (oldPlace, newPlace) in diff.updated {
+            oldPlace.update(from: newPlace)
+        }
+        
+        zoomOnPlaces(animated: true)
     }
     
     private func zoomOnPlaces(animated: Bool) {
