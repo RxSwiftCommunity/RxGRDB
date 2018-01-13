@@ -61,8 +61,9 @@ extension Reactive where Base: Request {
     /// transaction that has modified the tables and columns fetched by
     /// the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first element
-    /// is emitted synchronously, on subscription.
+    /// All values are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     ///     let dbQueue = DatabaseQueue()
     ///     let request = Person.all()
@@ -91,7 +92,7 @@ extension Reactive where Base: Request {
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchCount(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,

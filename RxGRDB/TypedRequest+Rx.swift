@@ -14,14 +14,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first array
-    /// is emitted synchronously, on subscription.
+    /// All arrays are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
@@ -47,14 +48,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     /// database transaction that has modified the tables and columns fetched by
     /// the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first record
-    /// is emitted synchronously, on subscription.
+    /// All records are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchOne(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
@@ -84,14 +86,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first array
-    /// is emitted synchronously, on subscription.
+    /// All arrays are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
@@ -116,14 +119,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     /// database transaction that has modified the tables and columns fetched by
     /// the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first row
-    /// is emitted synchronously, on subscription.
+    /// All rows are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchOne(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
@@ -153,14 +157,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first array
-    /// is emitted synchronously, on subscription.
+    /// All arrays are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
@@ -186,14 +191,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// database transaction that has modified the tables and columns fetched by
     /// the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first value
-    /// is emitted synchronously, on subscription.
+    /// All values are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchOne(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
@@ -231,14 +237,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol,
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first array
-    /// is emitted synchronously, on subscription.
+    /// All arrays are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
@@ -268,14 +275,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first array
-    /// is emitted synchronously, on subscription.
+    /// All arrays are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchAll(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
@@ -301,14 +309,15 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     /// database transaction that has modified the tables and columns fetched by
     /// the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first value
-    /// is emitted synchronously, on subscription.
+    /// All values are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
-    //    (default is MainScheduler.instance).
+    ///   (default is MainScheduler.instance).
     public func fetchOne(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
