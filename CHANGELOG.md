@@ -3,16 +3,22 @@ Release Notes
 
 ## Next Version
 
-This version enhances the scheduling of database notifications, and provides a general protocol for computing diffs of database values.
+This version enhances the scheduling of database notifications, and provides a general protocol for efficiently computing diffs of database values.
+
+## Fixed
+
+- RxGRDB observables used to require subscription and observation to happen on the same dispatch queue. It was easy to fail this precondition, and misuse the library. This has been fixed, while preserving complete user control over notifications scheduling.
+- The [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) used to misuse MKMapView by converting database changes into annotation coordinate updates on the wrong dispatch queue. This has been fixed.
+- The [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) used to synchronize the content of a table view with the results of a fetch request by computing diffs on the wrong dispaatch queue. This has been fixed as well.
 
 ### New
 
-- The `DiffStrategy` protocol helps you computing any kind of diffs out of database notifications ([documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffstrategy-protocol)). Check out the [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) for an example of integration.
+- The `DiffStrategy` protocol helps you computing any kind of diffs out of database notifications, without blocking the main thread ([documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffstrategy-protocol)). Check out the table view demo in the [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) for some sample code.
 
 ### Breaking Changes
 
-- The `Diffable` protocol that would support diff strategies has been removed
-- Database observation scheduling used to be managed through raw dispatch queues. One now uses regular RxSwift schedulers.
+- The `Diffable` protocol that would support diff strategies was ill-advised, and has been removed.
+- Database observation scheduling used to be managed through raw dispatch queues. One now uses regular [RxSwift schedulers](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md).
 
 ### API diff
 
