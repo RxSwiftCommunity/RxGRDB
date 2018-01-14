@@ -132,8 +132,8 @@ request.rx.changes(in: dbQueue)    // Observable<Database>
 
 - [`rx.changes`](#requestrxchangesinsynchronizedstart)
 - [`rx.fetchCount`](#requestrxfetchcountinsynchronizedstartscheduler)
-- [`rx.fetchOne`](#typedrequestrxfetchoneinsynchronizedstartdistinctuntilchangedscheduler)
-- [`rx.fetchAll`](#typedrequestrxfetchallinsynchronizedstartdistinctuntilchangedscheduler)
+- [`rx.fetchOne`](#typedrequestrxfetchoneinsynchronizedstartschedulerdistinctuntilchanged)
+- [`rx.fetchAll`](#typedrequestrxfetchallinsynchronizedstartschedulerdistinctuntilchanged)
 
 
 ---
@@ -214,7 +214,7 @@ request.rx.fetchCount(in: dbQueue).distinctUntilChanged()...
 
 ---
 
-#### `TypedRequest.rx.fetchOne(in:synchronizedStart:distinctUntilChanged:scheduler:)`
+#### `TypedRequest.rx.fetchOne(in:synchronizedStart:scheduler:distinctUntilChanged:)`
 
 Emits a value after each [impactful](#what-is-database-observation) database transaction:
 
@@ -265,7 +265,7 @@ The `distinctUntilChanged` parameter does not involve the fetched type, and simp
 
 ---
 
-#### `TypedRequest.rx.fetchAll(in:synchronizedStart:distinctUntilChanged:scheduler:)`
+#### `TypedRequest.rx.fetchAll(in:synchronizedStart:scheduler:distinctUntilChanged:)`
 
 Emits an array of values after each [impactful](#what-is-database-observation) database transaction:
 
@@ -404,7 +404,7 @@ let request = Player.all()
 request.rx.fetchAll(in: dbQueue) // Observable<[Player]>
 ```
 
-After each modification of the players database table, the observable above emits a fresh array of players (see [rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartdistinctuntilchangedscheduler) for more options).
+After each modification of the players database table, the observable above emits a fresh array of players (see [rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartschedulerdistinctuntilchanged) for more options).
 
 It can be decomposed into two steps:
 
