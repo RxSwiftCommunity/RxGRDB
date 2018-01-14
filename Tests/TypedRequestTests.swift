@@ -540,14 +540,17 @@ extension TypedRequestTests {
     
     func testPrimaryKeySortedDiff(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.order(Column("id"))
-        let expectedDiffs: [PrimaryKeySortedDiff<Player>?] = [
+        let expectedDiffs = [
             PrimaryKeySortedDiff<Player>(
                 inserted: [
                     Player(id: 1, name: "Arthur", email: "arthur@example.com"),
                     Player(id: 2, name: "Barbara", email: nil)],
                 updated: [],
                 deleted: []),
-            nil,
+            PrimaryKeySortedDiff<Player>(
+                inserted: [],
+                updated: [],
+                deleted: []),
             PrimaryKeySortedDiff<Player>(
                 inserted: [],
                 updated: [Player(id: 2, name: "Barbie", email: nil)],
@@ -568,7 +571,7 @@ extension TypedRequestTests {
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<PrimaryKeySortedDiff<Player>?>(expectedEventCount: expectedDiffs.count)
+        let recorder = EventRecorder<PrimaryKeySortedDiff<Player>>(expectedEventCount: expectedDiffs.count)
         
         let diffScanner = try writer.read { db in
             try PrimaryKeySortedDiffScanner(
@@ -590,16 +593,9 @@ extension TypedRequestTests {
         
         for (event, expectedDiff) in zip(recorder.recordedEvents, expectedDiffs) {
             let diff = event.element!
-            switch (diff, expectedDiff) {
-            case (nil, nil):
-                break
-            case (let diff?, let expectedDiff?):
-                XCTAssertEqual(diff.inserted, expectedDiff.inserted)
-                XCTAssertEqual(diff.updated, expectedDiff.updated)
-                XCTAssertEqual(diff.deleted, expectedDiff.deleted)
-            default:
-                XCTFail()
-            }
+            XCTAssertEqual(diff.inserted, expectedDiff.inserted)
+            XCTAssertEqual(diff.updated, expectedDiff.updated)
+            XCTAssertEqual(diff.deleted, expectedDiff.deleted)
         }
     }
 }

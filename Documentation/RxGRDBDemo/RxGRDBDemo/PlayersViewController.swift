@@ -131,7 +131,7 @@ extension PlayersViewController {
     // MARK: - Table View
     
     private func setupTableView() {
-        let scanner = ExtendedDiffScanner(rows: [], extendedDiff: nil)
+        let diffScanner = ExtendedDiffScanner(rows: [], extendedDiff: nil)
         
         // Track player ordering
         ordering.asObservable()
@@ -147,20 +147,16 @@ extension PlayersViewController {
             }
             
             // Compute diff between fetched rows
-            .scan(scanner) { (scanner, rows) in scanner.diffed(from: rows) }
+            .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
             
             // Apply diff to the table view
             .subscribe(onNext: { [weak self] scanner in
                 guard let strongSelf = self else { return }
                 strongSelf.players = scanner.rows.map { Player(row: $0) }
-                if let extendedDiff = scanner.extendedDiff {
-                    strongSelf.tableView.apply(
-                        extendedDiff,
-                        deletionAnimation: .fade,
-                        insertionAnimation: .fade)
-                } else {
-                    strongSelf.tableView.reloadData()
-                }
+                strongSelf.tableView.apply(
+                    scanner.extendedDiff!,
+                    deletionAnimation: .fade,
+                    insertionAnimation: .fade)
             })
             .disposed(by: disposeBag)
     }

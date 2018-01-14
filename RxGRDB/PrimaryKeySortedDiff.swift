@@ -12,7 +12,7 @@ public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersi
     private let references: [Reference]
     
     /// TODO
-    public let diff: PrimaryKeySortedDiff<Element>?
+    public let diff: PrimaryKeySortedDiff<Element>
     
     private struct Reference {
         let primaryKey: RowValue // Allows to sort elements by primary key
@@ -41,14 +41,14 @@ public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersi
             primaryKey: primaryKey,
             updateElement: updateElement ?? { (_, row) in Element(row: row) },
             references: references,
-            diff: nil)
+            diff: PrimaryKeySortedDiff(inserted: [], updated: [], deleted: []))
     }
         
     private init(
         primaryKey: @escaping (Row) -> RowValue,
         updateElement: @escaping (Element, Row) -> Element,
         references: [Reference],
-        diff: PrimaryKeySortedDiff<Element>?)
+        diff: PrimaryKeySortedDiff<Element>)
     {
         self.primaryKey = primaryKey
         self.updateElement = updateElement
@@ -63,14 +63,13 @@ public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersi
         var inserted: [Element] = []
         var updated: [Element] = []
         var deleted: [Element] = []
+        var nextReferences: [Reference] = []
 
         let mergeSteps = sortedMerge(
             left: references,
             right: newElements,
             leftKey: { $0.primaryKey },
             rightKey: { $0.primaryKey })
-
-        var nextReferences: [Reference] = []
         for step in mergeSteps {
             switch step {
             case .left(let previous):
@@ -78,14 +77,7 @@ public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersi
                 deleted.append(previous.element)
             case .common(let previous, let new):
                 // Update
-                var sameRows: Bool = true
-                for (column, dbValue) in previous.row { // we don't guarantee column ordering, so we don't compare rows with ==
-                    if new.row[column] != dbValue {
-                        sameRows = false
-                        break
-                    }
-                }
-                if sameRows {
+                if new.row == previous.row {
                     nextReferences.append(previous)
                 } else {
                     let newElement = updateElement(previous.element, new.row)
