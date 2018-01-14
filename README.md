@@ -406,18 +406,13 @@ request.rx.fetchAll(in: dbQueue) // Observable<[Player]>
 
 After each modification of the players database table, the observable above emits a fresh array of players (see [rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartschedulerdistinctuntilchanged) for more options).
 
-It can be decomposed into two steps:
-
-1. observe database modifications
-2. fetch fresh results
-
-The observable above is exactly equivalent to the following sequence:
+The job performed by this observable is decomposed into two steps: observe database modifications, and fetch fresh results after each modification. These two steps are made visible below:
 
 ```swift
-// The same Observable<[Player]>
+// The very same Observable<[Player]>
 dbQueue.rx
-    .changeTokens(in: [request])
-    .mapFetch { (db: Database) in
+    .changeTokens(in: [request])        // 1. observe modifications
+    .mapFetch { (db: Database) in       // 2. fetch fresh results
         return try request.fetchAll(db)
     }
 ```
@@ -437,7 +432,7 @@ dbQueue.rx
         return (players, count)
     }
     .subscribe(onNext: { (players, count) in
-        print("Best players out of \(count): \(players)")
+        print("Best ten players out of \(count): \(players)")
     })
 ```
 
@@ -449,7 +444,7 @@ dbQueue.rx
 
 #### `DatabaseWriter.rx.changeTokens(in:synchronizedStart:scheduler:)`
 
-Given a database writer ([database queue] or [database pool]), emits a [change token](#change-tokens) after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
+Emits a [change token](#change-tokens) after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
 
 ```swift
 let players = Player.all()
