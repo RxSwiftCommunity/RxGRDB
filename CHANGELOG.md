@@ -3,7 +3,7 @@ Release Notes
 
 ## Next Version
 
-This version enhances the scheduling of database notifications, and provides a general protocol for efficiently computing diffs of database values.
+This version is focused on enhancing the scheduling of database notifications.
 
 
 ## Fixed
