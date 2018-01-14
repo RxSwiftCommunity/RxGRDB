@@ -87,16 +87,22 @@ extension PlacesViewController: MKMapViewDelegate {
         // Feed the map view from annotations fetched from the database.
         //
         // To efficiently update the map view as database content changes, we
-        // use the PrimaryKeyDiff observable. It requires the database
-        // request to be sorted by primary key:
+        // use PrimaryKeyDiffScanner. It requires the tracked database request
+        // to be sorted by primary key:
         let placeAnnotations = PlaceAnnotation.order(Place.Columns.id)
         
         let diffScanner = try! dbPool.read { db in
             try PrimaryKeyDiffScanner(
                 database: db,
                 request: placeAnnotations,
-                initialElements: [],
-                updateElement: { (annotation, row) in
+                initialRecords: [],
+                updateRecord: { (annotation, row) in
+                    // When an annotation is modified in the databse, we want to
+                    // update the existing annotation instance.
+                    //
+                    // This avoids the visual glitches that would happen if
+                    // we would update the map view by removing old annotations
+                    // and adding new ones.
                     annotation.update(from: row)
                     return annotation
             })

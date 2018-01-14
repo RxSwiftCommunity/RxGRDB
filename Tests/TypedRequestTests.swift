@@ -1,7 +1,7 @@
 import XCTest
 import GRDB
 import RxSwift
-@testable import RxGRDB // @testable to get PrimaryKeySortedDiff initializer
+@testable import RxGRDB // @testable to get PrimaryKeyDiff initializer
 
 class TypedRequestTests : XCTestCase { }
 
@@ -532,36 +532,36 @@ extension TypedRequestTests {
 }
 
 extension TypedRequestTests {
-    func testPrimaryKeySortedDiff() throws {
-        try Test(testPrimaryKeySortedDiff)
+    func testPrimaryKeyDiffScanner() throws {
+        try Test(testPrimaryKeyDiffScanner)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testPrimaryKeySortedDiff(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testPrimaryKeyDiffScanner(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.order(Column("id"))
         let expectedDiffs = [
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
                 inserted: [
                     Player(id: 1, name: "Arthur", email: "arthur@example.com"),
                     Player(id: 2, name: "Barbara", email: nil)],
                 updated: [],
                 deleted: []),
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
                 inserted: [],
                 updated: [],
                 deleted: []),
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
                 inserted: [],
                 updated: [Player(id: 2, name: "Barbie", email: nil)],
                 deleted: []),
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
                 inserted: [],
                 updated: [],
                 deleted: [
                     Player(id: 1, name: "Arthur", email: "arthur@example.com"),
                     Player(id: 2, name: "Barbie", email: nil)]),
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
                 inserted: [
                     Player(id: 1, name: "Craig", email: nil),
                     Player(id: 2, name: "David", email: "david@example.com")
@@ -571,14 +571,13 @@ extension TypedRequestTests {
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<PrimaryKeySortedDiff<Player>>(expectedEventCount: expectedDiffs.count)
+        let recorder = EventRecorder<PrimaryKeyDiff<Player>>(expectedEventCount: expectedDiffs.count)
         
         let diffScanner = try writer.read { db in
             try PrimaryKeyDiffScanner(
                 database: db,
                 request: request,
-                initialElements: [],
-                updateElement: nil)
+                initialRecords: [])
         }
         request
             .asRequest(of: Row.self)

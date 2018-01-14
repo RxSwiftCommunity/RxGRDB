@@ -87,4 +87,3 @@ extension TypedRequest where RowDecoder: TableMapping {
         }
     }
 }
-

@@ -6,89 +6,89 @@
 import RxSwift
 
 /// TODO
-public struct PrimaryKeyDiffScanner<Element: RowConvertible & MutablePersistable> {
+public struct PrimaryKeyDiffScanner<Record: RowConvertible & MutablePersistable> {
     private let primaryKey: (Row) -> RowValue
-    private let updateElement: (Element, Row) -> Element
+    private let updateRecord: (Record, Row) -> Record
     private let references: [Reference]
     
     /// TODO
-    public let diff: PrimaryKeyDiff<Element>
+    public let diff: PrimaryKeyDiff<Record>
     
     private struct Reference {
-        let primaryKey: RowValue // Allows to sort elements by primary key
-        let row: Row             // Allows to identify identical elements
-        let element: Element     // An element reference
+        let primaryKey: RowValue // Allows to sort records by primary key
+        let row: Row             // Allows to identify identical records
+        let record: Record       // A record
     }
     
     /// TODO
     public init<Request>(
         database: Database,
         request: Request,
-        initialElements: [Element],
-        updateElement: ((Element, Row) -> Element)? = nil)
+        initialRecords: [Record],
+        updateRecord: ((Record, Row) -> Record)? = nil)
         throws
-        where Request: TypedRequest, Request.RowDecoder == Element
+        where Request: TypedRequest, Request.RowDecoder == Record
     {
         let primaryKey = try request.primaryKey(database)
-        let references = initialElements.map { element -> Reference in
-            let row = Row(element.databaseDictionary)
+        let references = initialRecords.map { record -> Reference in
+            let row = Row(record.databaseDictionary)
             return Reference(
                 primaryKey: primaryKey(row),
                 row: row,
-                element: element)
+                record: record)
         }
         self.init(
             primaryKey: primaryKey,
-            updateElement: updateElement ?? { (_, row) in Element(row: row) },
+            updateRecord: updateRecord ?? { (_, row) in Record(row: row) },
             references: references,
             diff: PrimaryKeyDiff(inserted: [], updated: [], deleted: []))
     }
         
     private init(
         primaryKey: @escaping (Row) -> RowValue,
-        updateElement: @escaping (Element, Row) -> Element,
+        updateRecord: @escaping (Record, Row) -> Record,
         references: [Reference],
-        diff: PrimaryKeyDiff<Element>)
+        diff: PrimaryKeyDiff<Record>)
     {
         self.primaryKey = primaryKey
-        self.updateElement = updateElement
+        self.updateRecord = updateRecord
         self.references = references
         self.diff = diff
     }
 
     public func diffed(from rows: [Row]) -> PrimaryKeyDiffScanner {
         let primaryKey = self.primaryKey
-        let newElements = rows.map { (primaryKey: primaryKey($0), row: $0) }
+        let newRecords = rows.map { (primaryKey: primaryKey($0), row: $0) }
 
-        var inserted: [Element] = []
-        var updated: [Element] = []
-        var deleted: [Element] = []
+        var inserted: [Record] = []
+        var updated: [Record] = []
+        var deleted: [Record] = []
         var nextReferences: [Reference] = []
 
         let mergeSteps = sortedMerge(
             left: references,
-            right: newElements,
+            right: newRecords,
             leftKey: { $0.primaryKey },
             rightKey: { $0.primaryKey })
         for step in mergeSteps {
             switch step {
             case .left(let previous):
                 // Deletion
-                deleted.append(previous.element)
+                deleted.append(previous.record)
             case .common(let previous, let new):
                 // Update
                 if new.row == previous.row {
                     nextReferences.append(previous)
                 } else {
-                    let newElement = updateElement(previous.element, new.row)
-                    updated.append(newElement)
-                    nextReferences.append(Reference(primaryKey: previous.primaryKey, row: new.row, element: newElement))
+                    let newRecord = updateRecord(previous.record, new.row)
+                    updated.append(newRecord)
+                    nextReferences.append(Reference(primaryKey: previous.primaryKey, row: new.row, record: newRecord))
                 }
             case .right(let new):
                 // Insertion
-                let element = Element(row: new.row)
-                inserted.append(element)
-                nextReferences.append(Reference(primaryKey: new.primaryKey, row: new.row, element: element))
+                let record = Record(row: new.row)
+                inserted.append(record)
+                nextReferences.append(Reference(primaryKey: new.primaryKey, row: new.row, record: record))
             }
         }
         
@@ -99,17 +99,16 @@ public struct PrimaryKeyDiffScanner<Element: RowConvertible & MutablePersistable
         
         return PrimaryKeyDiffScanner(
             primaryKey: primaryKey,
-            updateElement: updateElement,
+            updateRecord: updateRecord,
             references: nextReferences,
             diff: diff)
     }
 }
 
-public struct PrimaryKeyDiff<Element> {
-    public let inserted: [Element]
-    public let updated: [Element]
-    public let deleted: [Element]
-    
+public struct PrimaryKeyDiff<Record> {
+    public var inserted: [Record]
+    public var updated: [Record]
+    public var deleted: [Record]
     public var isEmpty: Bool {
         return inserted.isEmpty && updated.isEmpty && deleted.isEmpty
     }

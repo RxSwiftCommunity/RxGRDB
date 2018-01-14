@@ -14,8 +14,6 @@
 		560F92D61E94DFD50077EADF /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5650294C1E8FE05600615A2C /* RxSwift.framework */; };
 		561782571F655DAC00CEAA55 /* DiffSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782561F655DAC00CEAA55 /* DiffSupport.swift */; };
 		561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782561F655DAC00CEAA55 /* DiffSupport.swift */; };
-		5617825A1F65660800CEAA55 /* DiffObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782591F65660800CEAA55 /* DiffObservable.swift */; };
-		5617825B1F65660800CEAA55 /* DiffObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782591F65660800CEAA55 /* DiffObservable.swift */; };
 		5617825D1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */; };
 		5617825E1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */; };
 		562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 560F92C31E94DF280077EADF /* RxGRDB.framework */; };
@@ -306,7 +304,6 @@
 /* Begin PBXFileReference section */
 		560F92C31E94DF280077EADF /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		561782561F655DAC00CEAA55 /* DiffSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffSupport.swift; sourceTree = "<group>"; };
-		561782591F65660800CEAA55 /* DiffObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffObservable.swift; sourceTree = "<group>"; };
 		5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryKeyDiffScanner.swift; sourceTree = "<group>"; };
 		562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBmacOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		562756571E963C1B0035B653 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
@@ -501,7 +498,6 @@
 		56DBA5691F0BF1EF00C90A18 /* Implementations */ = {
 			isa = PBXGroup;
 			children = (
-				561782591F65660800CEAA55 /* DiffObservable.swift */,
 				561782561F655DAC00CEAA55 /* DiffSupport.swift */,
 				56DBA52E1F0BB02200C90A18 /* MapFetch.swift */,
 				565934171F0E157800707571 /* SelectionInfoChangeTokensObservable.swift */,
@@ -925,7 +921,6 @@
 				562EA7F51F17A2A600FA528C /* ChangeToken.swift in Sources */,
 				5617825E1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */,
 				561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
-				5617825B1F65660800CEAA55 /* DiffObservable.swift in Sources */,
 				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
 				569E8512200A695A0028D1EC /* SelectionInfoDatabaseObservable.swift in Sources */,
 				565934191F0E157800707571 /* SelectionInfoChangeTokensObservable.swift in Sources */,
@@ -958,7 +953,6 @@
 				562756581E963C1B0035B653 /* Result.swift in Sources */,
 				5617825D1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */,
 				561782571F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
-				5617825A1F65660800CEAA55 /* DiffObservable.swift in Sources */,
 				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
 				569E8511200A695A0028D1EC /* SelectionInfoDatabaseObservable.swift in Sources */,
 				56DBA5671F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */,
