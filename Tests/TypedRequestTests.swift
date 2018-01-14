@@ -570,14 +570,18 @@ extension TypedRequestTests {
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<PrimaryKeySortedDiff<Player>?>(expectedEventCount: expectedDiffs.count)
         
-        let scanner = try writer.read { db in
-            try DiffScanner(strategy: request.primaryKeySortedDiffStrategy(db, initialElements: []))
+        let diffScanner = try writer.read { db in
+            try PrimaryKeySortedDiffScanner(
+                database: db,
+                request: request,
+                initialElements: [],
+                updateElement: nil)
         }
         request
             .asRequest(of: Row.self)
             .rx
             .fetchAll(in: writer)
-            .scan(scanner) { (scanner, rows) in scanner.scan(rows) }
+            .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
             .map { $0.diff }
             .subscribe(recorder)
             .disposed(by: disposeBag)

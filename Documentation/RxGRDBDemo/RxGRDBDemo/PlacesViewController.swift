@@ -1,5 +1,6 @@
 import UIKit
 import MapKit
+import GRDB
 import RxGRDB
 import RxSwift
 
@@ -90,27 +91,35 @@ extension PlacesViewController: MKMapViewDelegate {
         // request to be sorted by primary key:
         let placeAnnotations = PlaceAnnotation.order(Place.Columns.id)
         
-        placeAnnotations.rx
-            .primaryKeySortedDiff(in: dbPool)
+        let diffScanner = try! dbPool.read { db in
+            try PrimaryKeySortedDiffScanner(
+                database: db,
+                request: placeAnnotations,
+                initialElements: [],
+                updateElement: { (annotation, row) in
+                    annotation.update(from: row)
+                    return annotation
+            })
+        }
+        
+        placeAnnotations
+            .asRequest(of: Row.self)
+            .rx
+            .fetchAll(in: dbPool)
+            .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
+            .map { diffScanner in diffScanner.diff }
             .subscribe(onNext: { [weak self] in self?.updateMapView($0) })
             .disposed(by: disposeBag)
     }
     
-    private func updateMapView(_ diff: PrimaryKeySortedDiff<PlaceAnnotation>) {
-        // Remove deleted annotation
-        mapView.removeAnnotations(diff.deleted)
-        
-        // Add inserted annotation
-        mapView.addAnnotations(diff.inserted)
-        
-        // Update updated annotations. This triggers key-value observing
-        // notifications on the annotation coordinates. It is important
-        // that those KVO notifications happens on the main thread, or
-        // the map view would complain.
-        for (oldPlace, newPlace) in diff.updated {
-            oldPlace.update(from: newPlace)
+    private func updateMapView(_ diff: PrimaryKeySortedDiff<PlaceAnnotation>?) {
+        // No diff, no update
+        guard let diff = diff else {
+            return
         }
         
+        mapView.removeAnnotations(diff.deleted)
+        mapView.addAnnotations(diff.inserted)
         zoomOnPlaces(animated: true)
     }
     

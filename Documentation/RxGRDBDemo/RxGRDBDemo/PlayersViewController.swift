@@ -131,8 +131,7 @@ extension PlayersViewController {
     // MARK: - Table View
     
     private func setupTableView() {
-        // Our custom RxGRDB diff strategy that uses Differ's extendedDiff algorithm
-        let extendedDiffStrategy = ExtendedDiffStrategy()
+        let scanner = ExtendedDiffScanner(rows: [], extendedDiff: nil)
         
         // Track player ordering
         ordering.asObservable()
@@ -148,15 +147,15 @@ extension PlayersViewController {
             }
             
             // Compute diff between fetched rows
-            .diff(strategy: extendedDiffStrategy)
+            .scan(scanner) { (scanner, rows) in scanner.diffed(from: rows) }
             
             // Apply diff to the table view
-            .subscribe(onNext: { [weak self] (playerRows, diff) in
+            .subscribe(onNext: { [weak self] scanner in
                 guard let strongSelf = self else { return }
-                strongSelf.players = playerRows.map { Player(row: $0) }
-                if let diff = diff {
+                strongSelf.players = scanner.rows.map { Player(row: $0) }
+                if let extendedDiff = scanner.extendedDiff {
                     strongSelf.tableView.apply(
-                        diff,
+                        extendedDiff,
                         deletionAnimation: .fade,
                         insertionAnimation: .fade)
                 } else {
@@ -183,26 +182,14 @@ extension PlayersViewController {
     }
 }
 
-struct ExtendedDiffStrategy: RxGRDB.DiffStrategy {
-    var rows: [Row]? = nil
+struct ExtendedDiffScanner {
+    var rows: [Row]
+    var extendedDiff: ExtendedDiff?
     
-    mutating func diff(_ newRows: [Row]) throws -> (rows: [Row], diff: ExtendedDiff?)? {
-        defer {
-            // Prepare for next diff
-            rows = newRows
-        }
-        
-        guard let rows = rows else {
-            // There is no initial diff
-            return (rows: newRows, diff: nil)
-        }
-        
-        let diff = rows.extendedDiff(newRows)
-        if diff.elements.isEmpty {
-            // No diff
-            return nil
-        }
-        
-        return (newRows, diff)
+    func diffed(from newRows: [Row]) -> ExtendedDiffScanner {
+        return ExtendedDiffScanner(
+            rows: newRows,
+            extendedDiff: rows.extendedDiff(newRows))
     }
 }
+

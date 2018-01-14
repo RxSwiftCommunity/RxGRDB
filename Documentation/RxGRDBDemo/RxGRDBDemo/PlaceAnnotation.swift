@@ -18,9 +18,8 @@ final class PlaceAnnotation: NSObject, MKAnnotation {
         self.place = place
     }
     
-    func update(from other: PlaceAnnotation) {
-        // Triggers key-value observing
-        place.coordinate = other.coordinate
+    func update(from row: Row) {
+        self.place = Place(row: row)
     }
 }
 
