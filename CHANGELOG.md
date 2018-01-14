@@ -15,7 +15,7 @@ This version is focused on enhancing the scheduling of database notifications.
 ### Breaking Changes
 
 - Database observation scheduling used to be managed through raw dispatch queues. One now uses regular [RxSwift schedulers](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md). See the updated [documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#documentation) of RxGRDB reactive methods.
-- The `Diffable` protocol that would support diff strategies was ill-advised, and has been removed.
+- The `Diffable` protocol was ill-advised, and has been removed.
 - The `primaryKeySortedDiff` operator has been replaced by `PrimaryKeyDiffScanner` ([documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#primarykeydiffscanner))
 
 
