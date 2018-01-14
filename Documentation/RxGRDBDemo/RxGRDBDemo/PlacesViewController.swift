@@ -78,7 +78,7 @@ extension PlacesViewController {
     }
 }
 
-extension PlacesViewController {
+extension PlacesViewController: MKMapViewDelegate {
     
     // MARK: - Map View
     
@@ -138,5 +138,12 @@ extension PlacesViewController {
             zoomRect,
             edgePadding: UIEdgeInsets(top: 40, left: 40, bottom: 40, right: 40),
             animated: animated)
+    }
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if let view = mapView.dequeueReusableAnnotationView(withIdentifier: "pin") {
+            return view
+        }
+        return MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
     }
 }
