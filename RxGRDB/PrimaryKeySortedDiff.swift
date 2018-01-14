@@ -5,9 +5,35 @@
 #endif
 import RxSwift
 
-struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable> : DiffStrategy {
+extension TypedRequest where RowDecoder: RowConvertible & MutablePersistable {
+    public func primaryKeySortedDiffStrategy(
+        _ db: Database,
+        initialElements: [RowDecoder]) throws
+        -> PrimaryKeySortedDiffStrategy<RowDecoder>
+    {
+        return try PrimaryKeySortedDiffStrategy(
+            primaryKey: primaryKey(db),
+            update: { (_, row) in RowDecoder(row: row) },
+            initialElements: initialElements)
+    }
+    
+    public func primaryKeySortedDiffStrategy(
+        _ db: Database,
+        update: @escaping (RowDecoder, Row) -> RowDecoder,
+        initialElements: [RowDecoder]) throws
+        -> PrimaryKeySortedDiffStrategy<RowDecoder>
+    {
+        return try PrimaryKeySortedDiffStrategy(
+            primaryKey: primaryKey(db),
+            update: update,
+            initialElements: initialElements)
+    }
+}
+
+public struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable>: DiffStrategy {
     private let primaryKey: (Row) -> RowValue
     private var references: [Reference]
+    private let update: (Element, Row) -> Element
     
     private struct Reference {
         let primaryKey: RowValue // Allows to sort elements by primary key
@@ -15,8 +41,13 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
         let element: Element     // An element reference
     }
     
-    init(primaryKey: @escaping (Row) -> RowValue, initialElements: [Element]) {
+    init(
+        primaryKey: @escaping (Row) -> RowValue,
+        update: @escaping (Element, Row) -> Element,
+        initialElements: [Element])
+    {
         self.primaryKey = primaryKey
+        self.update = update
         self.references = initialElements.map { element -> Reference in
             let row = Row(element.databaseDictionary)
             return Reference(
@@ -26,12 +57,12 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
         }
     }
     
-    mutating func diff(_ value: [Row]) throws -> PrimaryKeySortedDiff<Element>? {
+    public mutating func diff(_ value: [Row]) -> PrimaryKeySortedDiff<Element>? {
         let primaryKey = self.primaryKey
         let newElements = value.map { (primaryKey: primaryKey($0), row: $0) }
 
         var inserted: [Element] = []
-        var updated: [(old: Element, new:Element)] = []
+        var updated: [Element] = []
         var deleted: [Element] = []
 
         let mergeSteps = sortedMerge(
@@ -58,8 +89,8 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
                 if sameRows {
                     nextReferences.append(previous)
                 } else {
-                    let newElement = Element(row: new.row)
-                    updated.append((old: previous.element, new: newElement))
+                    let newElement = update(previous.element, new.row)
+                    updated.append(newElement)
                     nextReferences.append(Reference(primaryKey: previous.primaryKey, row: new.row, element: newElement))
                 }
             case .right(let new):
@@ -80,6 +111,12 @@ struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable
             updated: updated,
             deleted: deleted)
     }
+}
+
+public struct PrimaryKeySortedDiff<Element> {
+    public let inserted: [Element]
+    public let updated: [Element]
+    public let deleted: [Element]
 }
 
 /// Given two sorted sequences (left and right), this function emits "merge steps"

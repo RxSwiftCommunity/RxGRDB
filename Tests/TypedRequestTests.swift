@@ -540,17 +540,17 @@ extension TypedRequestTests {
     
     func testPrimaryKeySortedDiff(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.order(Column("id"))
-        let expectedDiffs = [
+        let expectedDiffs: [PrimaryKeySortedDiff<Player>?] = [
             PrimaryKeySortedDiff<Player>(
                 inserted: [
                     Player(id: 1, name: "Arthur", email: "arthur@example.com"),
                     Player(id: 2, name: "Barbara", email: nil)],
                 updated: [],
                 deleted: []),
+            nil,
             PrimaryKeySortedDiff<Player>(
                 inserted: [],
-                updated: [(old: Player(id: 2, name: "Barbara", email: nil),
-                           new: Player(id: 2, name: "Barbie", email: nil))],
+                updated: [Player(id: 2, name: "Barbie", email: nil)],
                 deleted: []),
             PrimaryKeySortedDiff<Player>(
                 inserted: [],
@@ -568,9 +568,17 @@ extension TypedRequestTests {
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<PrimaryKeySortedDiff<Player>>(expectedEventCount: expectedDiffs.count)
-        request.rx
-            .primaryKeySortedDiff(in: writer, initialElements: [])
+        let recorder = EventRecorder<PrimaryKeySortedDiff<Player>?>(expectedEventCount: expectedDiffs.count)
+        
+        let scanner = try writer.read { db in
+            try DiffScanner(strategy: request.primaryKeySortedDiffStrategy(db, initialElements: []))
+        }
+        request
+            .asRequest(of: Row.self)
+            .rx
+            .fetchAll(in: writer)
+            .scan(scanner) { (scanner, rows) in scanner.scan(rows) }
+            .map { $0.diff }
             .subscribe(recorder)
             .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
@@ -578,17 +586,16 @@ extension TypedRequestTests {
         
         for (event, expectedDiff) in zip(recorder.recordedEvents, expectedDiffs) {
             let diff = event.element!
-            
-            XCTAssertEqual(diff.inserted, expectedDiff.inserted)
-            
-            // Use XCTAssertEqual(diff.updated, expectedDiff.updated) when array of tuples become equatable
-            XCTAssertEqual(diff.updated.count, expectedDiff.updated.count)
-            for ((old: old, new: new), (old: expectedOld, new: expectedNew)) in zip(diff.updated, expectedDiff.updated) {
-                XCTAssertEqual(old, expectedOld)
-                XCTAssertEqual(new, expectedNew)
+            switch (diff, expectedDiff) {
+            case (nil, nil):
+                break
+            case (let diff?, let expectedDiff?):
+                XCTAssertEqual(diff.inserted, expectedDiff.inserted)
+                XCTAssertEqual(diff.updated, expectedDiff.updated)
+                XCTAssertEqual(diff.deleted, expectedDiff.deleted)
+            default:
+                XCTFail()
             }
-            
-            XCTAssertEqual(diff.deleted, expectedDiff.deleted)
         }
     }
 }

@@ -15,25 +15,42 @@ public protocol DiffStrategy {
     ///
     /// The result is nil if and only if the new value is identical to the
     /// previous value.
-    mutating func diff(_ value: Value) throws -> Diff?
+    mutating func diff(_ value: Value) -> Diff?
 }
 
-extension ObservableType {
-    /// TODO
-    public func diff<Strategy>(
-        strategy: Strategy,
-        synchronizedStart: Bool = true,
-        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
-        diffQoS: DispatchQoS = .default)
-        -> Observable<Strategy.Diff>
-        where Strategy: DiffStrategy, Strategy.Value == E
-    {
-        return DiffObservable(
-            values: asObservable(),
-            strategy: strategy,
-            synchronizedStart: synchronizedStart,
-            scheduler: scheduler,
-            diffQoS: diffQoS)
-            .asObservable()
+public struct DiffScanner<Strategy: DiffStrategy> {
+    public var strategy: Strategy
+    public var diff: Strategy.Diff?
+    
+    init(strategy: Strategy, diff: Strategy.Diff? = nil) {
+        self.strategy = strategy
+        self.diff = diff
+    }
+    
+    func scan(_ value: Strategy.Value) -> DiffScanner {
+        var strategy = self.strategy
+        let diff = strategy.diff(value)
+        return DiffScanner(strategy: strategy, diff: diff)
     }
 }
+
+//extension ObservableType {
+//    /// TODO
+//    public func diff<Strategy>(
+//        strategy: Strategy,
+//        synchronizedStart: Bool = true,
+//        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
+//        diffScheduler: SerialDispatchQueueScheduler = SerialDispatchQueueScheduler(qos: .default))
+//        -> Observable<Strategy.Diff>
+//        where Strategy: DiffStrategy, Strategy.Value == E
+//    {
+//        return DiffObservable(
+//            values: asObservable(),
+//            strategy: strategy,
+//            synchronizedStart: synchronizedStart,
+//            scheduler: scheduler,
+//            diffScheduler: diffScheduler)
+//            .asObservable()
+//    }
+//}
+
