@@ -16,8 +16,8 @@
 		561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782561F655DAC00CEAA55 /* DiffSupport.swift */; };
 		5617825A1F65660800CEAA55 /* DiffObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782591F65660800CEAA55 /* DiffObservable.swift */; };
 		5617825B1F65660800CEAA55 /* DiffObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782591F65660800CEAA55 /* DiffObservable.swift */; };
-		5617825D1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift */; };
-		5617825E1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift */; };
+		5617825D1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */; };
+		5617825E1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */; };
 		562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 560F92C31E94DF280077EADF /* RxGRDB.framework */; };
 		562756041E962C5B0035B653 /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
 		562756061E962C5B0035B653 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
@@ -307,7 +307,7 @@
 		560F92C31E94DF280077EADF /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		561782561F655DAC00CEAA55 /* DiffSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffSupport.swift; sourceTree = "<group>"; };
 		561782591F65660800CEAA55 /* DiffObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffObservable.swift; sourceTree = "<group>"; };
-		5617825C1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryKeySortedDiff.swift; sourceTree = "<group>"; };
+		5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryKeyDiffScanner.swift; sourceTree = "<group>"; };
 		562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBmacOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		562756571E963C1B0035B653 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		565029151E8FDF5600615A2C /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -414,7 +414,7 @@
 				565933ED1F0D72A400707571 /* ChangeToken.swift */,
 				56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */,
 				56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */,
-				5617825C1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift */,
+				5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */,
 				565029B91E91265A00615A2C /* Request+Rx.swift */,
 				565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */,
 				56DBA5691F0BF1EF00C90A18 /* Implementations */,
@@ -923,7 +923,7 @@
 			files = (
 				56DBA5301F0BB02200C90A18 /* MapFetch.swift in Sources */,
 				562EA7F51F17A2A600FA528C /* ChangeToken.swift in Sources */,
-				5617825E1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift in Sources */,
+				5617825E1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */,
 				561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
 				5617825B1F65660800CEAA55 /* DiffObservable.swift in Sources */,
 				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
@@ -956,7 +956,7 @@
 			files = (
 				56DBA52F1F0BB02200C90A18 /* MapFetch.swift in Sources */,
 				562756581E963C1B0035B653 /* Result.swift in Sources */,
-				5617825D1F6566EA00CEAA55 /* PrimaryKeySortedDiff.swift in Sources */,
+				5617825D1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */,
 				561782571F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
 				5617825A1F65660800CEAA55 /* DiffObservable.swift in Sources */,
 				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,

@@ -87,12 +87,12 @@ extension PlacesViewController: MKMapViewDelegate {
         // Feed the map view from annotations fetched from the database.
         //
         // To efficiently update the map view as database content changes, we
-        // use the primaryKeySortedDiff observable. It requires the database
+        // use the PrimaryKeyDiff observable. It requires the database
         // request to be sorted by primary key:
         let placeAnnotations = PlaceAnnotation.order(Place.Columns.id)
         
         let diffScanner = try! dbPool.read { db in
-            try PrimaryKeySortedDiffScanner(
+            try PrimaryKeyDiffScanner(
                 database: db,
                 request: placeAnnotations,
                 initialElements: [],
@@ -107,20 +107,14 @@ extension PlacesViewController: MKMapViewDelegate {
             .rx
             .fetchAll(in: dbPool)
             .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
-            .map { diffScanner in diffScanner.diff }
-            .subscribe(onNext: { [weak self] in self?.updateMapView($0) })
+            .subscribe(onNext: { [weak self] diffScanner in
+                guard let strongSelf = self else { return }
+                let diff = diffScanner.diff
+                strongSelf.mapView.removeAnnotations(diff.deleted)
+                strongSelf.mapView.addAnnotations(diff.inserted)
+                strongSelf.zoomOnPlaces(animated: true)
+            })
             .disposed(by: disposeBag)
-    }
-    
-    private func updateMapView(_ diff: PrimaryKeySortedDiff<PlaceAnnotation>?) {
-        // No diff, no update
-        guard let diff = diff else {
-            return
-        }
-        
-        mapView.removeAnnotations(diff.deleted)
-        mapView.addAnnotations(diff.inserted)
-        zoomOnPlaces(animated: true)
     }
     
     private func zoomOnPlaces(animated: Bool) {

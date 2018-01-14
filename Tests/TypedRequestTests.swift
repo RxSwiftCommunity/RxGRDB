@@ -574,7 +574,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<PrimaryKeySortedDiff<Player>>(expectedEventCount: expectedDiffs.count)
         
         let diffScanner = try writer.read { db in
-            try PrimaryKeySortedDiffScanner(
+            try PrimaryKeyDiffScanner(
                 database: db,
                 request: request,
                 initialElements: [],

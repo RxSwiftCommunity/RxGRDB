@@ -6,13 +6,13 @@
 import RxSwift
 
 /// TODO
-public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersistable> {
+public struct PrimaryKeyDiffScanner<Element: RowConvertible & MutablePersistable> {
     private let primaryKey: (Row) -> RowValue
     private let updateElement: (Element, Row) -> Element
     private let references: [Reference]
     
     /// TODO
-    public let diff: PrimaryKeySortedDiff<Element>
+    public let diff: PrimaryKeyDiff<Element>
     
     private struct Reference {
         let primaryKey: RowValue // Allows to sort elements by primary key
@@ -41,14 +41,14 @@ public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersi
             primaryKey: primaryKey,
             updateElement: updateElement ?? { (_, row) in Element(row: row) },
             references: references,
-            diff: PrimaryKeySortedDiff(inserted: [], updated: [], deleted: []))
+            diff: PrimaryKeyDiff(inserted: [], updated: [], deleted: []))
     }
         
     private init(
         primaryKey: @escaping (Row) -> RowValue,
         updateElement: @escaping (Element, Row) -> Element,
         references: [Reference],
-        diff: PrimaryKeySortedDiff<Element>)
+        diff: PrimaryKeyDiff<Element>)
     {
         self.primaryKey = primaryKey
         self.updateElement = updateElement
@@ -56,7 +56,7 @@ public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersi
         self.diff = diff
     }
 
-    public func diffed(from rows: [Row]) -> PrimaryKeySortedDiffScanner {
+    public func diffed(from rows: [Row]) -> PrimaryKeyDiffScanner {
         let primaryKey = self.primaryKey
         let newElements = rows.map { (primaryKey: primaryKey($0), row: $0) }
 
@@ -92,12 +92,12 @@ public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersi
             }
         }
         
-        let diff = PrimaryKeySortedDiff(
+        let diff = PrimaryKeyDiff(
             inserted: inserted,
             updated: updated,
             deleted: deleted)
         
-        return PrimaryKeySortedDiffScanner(
+        return PrimaryKeyDiffScanner(
             primaryKey: primaryKey,
             updateElement: updateElement,
             references: nextReferences,
@@ -105,7 +105,7 @@ public struct PrimaryKeySortedDiffScanner<Element: RowConvertible & MutablePersi
     }
 }
 
-public struct PrimaryKeySortedDiff<Element> {
+public struct PrimaryKeyDiff<Element> {
     public let inserted: [Element]
     public let updated: [Element]
     public let deleted: [Element]
