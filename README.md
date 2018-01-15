@@ -550,17 +550,14 @@ let scanner = try dbQueue.inDatabase { db in
 }
 ```
 
-Now is the time to compute diffs. Diffs are computed from raw database rows, so we need to turn the record request into a request of rows before feeding the scanner:
+Now is the time to compute diffs. Diffs are computed from raw database rows, so we need to turn the record request into a row request before feeding the scanner:
 
 ```swift
-// Observable of [Row]
-let rows = request
-    .asRequest(of: Row.self)
-    .rx
-    .fetchAll(in: writer)
+let rowRequest = request.asRequest(of: Row.self)
 
-// Use RxSwift scan operator to compute diffs
-rows
+// The scanner is designed to feed the built-in RxSwift `scan` operator:
+rowRequest.rx
+    .fetchAll(in: writer)
     .scan(scanner) { (scanner, rows) in scanner.diffed(from: rows) }
     .subscribe(onNext: { scanner in
         let diff = scanner.diff
@@ -570,7 +567,7 @@ rows
     })
 ```
 
-Check the [demo application](Documentation/RxGRDBDemo) for an example app that uses `primaryKeySortedDiff` to synchronize the content of a map view with the content of the database.
+Check the [demo application](Documentation/RxGRDBDemo) for an example app that uses `PrimaryKeyDiffScanner` to synchronize the content of a map view with the content of the database.
 
 
 [database connection]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-connections
