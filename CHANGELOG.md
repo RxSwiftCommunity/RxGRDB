@@ -26,7 +26,7 @@ This version is focused on enhancing the scheduling of database notifications.
 -    func fetchCount(
 -        in writer: DatabaseWriter,
 -        synchronizedStart: Bool = true,
--        resultQueue: DispatchQueue = DispatchQueue)
+-        resultQueue: DispatchQueue = DispatchQueue.main)
 -        -> Observable<Int>
 +    func fetchCount(
 +        in writer: DatabaseWriter,
@@ -39,7 +39,7 @@ This version is focused on enhancing the scheduling of database notifications.
 -    func fetchAll(
 -        in writer: DatabaseWriter,
 -        synchronizedStart: Bool = true,
--        resultQueue: DispatchQueue = DispatchQueue,
+-        resultQueue: DispatchQueue = DispatchQueue.main,
 -        distinctUntilChanged: Bool = false)
 -        -> Observable<[Base.RowDecoder]>
 +    func fetchAll(
@@ -51,7 +51,7 @@ This version is focused on enhancing the scheduling of database notifications.
 -    func fetchOne(
 -        in writer: DatabaseWriter,
 -        synchronizedStart: Bool = true,
--        resultQueue: DispatchQueue = DispatchQueue,
+-        resultQueue: DispatchQueue = DispatchQueue.main,
 -        distinctUntilChanged: Bool = false)
 -        -> Observable<Base.RowDecoder?>
 +    func fetchOne(
