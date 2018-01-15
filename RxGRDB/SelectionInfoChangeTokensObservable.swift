@@ -9,6 +9,7 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
     typealias E = ChangeToken
     let writer: DatabaseWriter
     let synchronizedStart: Bool
+    let scheduler: SerialDispatchQueueScheduler
     let selectionInfos: (Database) throws -> [SelectStatement.SelectionInfo]
     
     /// Creates an observable that emits `.change` tokens on the database writer
@@ -29,80 +30,45 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
     /// emitted after `.databaseSubscription`, and before `.subscription`.
     init(
         writer: DatabaseWriter,
-        synchronizedStart: Bool = true,
+        synchronizedStart: Bool,
+        scheduler: SerialDispatchQueueScheduler,
         selectionInfos: @escaping (Database) throws -> [SelectStatement.SelectionInfo])
     {
         self.writer = writer
         self.synchronizedStart = synchronizedStart
+        self.scheduler = scheduler
         self.selectionInfos = selectionInfos
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == ChangeToken {
-        let writer = self.writer
-        do {
-            let transactionObserver = try writer.unsafeReentrantWrite { db -> SelectionInfoChangeObserver in
-                if synchronizedStart {
-                    observer.onNext(ChangeToken(.databaseSubscription(db)))
+        return scheduler.schedule((writer, synchronizedStart, scheduler)) { (writer, synchronizedStart, scheduler) in
+            do {
+                let transactionObserver = try writer.unsafeReentrantWrite { db -> SelectionInfoChangeObserver in
+                    if synchronizedStart {
+                        observer.onNext(ChangeToken(kind: .databaseSubscription(db), scheduler: scheduler))
+                    }
+                    
+                    let transactionObserver = try SelectionInfoChangeObserver(
+                        selectionInfos: self.selectionInfos(db),
+                        onChange: { observer.onNext(ChangeToken(kind: .change(writer, db), scheduler: scheduler)) })
+                    db.add(transactionObserver: transactionObserver)
+                    return transactionObserver
                 }
                 
-                let selectionInfos = try self.selectionInfos(db)
-                let transactionObserver = SelectionInfoChangeObserver(
-                    selectionInfos: selectionInfos,
-                    onChange: { observer.onNext(ChangeToken(.change(writer, db))) })
-                db.add(transactionObserver: transactionObserver)
-                return transactionObserver
-            }
-            
-            if synchronizedStart {
-                observer.onNext(ChangeToken(.subscription))
-            }
-
-            return Disposables.create {
-                writer.unsafeReentrantWrite { db in
-                    db.remove(transactionObserver: transactionObserver)
+                if synchronizedStart {
+                    observer.onNext(ChangeToken(kind: .subscription, scheduler: scheduler))
                 }
+                
+                return Disposables.create {
+                    writer.unsafeReentrantWrite { db in
+                        db.remove(transactionObserver: transactionObserver)
+                    }
+                }
+            } catch {
+                observer.onError(error)
+                return Disposables.create()
             }
-        } catch {
-            observer.onError(error)
-            return Disposables.create()
         }
     }
 }
 
-private final class SelectionInfoChangeObserver : TransactionObserver {
-    var changed: Bool = false
-    let selectionInfos: [SelectStatement.SelectionInfo]
-    let change: () -> Void
-    
-    init(selectionInfos: [SelectStatement.SelectionInfo], onChange change: @escaping () -> Void) {
-        self.selectionInfos = selectionInfos
-        self.change = change
-    }
-    
-    func observes(eventsOfKind eventKind: DatabaseEventKind) -> Bool {
-        return selectionInfos.contains { eventKind.impacts($0) }
-    }
-    
-    func databaseDidChange(with event: DatabaseEvent) {
-        changed = true
-    }
-    
-    func databaseWillCommit() { }
-    
-    func databaseDidCommit(_ db: Database) {
-        // Avoid reentrancy bugs
-        let changed = self.changed
-        self.changed = false
-        if changed {
-            change()
-        }
-    }
-    
-    func databaseDidRollback(_ db: Database) {
-        changed = false
-    }
-    
-    #if SQLITE_ENABLE_PREUPDATE_HOOK
-    func databaseWillChange(with event: DatabasePreUpdateEvent) { }
-    #endif
-}

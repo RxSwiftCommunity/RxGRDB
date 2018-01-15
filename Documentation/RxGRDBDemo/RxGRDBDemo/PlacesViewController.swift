@@ -1,5 +1,6 @@
 import UIKit
 import MapKit
+import GRDB
 import RxGRDB
 import RxSwift
 
@@ -78,7 +79,7 @@ extension PlacesViewController {
     }
 }
 
-extension PlacesViewController {
+extension PlacesViewController: MKMapViewDelegate {
     
     // MARK: - Map View
     
@@ -86,15 +87,35 @@ extension PlacesViewController {
         // Feed the map view from annotations fetched from the database.
         //
         // To efficiently update the map view as database content changes, we
-        // use the primaryKeySortedDiff observable. It requires the database
-        // request to be sorted by primary key:
+        // use PrimaryKeyDiffScanner. It requires the tracked database request
+        // to be sorted by primary key:
         let placeAnnotations = PlaceAnnotation.order(Place.Columns.id)
         
-        placeAnnotations.rx
-            .primaryKeySortedDiff(in: dbPool)
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] (diff) in
+        let diffScanner = try! dbPool.read { db in
+            try PrimaryKeyDiffScanner(
+                database: db,
+                request: placeAnnotations,
+                initialRecords: [],
+                updateRecord: { (annotation, row) in
+                    // When an annotation is modified in the databse, we want to
+                    // update the existing annotation instance.
+                    //
+                    // This avoids the visual glitches that would happen if
+                    // we would update the map view by removing old annotations
+                    // and adding new ones.
+                    annotation.update(from: row)
+                    return annotation
+            })
+        }
+        
+        placeAnnotations
+            .asRequest(of: Row.self)
+            .rx
+            .fetchAll(in: dbPool)
+            .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
+            .subscribe(onNext: { [weak self] diffScanner in
                 guard let strongSelf = self else { return }
+                let diff = diffScanner.diff
                 strongSelf.mapView.removeAnnotations(diff.deleted)
                 strongSelf.mapView.addAnnotations(diff.inserted)
                 strongSelf.zoomOnPlaces(animated: true)
@@ -126,5 +147,12 @@ extension PlacesViewController {
             zoomRect,
             edgePadding: UIEdgeInsets(top: 40, left: 40, bottom: 40, right: 40),
             animated: animated)
+    }
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if let view = mapView.dequeueReusableAnnotationView(withIdentifier: "pin") {
+            return view
+        }
+        return MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
     }
 }

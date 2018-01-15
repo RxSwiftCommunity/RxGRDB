@@ -51,16 +51,11 @@ extension Reactive where Base: DatabaseWriter {
         synchronizedStart: Bool = true)
         -> Observable<Database>
     {
-        return changeTokens(in: requests, synchronizedStart: synchronizedStart)
-            .map { changeToken -> Database? in
-                switch changeToken.kind {
-                case .databaseSubscription(let db): return db
-                case .subscription: return nil
-                case .change(_, let db): return db
-                }
-            }
-            .filter { $0 != nil }
-            .map { $0! }
+        return SelectionInfoDatabaseObservable(
+            writer: base,
+            synchronizedStart: synchronizedStart,
+            selectionInfos: { db in try requests.map { try $0.selectionInfo(db) } })
+            .asObservable()
     }
     
     /// Returns an Observable that emits a change token after each committed
@@ -90,17 +85,15 @@ extension Reactive where Base: DatabaseWriter {
     ///   element is emitted synchronously, on subscription.
     public func changeTokens(
         in requests: [Request],
-        synchronizedStart: Bool = true)
+        synchronizedStart: Bool = true,
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
         -> Observable<ChangeToken>
     {
         return SelectionInfoChangeTokensObservable(
             writer: base,
             synchronizedStart: synchronizedStart,
-            selectionInfos: { db -> [SelectStatement.SelectionInfo] in
-                try requests.map { request in
-                    let (statement, _) = try request.prepare(db)
-                    return statement.selectionInfo
-                }
-        }).asObservable()
+            scheduler: scheduler,
+            selectionInfos: { db in try requests.map { try $0.selectionInfo(db) } })
+            .asObservable()
     }
 }

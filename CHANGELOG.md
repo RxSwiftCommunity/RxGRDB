@@ -1,6 +1,116 @@
 Release Notes
 =============
 
+## Next Version
+
+This version is focused on enhancing the scheduling of database notifications.
+
+
+## Fixed
+
+- RxGRDB observables used to require subscription and observation to happen on the same dispatch queue. It was easy to fail this precondition, and misuse the library. This has been fixed.
+- The [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) used to misuse MKMapView by converting database changes into annotation coordinate updates on the wrong dispatch queue. This has been fixed.
+
+
+### Breaking Changes
+
+- Database observation scheduling used to be managed through raw dispatch queues. One now uses regular [RxSwift schedulers](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md). See the updated [documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#documentation) of RxGRDB reactive methods.
+- The `Diffable` protocol was ill-advised, and has been removed.
+- The `primaryKeySortedDiff` operator has been replaced by `PrimaryKeyDiffScanner` ([documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#primarykeydiffscanner))
+
+
+### API diff
+
+```diff
+ extension Reactive where Base: Request {
+-    func fetchCount(
+-        in writer: DatabaseWriter,
+-        synchronizedStart: Bool = true,
+-        resultQueue: DispatchQueue = DispatchQueue.main)
+-        -> Observable<Int>
++    func fetchCount(
++        in writer: DatabaseWriter,
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
++        -> Observable<Int>
+ }
+
+ extension Reactive where Base: TypedRequest {
+-    func fetchAll(
+-        in writer: DatabaseWriter,
+-        synchronizedStart: Bool = true,
+-        resultQueue: DispatchQueue = DispatchQueue.main,
+-        distinctUntilChanged: Bool = false)
+-        -> Observable<[Base.RowDecoder]>
++    func fetchAll(
++        in writer: DatabaseWriter,
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
++        distinctUntilChanged: Bool = false)
++        -> Observable<[Base.RowDecoder]>
+-    func fetchOne(
+-        in writer: DatabaseWriter,
+-        synchronizedStart: Bool = true,
+-        resultQueue: DispatchQueue = DispatchQueue.main,
+-        distinctUntilChanged: Bool = false)
+-        -> Observable<Base.RowDecoder?>
++    func fetchOne(
++        in writer: DatabaseWriter,
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
++        distinctUntilChanged: Bool = false)
++        -> Observable<Base.RowDecoder?>
+ }
+
+ extension ObservableType where E == ChangeToken {
+-    func mapFetch<R>(
+-        resultQueue: DispatchQueue = DispatchQueue.main,
+-        _ fetch: @escaping (Database) throws -> R)
+-        -> Observable<R>
++    func mapFetch<R>(_ fetch: @escaping (Database) throws -> R) -> Observable<R>
+ }
+
+ extension Reactive where Base: DatabaseWriter {
+-    func changeTokens(
+-        in requests: [Request],
+-        synchronizedStart: Bool = true)
+-        -> Observable<ChangeToken>
++    func changeTokens(
++        in requests: [Request],
++        synchronizedStart: Bool = true,
++        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
++        -> Observable<ChangeToken>
+ }
+
+-protocol Diffable {
+-    func updated(with row: Row) -> Self
+-}
+-extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible & MutablePersistable & Diffable {
+-    func primaryKeySortedDiff(
+-        in writer: DatabaseWriter,
+-        initialElements: [Base.RowDecoder] = [])
+-        -> Observable<PrimaryKeySortedDiff<Base.RowDecoder>>
+-}
+-struct PrimaryKeySortedDiff<Element> { ... }
++struct PrimaryKeyDiffScanner<Record: RowConvertible & MutablePersistable> {
++    let diff: PrimaryKeyDiff<Record>
++    init<Request>(
++            database: Database,
++            request: Request,
++            initialRecords: [Record],
++            updateRecord: ((Record, Row) -> Record)? = nil)
++            throws
++            where Request: TypedRequest, Request.RowDecoder == Record
++    func diffed(from rows: [Row]) -> PrimaryKeyDiffScanner
++}
++struct PrimaryKeyDiff<Record> {
++    let inserted: [Record]
++    let updated: [Record]
++    let deleted: [Record]
++    var isEmpty: Bool
++}
+```
+
 ## 0.7.0
 
 Released October 18, 2017 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.6.0...v0.7.0)
@@ -8,7 +118,7 @@ Released October 18, 2017 &bull; [diff](https://github.com/RxSwiftCommunity/RxGR
 ### New
 
 - Support for Swift 4
-- Support for various diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB#diffs))
+- Support for various diff algorithms ([Documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#diffs))
 - New [demo application](https://github.com/RxSwiftCommunity/RxGRDB/tree/master/Documentation/RxGRDBDemo) for various diff algorithms.
 
 ### Fixed
@@ -34,7 +144,7 @@ Released July 8, 2017
 
 ### New
 
-RxGRDB has learned how to observe multiple requests and fetch from other requests. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB#observing-multiple-requests)
+RxGRDB has learned how to observe multiple requests and fetch from other requests. [Documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#observing-multiple-requests)
 
 To get a single notification when a transaction has modified several requests, use `DatabaseWriter.rx.changes`:
 

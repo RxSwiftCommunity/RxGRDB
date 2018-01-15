@@ -11,24 +11,18 @@ class MapFetch<ResultType> : ObservableType {
     typealias E = ResultType
     
     private let changeTokens: Observable<ChangeToken>
-    private let resultQueue: DispatchQueue
     private let fetch: (Database) throws -> ResultType
     
     /// Creates a MapFetch observable.
     ///
-    /// - precondition: This observable must be subscribed on resultQueue.
-    ///
     /// - parameters:
     ///   - source: An observable sequence of ChangeToken
     ///   - fetch: A closure that fetches elements
-    ///   - resultQueue: The dispatch queue where elements are emitted.
     init(
         source changeTokens: Observable<ChangeToken>,
-        resultQueue: DispatchQueue,
         fetch: @escaping (Database) throws -> ResultType)
     {
         self.changeTokens = changeTokens
-        self.resultQueue = resultQueue
         self.fetch = fetch
     }
     
@@ -57,8 +51,9 @@ class MapFetch<ResultType> : ObservableType {
                     initialResult = Result { try self.fetch(db) }
                     
                 case .subscription:
-                    // Current dispatch queue: the subscription dispatch queue,
-                    // which happens to be `resultQueue`, per precondition.
+                    // Current dispatch queue: the dispatch queue of the
+                    // scheduler used to create the source observable of change
+                    // tokens.
                     //
                     // This token is emitted synchronously upon subscription,
                     // after `databaseSubscription`.
@@ -102,11 +97,12 @@ class MapFetch<ResultType> : ObservableType {
                         _ = semaphore.wait(timeout: .distantFuture)
                         
                         guard let result = result else { return }
-                        guard !subscription.isDisposed else { return }
                         
-                        self.resultQueue.async {
-                            guard !subscription.isDisposed else { return }
-                            observer.onResult(result)
+                        _ = changeToken.scheduler.schedule(result) { result in
+                            if !subscription.isDisposed {
+                                observer.onResult(result)
+                            }
+                            return Disposables.create()
                         }
                     }
                 }

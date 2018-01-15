@@ -5,85 +5,112 @@
 #endif
 import RxSwift
 
-struct PrimaryKeySortedDiffStrategy<Element: RowConvertible & MutablePersistable & Diffable> : DiffStrategy {
+/// TODO
+public struct PrimaryKeyDiffScanner<Record: RowConvertible & MutablePersistable> {
     private let primaryKey: (Row) -> RowValue
-    private var references: [Reference]
+    private let updateRecord: (Record, Row) -> Record
+    private let references: [Reference]
+    
+    /// TODO
+    public let diff: PrimaryKeyDiff<Record>
     
     private struct Reference {
-        let primaryKey: RowValue // Allows to sort elements by primary key
-        let row: Row             // Allows to identify identical elements
-        let element: Element     // An element reference
+        let primaryKey: RowValue // Allows to sort records by primary key
+        let row: Row             // Allows to identify identical records
+        let record: Record       // A record
     }
     
-    init(primaryKey: @escaping (Row) -> RowValue, initialElements: [Element]) {
-        let references = initialElements.map { element -> Reference in
-            let row = Row(element.databaseDictionary)
+    /// TODO
+    public init<Request>(
+        database: Database,
+        request: Request,
+        initialRecords: [Record],
+        updateRecord: ((Record, Row) -> Record)? = nil)
+        throws
+        where Request: TypedRequest, Request.RowDecoder == Record
+    {
+        let primaryKey = try request.primaryKey(database)
+        let references = initialRecords.map { record -> Reference in
+            let row = Row(record.databaseDictionary)
             return Reference(
                 primaryKey: primaryKey(row),
                 row: row,
-                element: element)
+                record: record)
         }
-        self.init(primaryKey: primaryKey, references: references)
+        self.init(
+            primaryKey: primaryKey,
+            updateRecord: updateRecord ?? { (_, row) in Record(row: row) },
+            references: references,
+            diff: PrimaryKeyDiff(inserted: [], updated: [], deleted: []))
     }
-    
-    private init(primaryKey: @escaping (Row) -> RowValue, references: [Reference]) {
+        
+    private init(
+        primaryKey: @escaping (Row) -> RowValue,
+        updateRecord: @escaping (Record, Row) -> Record,
+        references: [Reference],
+        diff: PrimaryKeyDiff<Record>)
+    {
         self.primaryKey = primaryKey
+        self.updateRecord = updateRecord
         self.references = references
+        self.diff = diff
     }
 
-    mutating func diff(from rows: [Row]) throws -> PrimaryKeySortedDiff<Element>? {
+    public func diffed(from rows: [Row]) -> PrimaryKeyDiffScanner {
         let primaryKey = self.primaryKey
-        let newElements = Array(rows.map { (primaryKey: primaryKey($0), row: $0) })
+        let newRecords = rows.map { (primaryKey: primaryKey($0), row: $0) }
 
-        var inserted: [Element] = []
-        var updated: [Element] = []
-        var deleted: [Element] = []
+        var inserted: [Record] = []
+        var updated: [Record] = []
+        var deleted: [Record] = []
+        var nextReferences: [Reference] = []
 
         let mergeSteps = sortedMerge(
             left: references,
-            right: newElements,
+            right: newRecords,
             leftKey: { $0.primaryKey },
             rightKey: { $0.primaryKey })
-
-        var nextReferences: [Reference] = []
         for step in mergeSteps {
             switch step {
             case .left(let previous):
                 // Deletion
-                deleted.append(previous.element)
+                deleted.append(previous.record)
             case .common(let previous, let new):
                 // Update
-                var sameRows: Bool = true
-                for (column, dbValue) in previous.row { // we don't guarantee column ordering, so we don't compare rows with ==
-                    if new.row[column] != dbValue {
-                        sameRows = false
-                        break
-                    }
-                }
-                if sameRows {
+                if new.row == previous.row {
                     nextReferences.append(previous)
                 } else {
-                    let newElement = previous.element.updated(with: new.row)
-                    updated.append(newElement)
-                    nextReferences.append(Reference(primaryKey: previous.primaryKey, row: new.row, element: newElement))
+                    let newRecord = updateRecord(previous.record, new.row)
+                    updated.append(newRecord)
+                    nextReferences.append(Reference(primaryKey: previous.primaryKey, row: new.row, record: newRecord))
                 }
             case .right(let new):
                 // Insertion
-                let element = Element(row: new.row)
-                inserted.append(element)
-                nextReferences.append(Reference(primaryKey: new.primaryKey, row: new.row, element: element))
+                let record = Record(row: new.row)
+                inserted.append(record)
+                nextReferences.append(Reference(primaryKey: new.primaryKey, row: new.row, record: record))
             }
         }
-
-        // Ready for next rows
-        references = nextReferences
-
-        // Result
-        if inserted.isEmpty && updated.isEmpty && deleted.isEmpty { return nil }
-        return PrimaryKeySortedDiff(
+        
+        let diff = PrimaryKeyDiff(
             inserted: inserted,
             updated: updated,
             deleted: deleted)
+        
+        return PrimaryKeyDiffScanner(
+            primaryKey: primaryKey,
+            updateRecord: updateRecord,
+            references: nextReferences,
+            diff: diff)
+    }
+}
+
+public struct PrimaryKeyDiff<Record> {
+    public var inserted: [Record]
+    public var updated: [Record]
+    public var deleted: [Record]
+    public var isEmpty: Bool {
+        return inserted.isEmpty && updated.isEmpty && deleted.isEmpty
     }
 }
 

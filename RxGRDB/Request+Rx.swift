@@ -47,16 +47,23 @@ extension Reactive where Base: Request {
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    public func changes(in writer: DatabaseWriter, synchronizedStart: Bool = true) -> Observable<Database> {
-        return AnyDatabaseWriter(writer).rx.changes(in: [base], synchronizedStart: synchronizedStart)
+    public func changes(
+        in writer: DatabaseWriter,
+        synchronizedStart: Bool = true)
+        -> Observable<Database>
+    {
+        return AnyDatabaseWriter(writer).rx.changes(
+            in: [base],
+            synchronizedStart: synchronizedStart)
     }
     
     /// Returns an Observable that emits after each committed database
     /// transaction that has modified the tables and columns fetched by
     /// the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first element
-    /// is emitted synchronously, on subscription.
+    /// All values are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// default value), the first element is emitted right upon subscription.
     ///
     ///     let dbQueue = DatabaseQueue()
     ///     let request = Person.all()
@@ -84,16 +91,17 @@ extension Reactive where Base: Request {
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     /// - parameter synchronizedStart: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    ///   (default is MainScheduler.instance).
     public func fetchCount(
         in writer: DatabaseWriter,
         synchronizedStart: Bool = true,
-        resultQueue: DispatchQueue = DispatchQueue.main)
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
         -> Observable<Int>
     {
         let request = base
         return AnyDatabaseWriter(writer).rx
-            .changeTokens(in: [request], synchronizedStart: synchronizedStart)
-            .mapFetch(resultQueue: resultQueue) { try request.fetchCount($0) }
+            .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+            .mapFetch { try request.fetchCount($0) }
     }
 }
