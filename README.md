@@ -557,7 +557,7 @@ let rowRequest = request.asRequest(of: Row.self)
 
 // The scanner is designed to feed the built-in RxSwift `scan` operator:
 rowRequest.rx
-    .fetchAll(in: writer)
+    .fetchAll(in: dbQueue)
     .scan(scanner) { (scanner, rows) in scanner.diffed(from: rows) }
     .subscribe(onNext: { scanner in
         let diff = scanner.diff
