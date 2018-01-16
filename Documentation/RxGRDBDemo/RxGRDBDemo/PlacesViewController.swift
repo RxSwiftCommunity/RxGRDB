@@ -150,9 +150,11 @@ extension PlacesViewController: MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        if let view = mapView.dequeueReusableAnnotationView(withIdentifier: "pin") {
+        if let view = mapView.dequeueReusableAnnotationView(withIdentifier: "annotation") {
             return view
         }
-        return MKPinAnnotationView(annotation: annotation, reuseIdentifier: "pin")
+        let view = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "annotation")
+        view.displayPriority = .required // opt out of clustering in order to show *all* annotations
+        return view
     }
 }
