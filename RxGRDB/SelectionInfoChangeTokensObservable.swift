@@ -8,7 +8,7 @@ import RxSwift
 final class SelectionInfoChangeTokensObservable : ObservableType {
     typealias E = ChangeToken
     let writer: DatabaseWriter
-    let synchronizedStart: Bool
+    let startImmediately: Bool
     let scheduler: SerialDispatchQueueScheduler
     let selectionInfos: (Database) throws -> [SelectStatement.SelectionInfo]
     
@@ -16,7 +16,7 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
     /// queue when a transaction has modified the database in a way that impacts
     /// some requests' selections.
     ///
-    /// When the `synchronizedStart` argument is true, the observable also emits
+    /// When the `startImmediately` argument is true, the observable also emits
     /// one `.databaseSubscription` and one `.subscription` token upon
     /// subscription, synchronously.
     ///
@@ -30,21 +30,21 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
     /// emitted after `.databaseSubscription`, and before `.subscription`.
     init(
         writer: DatabaseWriter,
-        synchronizedStart: Bool,
+        startImmediately: Bool,
         scheduler: SerialDispatchQueueScheduler,
         selectionInfos: @escaping (Database) throws -> [SelectStatement.SelectionInfo])
     {
         self.writer = writer
-        self.synchronizedStart = synchronizedStart
+        self.startImmediately = startImmediately
         self.scheduler = scheduler
         self.selectionInfos = selectionInfos
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == ChangeToken {
-        return scheduler.schedule((writer, synchronizedStart, scheduler)) { (writer, synchronizedStart, scheduler) in
+        return scheduler.schedule((writer, startImmediately, scheduler)) { (writer, startImmediately, scheduler) in
             do {
                 let transactionObserver = try writer.unsafeReentrantWrite { db -> SelectionInfoChangeObserver in
-                    if synchronizedStart {
+                    if startImmediately {
                         observer.onNext(ChangeToken(kind: .databaseSubscription(db), scheduler: scheduler))
                     }
                     
@@ -55,7 +55,7 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
                     return transactionObserver
                 }
                 
-                if synchronizedStart {
+                if startImmediately {
                     observer.onNext(ChangeToken(kind: .subscription, scheduler: scheduler))
                 }
                 

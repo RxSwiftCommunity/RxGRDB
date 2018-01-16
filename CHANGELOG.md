@@ -14,7 +14,7 @@ This version is focused on enhancing the scheduling of database notifications.
 
 ### Breaking Changes
 
-- Database observation scheduling used to be managed through raw dispatch queues. One now uses regular [RxSwift schedulers](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md). See the updated [documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#documentation) of RxGRDB reactive methods.
+- Database observation scheduling used to be managed through raw dispatch queues. One now uses regular [RxSwift schedulers](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md). The `synchronizedStart` parameter has been renamed to `startImmediately` in order to reflect the fact that not all schedulers can start synchronously. See the updated [documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#documentation) of RxGRDB reactive methods.
 - The `Diffable` protocol was ill-advised, and has been removed.
 - The `primaryKeySortedDiff` operator has been replaced by `PrimaryKeyDiffScanner` ([documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#primarykeydiffscanner))
 
@@ -23,6 +23,15 @@ This version is focused on enhancing the scheduling of database notifications.
 
 ```diff
  extension Reactive where Base: Request {
+-    func changes(
+-        in writer: DatabaseWriter,
+-        synchronizedStart: Bool = true)
+-        -> Observable<Database>
++    func changes(
++        in writer: DatabaseWriter,
++        startImmediately: Bool = true)
++        -> Observable<Database>
+ 
 -    func fetchCount(
 -        in writer: DatabaseWriter,
 -        synchronizedStart: Bool = true,
@@ -30,7 +39,7 @@ This version is focused on enhancing the scheduling of database notifications.
 -        -> Observable<Int>
 +    func fetchCount(
 +        in writer: DatabaseWriter,
-+        synchronizedStart: Bool = true,
++        startImmediately: Bool = true,
 +        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
 +        -> Observable<Int>
  }
@@ -44,10 +53,11 @@ This version is focused on enhancing the scheduling of database notifications.
 -        -> Observable<[Base.RowDecoder]>
 +    func fetchAll(
 +        in writer: DatabaseWriter,
-+        synchronizedStart: Bool = true,
++        startImmediately: Bool = true,
 +        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
 +        distinctUntilChanged: Bool = false)
 +        -> Observable<[Base.RowDecoder]>
+ 
 -    func fetchOne(
 -        in writer: DatabaseWriter,
 -        synchronizedStart: Bool = true,
@@ -56,7 +66,7 @@ This version is focused on enhancing the scheduling of database notifications.
 -        -> Observable<Base.RowDecoder?>
 +    func fetchOne(
 +        in writer: DatabaseWriter,
-+        synchronizedStart: Bool = true,
++        startImmediately: Bool = true,
 +        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance,
 +        distinctUntilChanged: Bool = false)
 +        -> Observable<Base.RowDecoder?>
@@ -71,13 +81,22 @@ This version is focused on enhancing the scheduling of database notifications.
  }
 
  extension Reactive where Base: DatabaseWriter {
+-    public func changes(
+-        in requests: [Request],
+-        synchronizedStart: Bool = true)
+-        -> Observable<Database>
++    public func changes(
++        in requests: [Request],
++        startImmediately: Bool = true)
++        -> Observable<Database>
+ 
 -    func changeTokens(
 -        in requests: [Request],
 -        synchronizedStart: Bool = true)
 -        -> Observable<ChangeToken>
 +    func changeTokens(
 +        in requests: [Request],
-+        synchronizedStart: Bool = true,
++        startImmediately: Bool = true,
 +        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
 +        -> Observable<ChangeToken>
  }

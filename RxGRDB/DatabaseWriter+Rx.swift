@@ -10,8 +10,11 @@ extension Reactive where Base: DatabaseWriter {
     /// committed database transaction that has modified the tables and columns
     /// fetched by the requests.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first element
-    /// is emitted synchronously, on subscription.
+    /// All elements are emitted in a protected database dispatch queue,
+    /// serialized with all database updates. If you set *startImmediately* to
+    /// true (the default value), the first element is emitted right upon
+    /// subscription. See [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency)
+    /// for more information.
     ///
     ///     let dbQueue = DatabaseQueue()
     ///     try dbQueue.inDatabase { db in
@@ -44,16 +47,16 @@ extension Reactive where Base: DatabaseWriter {
     ///     // Prints "Number of persons: 4"
     ///
     /// - parameter requests: The observed requests.
-    /// - parameter synchronizedStart: When true (the default), the first
+    /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     public func changes(
         in requests: [Request],
-        synchronizedStart: Bool = true)
+        startImmediately: Bool = true)
         -> Observable<Database>
     {
         return SelectionInfoDatabaseObservable(
             writer: base,
-            synchronizedStart: synchronizedStart,
+            startImmediately: startImmediately,
             selectionInfos: { db in try requests.map { try $0.selectionInfo(db) } })
             .asObservable()
     }
@@ -61,9 +64,6 @@ extension Reactive where Base: DatabaseWriter {
     /// Returns an Observable that emits a change token after each committed
     /// database transaction that has modified the tables and columns fetched by
     /// the requests.
-    ///
-    /// If you set `synchronizedStart` to true (the default), the first element
-    /// is emitted synchronously, on subscription.
     ///
     /// The change tokens are meant to be used by the mapFetch operator:
     ///
@@ -80,18 +80,25 @@ extension Reactive where Base: DatabaseWriter {
     ///             print("Best players out of \(count): \(players)")
     ///         })
     ///
+    /// All values from the mapFetch operator are emitted on *scheduler*, which
+    /// defaults to `MainScheduler.instance`. If you set *startImmediately* to
+    /// true (the default value), the first element is emitted right
+    /// upon subscription.
+    ///
     /// - parameter requests: The observed requests.
-    /// - parameter synchronizedStart: When true (the default), the first
-    ///   element is emitted synchronously, on subscription.
+    /// - parameter startImmediately: When true (the default), mapFetch emits
+    ///   its first right upon subscription.
+    /// - parameter scheduler: The scheduler on which mapFetch emits its
+    ///   elements (default is MainScheduler.instance).
     public func changeTokens(
         in requests: [Request],
-        synchronizedStart: Bool = true,
+        startImmediately: Bool = true,
         scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
         -> Observable<ChangeToken>
     {
         return SelectionInfoChangeTokensObservable(
             writer: base,
-            synchronizedStart: synchronizedStart,
+            startImmediately: startImmediately,
             scheduler: scheduler,
             selectionInfos: { db in try requests.map { try $0.selectionInfo(db) } })
             .asObservable()

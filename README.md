@@ -114,7 +114,7 @@ It is possible to avoid notifications of identical consecutive values. For examp
 
 **When your application observes a request, it gets notified each time a change in the results of the request has been committed in the database.**
 
-If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.fetchCount](#requestrxfetchcountinsynchronizedstartscheduler), [rx.fetchOne](#typedrequestrxfetchoneinsynchronizedstartscheduler), and [rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartscheduler) methods, depending on whether you want to track the number of results, the first one, or all of them:
+If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.fetchCount](#requestrxfetchcountinstartimmediatelyscheduler), [rx.fetchOne](#typedrequestrxfetchoneinstartimmediatelyscheduler), and [rx.fetchAll](#typedrequestrxfetchallinstartimmediatelyscheduler) methods, depending on whether you want to track the number of results, the first one, or all of them:
 
 ```swift
 let request = Player.all()
@@ -123,22 +123,22 @@ request.rx.fetchOne(in: dbQueue)   // Observable<Player?>
 request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 ```
 
-Some applications need to be synchronously notified right after any impactful transaction has been committed, and before any further database modification. This feature is provided by the [rx.changes](#requestrxchangesinsynchronizedstart) method:
+Some applications need to be synchronously notified right after any impactful transaction has been committed, and before any further database modification. This feature is provided by the [rx.changes](#requestrxchangesinstartimmediately) method:
 
 ```swift
 let request = Player.all()
 request.rx.changes(in: dbQueue)    // Observable<Database>
 ```
 
-- [`rx.changes`](#requestrxchangesinsynchronizedstart)
-- [`rx.fetchCount`](#requestrxfetchcountinsynchronizedstartscheduler)
-- [`rx.fetchOne`](#typedrequestrxfetchoneinsynchronizedstartschedulerdistinctuntilchanged)
-- [`rx.fetchAll`](#typedrequestrxfetchallinsynchronizedstartschedulerdistinctuntilchanged)
+- [`rx.changes`](#requestrxchangesinstartimmediately)
+- [`rx.fetchCount`](#requestrxfetchcountinstartimmediatelyscheduler)
+- [`rx.fetchOne`](#typedrequestrxfetchoneinstartimmediatelyschedulerdistinctuntilchanged)
+- [`rx.fetchAll`](#typedrequestrxfetchallinstartimmediatelyschedulerdistinctuntilchanged)
 
 
 ---
 
-#### `Request.rx.changes(in:synchronizedStart:)`
+#### `Request.rx.changes(in:startImmediately:)`
 
 Emits a database connection after each [impactful](#what-is-database-observation) database transaction:
 
@@ -162,7 +162,7 @@ try dbQueue.inTransaction { db in
 }
 ```
 
-All elements are emitted on the database writer dispatch queue, serialized with all database updates. If you set `synchronizedStart` to true (the default value), the first element is emitted right upon subscription. See [GRDB Concurrency Guide] for more information.
+All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription. See [GRDB Concurrency Guide] for more information.
 
 **You can also track SQL requests:**
 
@@ -184,7 +184,7 @@ try dbQueue.inDatabase { db in
 
 ---
 
-#### `Request.rx.fetchCount(in:synchronizedStart:scheduler:)`
+#### `Request.rx.fetchCount(in:startImmediately:scheduler:)`
 
 Emits a count after each [impactful](#what-is-database-observation) database transaction:
 
@@ -203,7 +203,7 @@ try dbQueue.inTransaction { db in
 }
 ```
 
-All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `synchronizedStart` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 **This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator in order to avoid duplicates:
 
@@ -214,7 +214,7 @@ request.rx.fetchCount(in: dbQueue).distinctUntilChanged()...
 
 ---
 
-#### `TypedRequest.rx.fetchOne(in:synchronizedStart:scheduler:distinctUntilChanged:)`
+#### `TypedRequest.rx.fetchOne(in:startImmediately:scheduler:distinctUntilChanged:)`
 
 Emits a value after each [impactful](#what-is-database-observation) database transaction:
 
@@ -238,7 +238,7 @@ try dbQueue.inDatabase { db in
 }
 ```
 
-All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `synchronizedStart` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
@@ -265,7 +265,7 @@ The `distinctUntilChanged` parameter does not involve the fetched type, and simp
 
 ---
 
-#### `TypedRequest.rx.fetchAll(in:synchronizedStart:scheduler:distinctUntilChanged:)`
+#### `TypedRequest.rx.fetchAll(in:startImmediately:scheduler:distinctUntilChanged:)`
 
 Emits an array of values after each [impactful](#what-is-database-observation) database transaction:
 
@@ -285,7 +285,7 @@ try dbQueue.inTransaction { db in
 }
 ```
 
-All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `synchronizedStart` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
@@ -332,19 +332,19 @@ request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 
 Those observables can be composed together using [RxSwift operators](https://github.com/ReactiveX/RxSwift). However, be careful: those operators are unable to fulfill some database-specific requirements:
 
-To get a single notification when a transaction has modified several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinsynchronizedstart).
+To get a single notification when a transaction has modified several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
 
 When you need to fetch from several requests with the guarantee of consistent results, that is to say when you need values that come alltogether from a single database transaction, see [Change Tokens](#change-tokens).
 
-- [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinsynchronizedstart)
+- [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately)
 - [Change Tokens](#change-tokens)
-- [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinsynchronizedstartscheduler)
+- [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinstartimmediatelyscheduler)
 - [`Observable.mapFetch`](#observablemapfetch_)
 
 
 ---
 
-#### `DatabaseWriter.rx.changes(in:synchronizedStart:)`
+#### `DatabaseWriter.rx.changes(in:startImmediately:)`
 
 Emits a database connection after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
 
@@ -370,7 +370,7 @@ try dbQueue.inTransaction { db in
 }
 ```
 
-All elements are emitted on the database writer dispatch queue, serialized with all database updates. If you set `synchronizedStart` to true (the default value), the first element is emitted right upon subscription. See [GRDB Concurrency Guide] for more information.
+All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription. See [GRDB Concurrency Guide] for more information.
 
 **You can also track SQL requests:**
 
@@ -404,7 +404,7 @@ let request = Player.all()
 request.rx.fetchAll(in: dbQueue) // Observable<[Player]>
 ```
 
-After each modification of the players database table, the observable above emits a fresh array of players (see [rx.fetchAll](#typedrequestrxfetchallinsynchronizedstartschedulerdistinctuntilchanged) for more options).
+After each modification of the players database table, the observable above emits a fresh array of players (see [rx.fetchAll](#typedrequestrxfetchallinstartimmediatelyschedulerdistinctuntilchanged) for more options).
 
 The job performed by this observable is decomposed into two steps: observe database modifications, and fetch fresh results after each modification. These two steps are made visible below:
 
@@ -436,13 +436,13 @@ dbQueue.rx
     })
 ```
 
-- [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinsynchronizedstartscheduler)
+- [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinstartimmediatelyscheduler)
 - [`Observable.mapFetch`](#observablemapfetch_)
 
 
 ---
 
-#### `DatabaseWriter.rx.changeTokens(in:synchronizedStart:scheduler:)`
+#### `DatabaseWriter.rx.changeTokens(in:startImmediately:scheduler:)`
 
 Emits a [change token](#change-tokens) after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
 
@@ -456,7 +456,7 @@ let changeTokens = dbQueue.rx.changeTokens(in: [players, teams]) // or dbPool
 
 Change tokens are opaque values: you can't use them directly. Instead, sequences of change tokens are designed to be consumed by the [mapFetch](#observablemapfetch_) operator.
 
-The `scheduler` and `synchronizedStart` parameters are used to control the delivery of fetched elements by the mapFetch operator. See below.
+The `scheduler` and `startImmediately` parameters are used to control the delivery of fetched elements by the mapFetch operator. See below.
 
 > :point_up: **Note**: RxGRDB does not support any alteration of change tokens sequences by the way of any RxSwift operator. Don't skip elements, don't merge sequences, etc.
 
@@ -476,9 +476,9 @@ let players = changeTokens.mapFetch { (db: Database) in
 }
 ```
 
-The `scheduler` and `synchronizedStart` parameters are used to build the sequence of change tokens control the delivery of fetched elements:
+The `scheduler` and `startImmediately` parameters are used to build the sequence of change tokens control the delivery of fetched elements:
 
-All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `synchronizedStart` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 **The closure provided to `mapFetch` is guaranteed an immutable view of the last committed state of the database.** This means that you can perform several fetches without fearing eventual concurrent writes to mess with your application logic:
 

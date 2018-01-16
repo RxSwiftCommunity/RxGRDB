@@ -10,8 +10,11 @@ extension Reactive where Base: Request {
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first element
-    /// is emitted synchronously, on subscription.
+    /// All elements are emitted in a protected database dispatch queue,
+    /// serialized with all database updates. If you set *startImmediately* to
+    /// true (the default value), the first element is emitted right upon
+    /// subscription. See [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency)
+    /// for more information.
     ///
     ///     let dbQueue = DatabaseQueue()
     ///     try dbQueue.inDatabase { db in
@@ -45,16 +48,16 @@ extension Reactive where Base: Request {
     ///     // Prints "Number of persons: 4"
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
-    /// - parameter synchronizedStart: When true (the default), the first
+    /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     public func changes(
         in writer: DatabaseWriter,
-        synchronizedStart: Bool = true)
+        startImmediately: Bool = true)
         -> Observable<Database>
     {
         return AnyDatabaseWriter(writer).rx.changes(
             in: [base],
-            synchronizedStart: synchronizedStart)
+            startImmediately: startImmediately)
     }
     
     /// Returns an Observable that emits after each committed database
@@ -62,7 +65,7 @@ extension Reactive where Base: Request {
     /// the request.
     ///
     /// All values are emitted on *scheduler*, which defaults to
-    /// `MainScheduler.instance`. If you set *synchronizedStart* to true (the
+    /// `MainScheduler.instance`. If you set *startImmediately* to true (the
     /// default value), the first element is emitted right upon subscription.
     ///
     ///     let dbQueue = DatabaseQueue()
@@ -89,19 +92,19 @@ extension Reactive where Base: Request {
     ///     // Prints "Number of persons: 4"
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
-    /// - parameter synchronizedStart: When true (the default), the first
-    ///   element is emitted synchronously, on subscription.
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted right upon subscription.
     /// - parameter scheduler: The scheduler on which elements are emitted
     ///   (default is MainScheduler.instance).
     public func fetchCount(
         in writer: DatabaseWriter,
-        synchronizedStart: Bool = true,
+        startImmediately: Bool = true,
         scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
         -> Observable<Int>
     {
         let request = base
         return AnyDatabaseWriter(writer).rx
-            .changeTokens(in: [request], synchronizedStart: synchronizedStart, scheduler: scheduler)
+            .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
             .mapFetch { try request.fetchCount($0) }
     }
 }

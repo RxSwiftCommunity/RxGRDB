@@ -8,7 +8,7 @@ import RxSwift
 /// Change tokens let you turn notifications of database changes into
 /// fetched values.
 ///
-/// To generate change tokens, see `DatabaseWriter.rx.changeTokens(in:synchronizedStart:)`.
+/// To generate change tokens, see `DatabaseWriter.rx.changeTokens(in:startImmediately:scheduler:)`.
 ///
 /// To turn change tokens into fetched values, see `ObservableType.mapFetch(_:)`.
 ///
@@ -20,12 +20,10 @@ import RxSwift
 public struct ChangeToken {
     /// Not public: the kind of change token
     enum Kind {
-        /// Emitted synchronously upon subscription, from the database writer
-        /// dispatch queue.
+        /// Emitted upon subscription, from the database writer dispatch queue.
         case databaseSubscription(Database)
         
-        /// Emitted synchronously upon subscription, from the subscription
-        /// dispatch queue.
+        /// Emitted upon subscription, from the scheduler dispatch queue.
         case subscription
         
         /// Emitted from the database writer dispatch queue.
@@ -39,6 +37,8 @@ public struct ChangeToken {
 extension ObservableType where E == ChangeToken {
     /// Transforms a sequence of change tokens into a sequence of values fetched
     /// from the database.
+    ///
+    /// 
     ///
     /// - parameter fetch: A function that accepts a database connection.
     /// - returns: An observable sequence whose elements are the result of

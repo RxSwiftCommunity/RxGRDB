@@ -8,22 +8,22 @@ import RxSwift
 final class SelectionInfoDatabaseObservable : ObservableType {
     typealias E = Database
     let writer: DatabaseWriter
-    let synchronizedStart: Bool
+    let startImmediately: Bool
     let selectionInfos: (Database) throws -> [SelectStatement.SelectionInfo]
     
     /// Creates an observable that emits writer database connections on their
     /// dedicated dispatch queue when a transaction has modified the database
     /// in a way that impacts some requests' selections.
     ///
-    /// When the `synchronizedStart` argument is true, the observable also emits
+    /// When the `startImmediately` argument is true, the observable also emits
     /// a database connection, synchronously.
     init(
         writer: DatabaseWriter,
-        synchronizedStart: Bool,
+        startImmediately: Bool,
         selectionInfos: @escaping (Database) throws -> [SelectStatement.SelectionInfo])
     {
         self.writer = writer
-        self.synchronizedStart = synchronizedStart
+        self.startImmediately = startImmediately
         self.selectionInfos = selectionInfos
     }
     
@@ -32,7 +32,7 @@ final class SelectionInfoDatabaseObservable : ObservableType {
             let writer = self.writer
             
             let transactionObserver = try writer.unsafeReentrantWrite { db -> SelectionInfoChangeObserver in
-                if synchronizedStart {
+                if startImmediately {
                     observer.onNext(db)
                 }
                 
