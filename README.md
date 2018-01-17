@@ -162,7 +162,7 @@ try dbQueue.inTransaction { db in
 }
 ```
 
-All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription. See [GRDB Concurrency Guide] for more information.
+All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted synchronously, right upon subscription. See [GRDB Concurrency Guide] for more information.
 
 **You can also track SQL requests:**
 
@@ -370,7 +370,7 @@ try dbQueue.inTransaction { db in
 }
 ```
 
-All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription. See [GRDB Concurrency Guide] for more information.
+All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted synchronously, right upon subscription. See [GRDB Concurrency Guide] for more information.
 
 **You can also track SQL requests:**
 

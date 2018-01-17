@@ -5,8 +5,7 @@
 #endif
 import RxSwift
 
-/// An observable that fetches results from database connections and emits
-/// them asynchronously.
+/// An observable that fetches results from database connections
 class MapFetch<ResultType> : ObservableType {
     typealias E = ResultType
     
@@ -47,7 +46,7 @@ class MapFetch<ResultType> : ObservableType {
                     
                 case .databaseSubscription(let db):
                     // Current dispatch queue: the database writer dispatch queue
-                    // This token is emitted synchronously upon subscription.
+                    // This token is emitted upon subscription.
                     initialResult = Result { try self.fetch(db) }
                     
                 case .subscription:
@@ -55,7 +54,7 @@ class MapFetch<ResultType> : ObservableType {
                     // scheduler used to create the source observable of change
                     // tokens.
                     //
-                    // This token is emitted synchronously upon subscription,
+                    // This token is emitted upon subscription,
                     // after `databaseSubscription`.
                     //
                     // NB: this code executes concurrently with database writes.

@@ -18,7 +18,7 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
     ///
     /// When the `startImmediately` argument is true, the observable also emits
     /// one `.databaseSubscription` and one `.subscription` token upon
-    /// subscription, synchronously.
+    /// subscription.
     ///
     /// The `.databaseSubscription` token is emitted from the database writer
     /// queue, and the `.subscription` token is emitted from the subscription

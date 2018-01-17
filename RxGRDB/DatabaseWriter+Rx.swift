@@ -12,8 +12,8 @@ extension Reactive where Base: DatabaseWriter {
     ///
     /// All elements are emitted in a protected database dispatch queue,
     /// serialized with all database updates. If you set *startImmediately* to
-    /// true (the default value), the first element is emitted right upon
-    /// subscription. See [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency)
+    /// true (the default value), the first element is emitted synchronously
+    /// upon subscription. See [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency)
     /// for more information.
     ///
     ///     let dbQueue = DatabaseQueue()
