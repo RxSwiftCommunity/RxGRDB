@@ -22,13 +22,15 @@ extension TypedRequestTests {
     
     func modifyDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
-            try db.execute("UPDATE players SET name = name")
+            try db.execute("UPDATE players SET name = name WHERE id = 1")
             try db.execute("UPDATE players SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
             _ = try Player.deleteAll(db)
             try db.inTransaction {
                 var player = Player(id: nil, name: "Craig", email: nil)
                 try player.insert(db)
                 player = Player(id: nil, name: "David", email: "david@example.com")
+                try player.insert(db)
+                player = Player(id: nil, name: "Elena", email: "elena@example.com")
                 try player.insert(db)
                 return .commit
             }
@@ -52,7 +54,7 @@ extension TypedRequestTests {
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
-            ["Craig", "David"],
+            ["Craig", "David", "Elena"],
             ]
         
         try setUpDatabase(in: writer)
@@ -86,12 +88,46 @@ extension TypedRequestTests {
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
-            ["Craig", "David"],
+            ["Craig", "David", "Elena"],
             ]
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
+            .subscribe { event in
+                // events are expected on the main thread by default
+                assertMainQueue()
+                recorder.on(event)
+            }
+            .disposed(by: disposeBag)
+        try modifyDatabase(in: writer)
+        wait(for: recorder, timeout: 1)
+        
+        for (event, names) in zip(recorder.recordedEvents, expectedNames) {
+            XCTAssertEqual(event.element!.map { $0.name }, names)
+        }
+    }
+}
+
+extension TypedRequestTests {
+    func testRxFetchAllRecordsIdentifiedByIds() throws {
+        try Test(testRxFetchAllRecordsIdentifiedByIds)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testRxFetchAllRecordsIdentifiedByIds(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        let request = Player.filter(keys: [2, 3]).order(Column("name"))
+        let expectedNames = [
+            ["Barbara"],
+            ["Barbie"],
+            [],
+            ["David", "Elena"],
+            ]
+        
+        try setUpDatabase(in: writer)
+        let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
+        request.rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -175,6 +211,40 @@ extension TypedRequestTests {
     }
 }
 
+extension TypedRequestTests {
+    func testRxFetchOneRecordIdentifiedById() throws {
+        try Test(testRxFetchOneRecordIdentifiedById)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testRxFetchOneRecordIdentifiedById(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        let request = Player.filter(key: 2)
+        let expectedNames = [
+            "Barbara",
+            "Barbie",
+            nil,
+            "David"
+        ]
+        
+        try setUpDatabase(in: writer)
+        let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
+        request.rx.fetchOne(in: writer)
+            .subscribe { event in
+                // events are expected on the main thread by default
+                assertMainQueue()
+                recorder.on(event)
+            }
+            .disposed(by: disposeBag)
+        try modifyDatabase(in: writer)
+        wait(for: recorder, timeout: 1)
+        
+        for (event, name) in zip(recorder.recordedEvents, expectedNames) {
+            XCTAssertEqual(event.element!?.name, name)
+        }
+    }
+}
+
 // MARK: - Row
 
 extension TypedRequestTests {
@@ -191,7 +261,7 @@ extension TypedRequestTests {
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
-            ["Craig", "David"],
+            ["Craig", "David", "Elena"],
             ]
         
         try setUpDatabase(in: writer)
@@ -225,12 +295,46 @@ extension TypedRequestTests {
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
-            ["Craig", "David"],
+            ["Craig", "David", "Elena"],
             ]
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
+            .subscribe { event in
+                // events are expected on the main thread by default
+                assertMainQueue()
+                recorder.on(event)
+            }
+            .disposed(by: disposeBag)
+        try modifyDatabase(in: writer)
+        wait(for: recorder, timeout: 1)
+        
+        for (event, names) in zip(recorder.recordedEvents, expectedNames) {
+            XCTAssertEqual(event.element!.map { $0["name"] as String }, names)
+        }
+    }
+}
+
+extension TypedRequestTests {
+    func testRxFetchAllRowsIdentifiedByIds() throws {
+        try Test(testRxFetchAllRowsIdentifiedByIds)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testRxFetchAllRowsIdentifiedByIds(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        let request = Player.filter(keys: [2, 3]).order(Column("name")).asRequest(of: Row.self)
+        let expectedNames = [
+            ["Barbara"],
+            ["Barbie"],
+            [],
+            ["David", "Elena"],
+            ]
+        
+        try setUpDatabase(in: writer)
+        let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
+        request.rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -314,6 +418,40 @@ extension TypedRequestTests {
     }
 }
 
+extension TypedRequestTests {
+    func testRxFetchOneRowIdentifiedById() throws {
+        try Test(testRxFetchOneRowIdentifiedById)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testRxFetchOneRowIdentifiedById(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        let request = Player.filter(key: 2).asRequest(of: Row.self)
+        let expectedNames = [
+            "Barbara",
+            "Barbie",
+            nil,
+            "David"
+        ]
+        
+        try setUpDatabase(in: writer)
+        let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
+        request.rx.fetchOne(in: writer)
+            .subscribe { event in
+                // events are expected on the main thread by default
+                assertMainQueue()
+                recorder.on(event)
+            }
+            .disposed(by: disposeBag)
+        try modifyDatabase(in: writer)
+        wait(for: recorder, timeout: 1)
+        
+        for (event, name) in zip(recorder.recordedEvents, expectedNames) {
+            XCTAssertEqual(event.element!?["name"] as String?, name)
+        }
+    }
+}
+
 // MARK: - DatabaseValue
 
 extension TypedRequestTests {
@@ -330,7 +468,7 @@ extension TypedRequestTests {
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
-            ["Craig", "David"],
+            ["Craig", "David", "Elena"],
             ]
         
         try setUpDatabase(in: writer)
@@ -364,7 +502,7 @@ extension TypedRequestTests {
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
-            ["Craig", "David"],
+            ["Craig", "David", "Elena"],
             ]
         
         try setUpDatabase(in: writer)
@@ -469,7 +607,7 @@ extension TypedRequestTests {
             ["arthur@example.com", nil],
             ["arthur@example.com", nil],
             [],
-            [nil, "david@example.com"],
+            [nil, "david@example.com", "elena@example.com"],
             ]
         
         try setUpDatabase(in: writer)
@@ -506,7 +644,7 @@ extension TypedRequestTests {
         let expectedNames = [
             ["arthur@example.com", nil],
             [],
-            [nil, "david@example.com"],
+            [nil, "david@example.com", "elena@example.com"],
             ]
         
         try setUpDatabase(in: writer)
@@ -544,7 +682,8 @@ extension TypedRequestTests {
             PrimaryKeyDiff(
                 inserted: [
                     Player(id: 1, name: "Arthur", email: "arthur@example.com"),
-                    Player(id: 2, name: "Barbara", email: nil)],
+                    Player(id: 2, name: "Barbara", email: nil),
+                    ],
                 updated: [],
                 deleted: []),
             PrimaryKeyDiff(
@@ -564,8 +703,9 @@ extension TypedRequestTests {
             PrimaryKeyDiff(
                 inserted: [
                     Player(id: 1, name: "Craig", email: nil),
-                    Player(id: 2, name: "David", email: "david@example.com")
-                ],
+                    Player(id: 2, name: "David", email: "david@example.com"),
+                    Player(id: 3, name: "Elena", email: "elena@example.com"),
+                    ],
                 updated: [],
                 deleted: []),
             ]

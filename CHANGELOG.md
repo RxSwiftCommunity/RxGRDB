@@ -3,7 +3,16 @@ Release Notes
 
 ## Next Version
 
-This version is focused on enhancing the scheduling of database notifications.
+This version enhances the scheduling of database notifications, and the tracking of specific database rows.
+
+
+## New
+
+- The tracking of requests that target specific rows, identified by their row ids, has been enhanced:
+    
+    In previous version of RxGRDB, tracking `Player.filter(key: 1)` would trigger change notifications for all changes to the players table.
+    
+    Now RxGRDB is able to precisely track the player of ID 1, and won't emit any notification for changes performed on other players.
 
 
 ## Fixed
@@ -14,6 +23,7 @@ This version is focused on enhancing the scheduling of database notifications.
 
 ### Breaking Changes
 
+- GRDB dependency has been bumped to v2.6.
 - Database observation scheduling used to be managed through raw dispatch queues. One now uses regular [RxSwift schedulers](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md). The `synchronizedStart` parameter has been renamed to `startImmediately` in order to reflect the fact that not all schedulers can start synchronously. See the updated [documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#documentation) of RxGRDB reactive methods.
 - The `Diffable` protocol was ill-advised, and has been removed.
 - The `primaryKeySortedDiff` operator has been replaced by `PrimaryKeyDiffScanner` ([documentation](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#primarykeydiffscanner))

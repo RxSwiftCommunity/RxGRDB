@@ -4,29 +4,25 @@
     import GRDB
 #endif
 
-extension Request {
-    func selectionInfo(_ db: Database) throws -> SelectStatement.SelectionInfo {
-        let (statement, _) = try prepare(db)
-        return statement.selectionInfo
-    }
-}
-
-final class SelectionInfoChangeObserver : TransactionObserver {
+final class DatabaseRegionChangeObserver : TransactionObserver {
     var changed: Bool = false
-    let selectionInfos: [SelectStatement.SelectionInfo]
+    let observedRegion: DatabaseRegion
     let change: () -> Void
     
-    init(selectionInfos: [SelectStatement.SelectionInfo], onChange change: @escaping () -> Void) {
-        self.selectionInfos = selectionInfos
+    init(observedRegion: DatabaseRegion, onChange change: @escaping () -> Void) {
+        self.observedRegion = observedRegion
         self.change = change
     }
     
     func observes(eventsOfKind eventKind: DatabaseEventKind) -> Bool {
-        return selectionInfos.contains { eventKind.impacts($0) }
+        return observedRegion.isModified(byEventsOfKind:eventKind)
     }
     
     func databaseDidChange(with event: DatabaseEvent) {
-        changed = true
+        if observedRegion.isModified(by: event) {
+            changed = true
+            stopObservingDatabaseChangesUntilNextTransaction()
+        }
     }
     
     func databaseWillCommit() { }
