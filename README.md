@@ -49,6 +49,11 @@ Documentation
 - [Observing Multiple Requests](#observing-multiple-requests)
 - [Diffs](#diffs)
 - [Scheduling](#scheduling)
+    - [Scheduling Guarantees](#scheduling-guarantees)
+    - [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
+    - [Changes Observables](#changes-observables)
+    - [Values Observables](#values-observables)
+    - [Common Use Cases of Values Observables](#common-use-cases-of-values-observables)
 
 
 ## Installation
@@ -644,7 +649,7 @@ Changes and values observables don't have the same behavior, and we'd like you t
 
 ## Changes Observables
 
-Changes observable are all about being **synchronously** notified of any relevant transactions. They can be created and subscribed from any thread. They all emit database connections in a "protected dispatch queue", serialized with all database updates:
+**Changes Observable are all about being synchronously notified of any [impactful](#what-is-database-observation) transaction.** They can be created and subscribed from any thread. They all emit database connections in a "protected dispatch queue", serialized with all database updates:
 
 ```swift
 // On any thread
@@ -699,9 +704,11 @@ When one uses a [database queue], all reads are blocked as well. A [database poo
 
 **Because all writes are blocked, a changes observable guarantees access to the latest state of the database, exactly as it is written on disk.**
 
-*This is a very strong guarantee, that most applications don't need*. This may sound surprising, so please bear with me, and consider an application that displays the database content on screen.
+*This is a very strong guarantee, that most applications don't need*. This may sound surprising, so please bear with me, and consider an application that displays the database content on screen:
 
-This application needs to update its UI, on the main thread, from the freshest database values. As the application is setting up its views from those values, background threads can write in the database, and make those values obsolete even before screen pixels have been refreshed. Think about a background thread that processes the results of a network request, for example. Is it a problem if the app draws stale database content? RxGRDB's answer is *no*, as long as the application is eventually notified with refreshed values. And this is the job of [values observables](#values-observables).
+This application needs to update its UI, on the main thread, from the freshest database values. As the application is setting up its views from those values, background threads can write in the database, and make those values obsolete even before screen pixels have been refreshed.
+
+Is it a problem if the app draws stale database content? RxGRDB's answer is *no*, as long as the application is eventually notified with refreshed values. And this is the job of [values observables](#values-observables).
 
 **There are very few use cases for changes observables.** For example:
 
