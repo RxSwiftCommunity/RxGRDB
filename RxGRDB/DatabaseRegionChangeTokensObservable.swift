@@ -5,12 +5,12 @@
 #endif
 import RxSwift
 
-final class SelectionInfoChangeTokensObservable : ObservableType {
+final class DatabaseRegionChangeTokensObservable : ObservableType {
     typealias E = ChangeToken
     let writer: DatabaseWriter
     let startImmediately: Bool
     let scheduler: SerialDispatchQueueScheduler
-    let selectionInfos: (Database) throws -> [SelectStatement.SelectionInfo]
+    let observedRegion: (Database) throws -> DatabaseRegion
     
     /// Creates an observable that emits `.change` tokens on the database writer
     /// queue when a transaction has modified the database in a way that impacts
@@ -32,24 +32,24 @@ final class SelectionInfoChangeTokensObservable : ObservableType {
         writer: DatabaseWriter,
         startImmediately: Bool,
         scheduler: SerialDispatchQueueScheduler,
-        selectionInfos: @escaping (Database) throws -> [SelectStatement.SelectionInfo])
+        observedRegion: @escaping (Database) throws -> DatabaseRegion)
     {
         self.writer = writer
         self.startImmediately = startImmediately
         self.scheduler = scheduler
-        self.selectionInfos = selectionInfos
+        self.observedRegion = observedRegion
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == ChangeToken {
         return scheduler.schedule((writer, startImmediately, scheduler)) { (writer, startImmediately, scheduler) in
             do {
-                let transactionObserver = try writer.unsafeReentrantWrite { db -> SelectionInfoChangeObserver in
+                let transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionChangeObserver in
                     if startImmediately {
                         observer.onNext(ChangeToken(kind: .databaseSubscription(db), scheduler: scheduler))
                     }
                     
-                    let transactionObserver = try SelectionInfoChangeObserver(
-                        selectionInfos: self.selectionInfos(db),
+                    let transactionObserver = try DatabaseRegionChangeObserver(
+                        observedRegion: self.observedRegion(db),
                         onChange: { observer.onNext(ChangeToken(kind: .change(writer, db), scheduler: scheduler)) })
                     db.add(transactionObserver: transactionObserver)
                     return transactionObserver

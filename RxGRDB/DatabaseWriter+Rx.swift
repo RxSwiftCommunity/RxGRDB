@@ -54,10 +54,10 @@ extension Reactive where Base: DatabaseWriter {
         startImmediately: Bool = true)
         -> Observable<Database>
     {
-        return SelectionInfoDatabaseObservable(
+        return DatabaseRegionDatabaseObservable(
             writer: base,
             startImmediately: startImmediately,
-            selectionInfos: { db in try requests.map { try $0.selectionInfo(db) } })
+            observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
             .asObservable()
     }
     
@@ -96,11 +96,21 @@ extension Reactive where Base: DatabaseWriter {
         scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
         -> Observable<ChangeToken>
     {
-        return SelectionInfoChangeTokensObservable(
+        return DatabaseRegionChangeTokensObservable(
             writer: base,
             startImmediately: startImmediately,
             scheduler: scheduler,
-            selectionInfos: { db in try requests.map { try $0.selectionInfo(db) } })
+            observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
             .asObservable()
+    }
+}
+
+extension Array where Element == DatabaseRegion {
+    func union() -> DatabaseRegion {
+        if let initial = first {
+            return suffix(from: 1).reduce(into: initial) { $0.formUnion($1) }
+        } else {
+            return DatabaseRegion()
+        }
     }
 }

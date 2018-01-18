@@ -5,11 +5,11 @@
 #endif
 import RxSwift
 
-final class SelectionInfoDatabaseObservable : ObservableType {
+final class DatabaseRegionDatabaseObservable : ObservableType {
     typealias E = Database
     let writer: DatabaseWriter
     let startImmediately: Bool
-    let selectionInfos: (Database) throws -> [SelectStatement.SelectionInfo]
+    let observedRegion: (Database) throws -> DatabaseRegion
     
     /// Creates an observable that emits writer database connections on their
     /// dedicated dispatch queue when a transaction has modified the database
@@ -20,24 +20,24 @@ final class SelectionInfoDatabaseObservable : ObservableType {
     init(
         writer: DatabaseWriter,
         startImmediately: Bool,
-        selectionInfos: @escaping (Database) throws -> [SelectStatement.SelectionInfo])
+        observedRegion: @escaping (Database) throws -> DatabaseRegion)
     {
         self.writer = writer
         self.startImmediately = startImmediately
-        self.selectionInfos = selectionInfos
+        self.observedRegion = observedRegion
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == Database {
         do {
             let writer = self.writer
             
-            let transactionObserver = try writer.unsafeReentrantWrite { db -> SelectionInfoChangeObserver in
+            let transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionChangeObserver in
                 if startImmediately {
                     observer.onNext(db)
                 }
                 
-                let transactionObserver = try SelectionInfoChangeObserver(
-                    selectionInfos: selectionInfos(db),
+                let transactionObserver = try DatabaseRegionChangeObserver(
+                    observedRegion: observedRegion(db),
                     onChange: { observer.onNext(db) })
                 db.add(transactionObserver: transactionObserver)
                 return transactionObserver
