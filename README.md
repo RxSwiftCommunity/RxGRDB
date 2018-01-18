@@ -111,7 +111,7 @@ It is possible to avoid notifications of identical consecutive values. For examp
 **RxGRDB observables are based on GRDB's [TransactionObserver] protocol.** If your application needs change notifications that are not built in RxGRDB, this versatile protocol will probably provide a solution.
 
 
-## Observing Individual Requests
+# Observing Individual Requests
 
 **When your application observes a request, it gets notified each time a change in the results of the request has been committed in the database.**
 
@@ -319,7 +319,7 @@ request.rx.fetchAll(in: dbQueue, distinctUntilChanged: true)...
 The `distinctUntilChanged` parameter does not involve the fetched type, and simply performs comparisons of raw database values.
 
 
-## Observing Multiple Requests
+# Observing Multiple Requests
 
 We have seen above how to [observe individual requests](#observing-individual-requests):
 
@@ -394,7 +394,7 @@ try dbQueue.inDatabase { db in
 
 ---
 
-### Change Tokens
+## Change Tokens
 
 **Generally speaking, *change tokens* let you turn notifications of database changes into fetched values. But the requests you observe don't have to be the same as the requests you fetch from.**
 
@@ -499,7 +499,7 @@ dbQueue.rx
 ```
 
 
-## Diffs
+# Diffs
 
 Since RxGRDB is able to track database changes, it is a natural desire to compute diffs between two consecutive request results.
 
@@ -510,7 +510,7 @@ RxGRDB ships with one diff algorithm which computes the inserted, updated, and d
 For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses Differ in order to animate the content of a table view.
 
 
-### PrimaryKeyDiffScanner
+## PrimaryKeyDiffScanner
 
 PrimaryKeyDiffScanner computes diffs between collections whose order does not matter. It is well suited, for example, for synchronizing annotations in a map view with the contents of the database.
 
@@ -568,7 +568,7 @@ rowRequest.rx
 Check the [demo application](Documentation/RxGRDBDemo) for an example app that uses `PrimaryKeyDiffScanner` to synchronize the content of a map view with the content of the database.
 
 
-## Scheduling
+# Scheduling
 
 GRDB and RxGRDB go a long way to make multi-threading with SQLite **safe**. But safety has constraints, and this chapter attempts at making RxGRDB scheduling as clear as possible.
 
@@ -579,7 +579,7 @@ GRDB and RxGRDB go a long way to make multi-threading with SQLite **safe**. But 
 - [Common Use Cases of Values Observables](#common-use-cases-of-values-observables)
 
 
-### Scheduling Guarantees
+## Scheduling Guarantees
 
 GRDB provides **3 fundamental guarantees** that hold as long as you follow the [rules](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency).
 
@@ -603,7 +603,7 @@ On top of that, RxGRDB adds its own guarantees:
 - :bowtie: **RxGRDB Guarantee 2: all observables emit their values in the same chronological order as transactions.**
 
 
-### Changes Observables vs. Values Observables
+## Changes Observables vs. Values Observables
 
 **RxGRDB provides two sets of observables: changes observables, and values observables.** Changes observables emit database connections, and values observables emit values (records, rows, ints, etc.):
 
@@ -621,8 +621,12 @@ Player.all().rx
     .subscribe(onNext: { players: [Player] in
         print("Players have changed.")
     })
+```
 
-// Another values observable:
+[Change tokens](#change-tokens) build values observables as well:
+
+```swift
+// A values observable:
 dbQueue
     .changeTokens(in: [Player.all()])
     .mapFetch { (db: Database) -> ([Player], Int) in
@@ -638,7 +642,7 @@ dbQueue
 Changes and values observables don't have the same behavior, and we'd like you to understand the differences.
 
 
-### Changes Observables
+## Changes Observables
 
 Changes observable are all about being **synchronously** notified of any relevant transactions. They can be created and subscribed from any thread. They all emit database connections in a "protected dispatch queue", serialized with all database updates:
 
@@ -660,12 +664,12 @@ dbQueue.rx
     })
 ```
 
-**It is not possible to observe changes observables in other queues.** It you do so, you'll get a "Database was not used on the correct thread" fatal error:
+**Changes observables must be observed on a database protected dispatch queue.** If you change the observation queue, you get a "Database was not used on the correct thread" fatal error:
 
 ```swift
 Player.all().rx
     .changes(in: dbQueue)
-    .observeOn(ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+    .observeOn(SerialDispatchQueueScheduler(qos: .userInitiated))
     .subscribe(onNext: { db: Database in
         // fatal error
         let players = try Player.fetchAll(db)
@@ -686,15 +690,9 @@ Player.all().rx
 print(Date())
 try dbQueue.inTransaction { db in
     try Player(name: "Arthur").insert(db)
-    return .commit // triggers the observable, and waits 1 second
+    return .commit // Triggers the observable, and waits 1 second
 }
 print(Date()) // 1+ second later
-
-DispatchQueue.global(qos: .default).async {
-    // blocked by the triggered observable
-    try dbQueue.inDatabase { db in ... }
-    print(Date()) // 1+ second later
-}
 ```
 
 When one uses a [database queue], all reads are blocked as well. A [database pool] allows concurrent reads.
@@ -703,57 +701,92 @@ When one uses a [database queue], all reads are blocked as well. A [database poo
 
 *This is a very strong guarantee, that most applications don't need*. This may sound surprising, so please bear with me, and consider an application that displays the database content on screen.
 
-This application needs to update its UI, on the main thread, from the freshest database values. As the application is setting up its views from those values, background threads can write in the database, and make those values obsolete even before screen pixels have been refreshed. Think about a background thread that processes the results of a network request, for example. Is it a problem if the app draws stale database content? RxGRDB's answer is no, as long as the application is eventually notified with refreshed values. And this is the job of [values observables](#values-observables).
+This application needs to update its UI, on the main thread, from the freshest database values. As the application is setting up its views from those values, background threads can write in the database, and make those values obsolete even before screen pixels have been refreshed. Think about a background thread that processes the results of a network request, for example. Is it a problem if the app draws stale database content? RxGRDB's answer is *no*, as long as the application is eventually notified with refreshed values. And this is the job of [values observables](#values-observables).
 
 **There are very few use cases for changes observables.** For example:
 
-- One needs to synchronize the content of the database file with some external resources, like other files.
+- One needs to synchronize the content of the database file with some external resources, like other files, or system sensors like CLRegion monitoring.
 
 - On iOS, one needs to process a database transaction before the operating system had any opportunity to put the application in the suspended state.
 
 Outside of those use cases, it is much likely *wrong* to use a changes observables. Please [open an issue] and come discuss if you have any question.
 
 
-### Values Observables
+## Values Observables
 
 **Values Observables are all about getting fresh database values**.
 
-They all emit in the dispatch queue of your choice, the default being the main queue.
+They all emit in the scheduler of your choice, the default being `MainScheduler.instance` which emits on the main queue:
 
-Values observables may block, or not, the thread that is writing in the database:
+```swift
+// On any thread
+Player.all().rx
+    .fetchAll(in: dbQueue)
+    .subscribe(onNext: { players: [Player] in
+        // On the main queue
+        print("Players have changed.")
+    })
+```
 
-- When one uses a [database queue], all application threads have to wait until RxGRDB has fetched the refreshed values. The thread that is writing is the database also has to wait.
-    
-    ```swift
-    Player.all().rx
-        .fetchAll(in: dbQueue)
-        .subscribe(onNext: { players: [Player] in
-            // On the main queue
-            print("Players have changed.")
-        })
-        
-    try dbQueue.inTransaction { db in
-        try Player(name: "Arthur").insert(db)
-        return .commit // waits until fresh players have been fetched
-    }
-    ```
-    
-    Fortunately, fetching values is usually [quite fast](https://github.com/groue/GRDB.swift/wiki/Performance).
-    
-    Yet some complex queries take a long time, and you may experience undesired blocking. In this case, consider replacing the database queue with a database pool.
-    
-    That's because database queue is designed to be *as simple as possible*, when database pool is dedicated to *efficient multi-threading*:
+The behavior of a values observable depends on whether you use a [database queue], or a [database pool].
 
-- When one uses a [database pool], writes are blocked until RxGRDB has established [snapshot isolation](https://sqlite.org/isolation.html). This is a very fast operation. The only limiting resource is the maximum number of concurrent reads (see [database pool configuration]).
-    
-    After snapshot isolation has been established, writes are unlocked, and one thread starts reading fresh values. The duration of the fetch does not really matter, because other threads can freely read and write in the database. This is the magic of snapshot isolation :sparkles:!
-    
-    Values observables that feed on database pools are a *very efficient* way to use GRDB and RxGRDB.
+- [Values Observables in a Database Queue](#values-observables-in-a-database-queue)
+- [Values Observables in a Database Pool](#values-observables-in-a-database-pool)
 
 
-### Common Use Cases of Values Observables
+### Values Observables in a Database Queue
 
-#### Consuming fetched values on the main thread
+In a [database queue], values observables fetch fresh values immediately after an [impactful](#what-is-database-observation) transaction has completed.
+
+**They block all threads that are accessing the database, or attempting to access in the database, until fresh values are fetched:**
+
+```swift
+Player.all().rx
+    .fetchAll(in: dbQueue)
+    .subscribe(onNext: { players: [Player] in
+        // On the main queue
+        print("Players have changed.")
+    })
+    
+try dbQueue.inTransaction { db in
+    try Player(name: "Arthur").insert(db)
+    return .commit // waits until fresh players have been fetched
+}
+```
+
+Fortunately, fetching values is usually [quite fast](https://github.com/groue/GRDB.swift/wiki/Performance).
+
+Yet some complex queries take a long time, and you may experience undesired blocking. In this case, consider replacing the database queue with a database pool, because that's what database pools are for: *efficient multi-threading*.
+
+
+### Values Observables in a Database Pool
+
+In a [database pool], values observables *eventually* fetch fresh values after an [impactful](#what-is-database-observation) transaction has completed.
+
+**They block all threads that are writing in the database, or attempting to write in the database, until [snapshot isolation](https://sqlite.org/isolation.html) has been established:**
+
+```swift
+Player.all().rx
+    .fetchAll(in: dbPool)
+    .subscribe(onNext: { players: [Player] in
+        // On the main queue
+        print("Players have changed.")
+    })
+    
+try dbPool.writeInTransaction { db in
+    try Player(name: "Arthur").insert(db)
+    return .commit // waits for snapshot isolation establishment
+}
+```
+
+Acquiring snapshot isolation is very fast. The only limiting resource is the maximum number of concurrent reads (see [database pool configuration]).
+
+After snapshot isolation has been established, the values observable fetches fresh values. Meanwhile, other threads can freely read and write in the database :tada:!
+
+
+## Common Use Cases of Values Observables
+
+### Consuming fetched values on the main thread
 
 ```swift
 // On any thread
@@ -779,7 +812,7 @@ dbQueue
     })
 ```
 
-#### Consuming fetched values off the main thread
+### Consuming fetched values off the main thread
 
 The first example is OK, even if the main thread is still involved as a relay. Subsequent examples don't use the main thread at all:
 
