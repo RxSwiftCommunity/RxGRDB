@@ -1,7 +1,9 @@
 Release Notes
 =============
 
-## Next Version
+## 0.8.0
+
+Released January 18, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.7.0...v0.8.0)
 
 This version enhances the scheduling of database notifications, and the tracking of specific database rows.
 
