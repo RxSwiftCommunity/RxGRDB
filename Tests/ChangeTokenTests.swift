@@ -32,7 +32,7 @@ extension ChangeTokenTests {
         let recorder = EventRecorder<([String], Int)>(expectedEventCount: expectedValues.count)
         let request = SQLRequest("SELECT * FROM table1")
         
-        // 1 (synchronizedStart parameter is true by default)
+        // 1 (startImmediately parameter is true by default)
         AnyDatabaseWriter(writer).rx
             .changeTokens(in: [request])
             .mapFetch() { db -> ([String], Int) in
@@ -41,7 +41,7 @@ extension ChangeTokenTests {
                 return (strings, int)
             }
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }

@@ -51,7 +51,7 @@ extension Place: MutablePersistable {
 extension Place {
     static func randomCoordinate() -> CLLocationCoordinate2D {
         let paris = CLLocationCoordinate2D(latitude: 48.8534100, longitude: 2.3488000)
-        return CLLocationCoordinate2D.random(withinDistance: 3000, from: paris)
+        return CLLocationCoordinate2D.random(withinDistance: 8000, from: paris)
     }
 }
 

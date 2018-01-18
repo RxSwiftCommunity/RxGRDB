@@ -131,8 +131,7 @@ extension PlayersViewController {
     // MARK: - Table View
     
     private func setupTableView() {
-        // We'll compute diffs in a background thread
-        let diffQueue = DispatchQueue(label: "diff")
+        let diffScanner = ExtendedDiffScanner(rows: [], extendedDiff: nil)
         
         // Track player ordering
         ordering.asObservable()
@@ -144,25 +143,20 @@ extension PlayersViewController {
                 let rowRequest = ordering.request.asRequest(of: Row.self)
                 
                 // Emits a new row array each time the database changes
-                return rowRequest.rx.fetchAll(in: dbPool, resultQueue: diffQueue)
+                return rowRequest.rx.fetchAll(in: dbPool)
             }
             
-            // Compute diff
-            .extendedDiff()
+            // Compute diff between fetched rows
+            .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
             
             // Apply diff to the table view
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] (playerRows, diff) in
+            .subscribe(onNext: { [weak self] scanner in
                 guard let strongSelf = self else { return }
-                strongSelf.players = playerRows.map { Player(row: $0) }
-                if let diff = diff {
-                    strongSelf.tableView.apply(
-                        diff,
-                        deletionAnimation: .fade,
-                        insertionAnimation: .fade)
-                } else {
-                    strongSelf.tableView.reloadData()
-                }
+                strongSelf.players = scanner.rows.map { Player(row: $0) }
+                strongSelf.tableView.apply(
+                    scanner.extendedDiff!,
+                    deletionAnimation: .fade,
+                    insertionAnimation: .fade)
             })
             .disposed(by: disposeBag)
     }
@@ -181,6 +175,17 @@ extension PlayersViewController {
         let player = players[indexPath.row]
         cell.textLabel?.text = player.name
         cell.detailTextLabel?.text = "\(player.score)"
+    }
+}
+
+struct ExtendedDiffScanner {
+    var rows: [Row]
+    var extendedDiff: ExtendedDiff?
+    
+    func diffed(from newRows: [Row]) -> ExtendedDiffScanner {
+        return ExtendedDiffScanner(
+            rows: newRows,
+            extendedDiff: rows.extendedDiff(newRows))
     }
 }
 

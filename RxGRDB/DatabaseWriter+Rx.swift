@@ -10,8 +10,11 @@ extension Reactive where Base: DatabaseWriter {
     /// committed database transaction that has modified the tables and columns
     /// fetched by the requests.
     ///
-    /// If you set `synchronizedStart` to true (the default), the first element
-    /// is emitted synchronously, on subscription.
+    /// All elements are emitted in a protected database dispatch queue,
+    /// serialized with all database updates. If you set *startImmediately* to
+    /// true (the default value), the first element is emitted synchronously
+    /// upon subscription. See [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency)
+    /// for more information.
     ///
     ///     let dbQueue = DatabaseQueue()
     ///     try dbQueue.inDatabase { db in
@@ -44,31 +47,23 @@ extension Reactive where Base: DatabaseWriter {
     ///     // Prints "Number of persons: 4"
     ///
     /// - parameter requests: The observed requests.
-    /// - parameter synchronizedStart: When true (the default), the first
+    /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     public func changes(
         in requests: [Request],
-        synchronizedStart: Bool = true)
+        startImmediately: Bool = true)
         -> Observable<Database>
     {
-        return changeTokens(in: requests, synchronizedStart: synchronizedStart)
-            .map { changeToken -> Database? in
-                switch changeToken.kind {
-                case .databaseSubscription(let db): return db
-                case .subscription: return nil
-                case .change(_, let db): return db
-                }
-            }
-            .filter { $0 != nil }
-            .map { $0! }
+        return SelectionInfoDatabaseObservable(
+            writer: base,
+            startImmediately: startImmediately,
+            selectionInfos: { db in try requests.map { try $0.selectionInfo(db) } })
+            .asObservable()
     }
     
     /// Returns an Observable that emits a change token after each committed
     /// database transaction that has modified the tables and columns fetched by
     /// the requests.
-    ///
-    /// If you set `synchronizedStart` to true (the default), the first element
-    /// is emitted synchronously, on subscription.
     ///
     /// The change tokens are meant to be used by the mapFetch operator:
     ///
@@ -85,22 +80,27 @@ extension Reactive where Base: DatabaseWriter {
     ///             print("Best players out of \(count): \(players)")
     ///         })
     ///
+    /// All values from the mapFetch operator are emitted on *scheduler*, which
+    /// defaults to `MainScheduler.instance`. If you set *startImmediately* to
+    /// true (the default value), the first element is emitted right
+    /// upon subscription.
+    ///
     /// - parameter requests: The observed requests.
-    /// - parameter synchronizedStart: When true (the default), the first
-    ///   element is emitted synchronously, on subscription.
+    /// - parameter startImmediately: When true (the default), mapFetch emits
+    ///   its first right upon subscription.
+    /// - parameter scheduler: The scheduler on which mapFetch emits its
+    ///   elements (default is MainScheduler.instance).
     public func changeTokens(
         in requests: [Request],
-        synchronizedStart: Bool = true)
+        startImmediately: Bool = true,
+        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
         -> Observable<ChangeToken>
     {
         return SelectionInfoChangeTokensObservable(
             writer: base,
-            synchronizedStart: synchronizedStart,
-            selectionInfos: { db -> [SelectStatement.SelectionInfo] in
-                try requests.map { request in
-                    let (statement, _) = try request.prepare(db)
-                    return statement.selectionInfo
-                }
-        }).asObservable()
+            startImmediately: startImmediately,
+            scheduler: scheduler,
+            selectionInfos: { db in try requests.map { try $0.selectionInfo(db) } })
+            .asObservable()
     }
 }

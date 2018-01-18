@@ -8,9 +8,9 @@ import RxSwift
 /// Change tokens let you turn notifications of database changes into
 /// fetched values.
 ///
-/// To generate change tokens, see `DatabaseWriter.rx.changeTokens(in:synchronizedStart:)`.
+/// To generate change tokens, see `DatabaseWriter.rx.changeTokens(in:startImmediately:scheduler:)`.
 ///
-/// To turn change tokens into fetched values, see `ObservableType.mapFetch(resultQueue:_:)`.
+/// To turn change tokens into fetched values, see `ObservableType.mapFetch(_:)`.
 ///
 ///     dbQueue.rx
 ///         .changeTokens(in: [...]) // observe changes in some requests
@@ -20,12 +20,10 @@ import RxSwift
 public struct ChangeToken {
     /// Not public: the kind of change token
     enum Kind {
-        /// Emitted synchronously upon subscription, from the database writer
-        /// dispatch queue.
+        /// Emitted upon subscription, from the database writer dispatch queue.
         case databaseSubscription(Database)
         
-        /// Emitted synchronously upon subscription, from the subscription
-        /// dispatch queue.
+        /// Emitted upon subscription, from the scheduler dispatch queue.
         case subscription
         
         /// Emitted from the database writer dispatch queue.
@@ -33,28 +31,21 @@ public struct ChangeToken {
     }
     
     var kind: Kind
-    
-    init(_ kind: Kind) {
-        self.kind = kind
-    }
+    var scheduler: SerialDispatchQueueScheduler
 }
 
 extension ObservableType where E == ChangeToken {
     /// Transforms a sequence of change tokens into a sequence of values fetched
     /// from the database.
     ///
-    /// - parameter resultQueue: A DispatchQueue (default is the main queue).
+    /// 
+    ///
     /// - parameter fetch: A function that accepts a database connection.
     /// - returns: An observable sequence whose elements are the result of
     ///   invoking the fetch function.
-    public func mapFetch<R>(
-        resultQueue: DispatchQueue = DispatchQueue.main,
-        _ fetch: @escaping (Database) throws -> R)
-        -> Observable<R>
-    {
+    public func mapFetch<R>(_ fetch: @escaping (Database) throws -> R) -> Observable<R> {
         return MapFetch(
             source: asObservable(),
-            resultQueue: resultQueue,
             fetch: fetch)
             .asObservable()
     }

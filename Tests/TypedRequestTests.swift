@@ -1,7 +1,7 @@
 import XCTest
 import GRDB
 import RxSwift
-@testable import RxGRDB // @testable to get PrimaryKeySortedDiff initializer
+@testable import RxGRDB // @testable to get PrimaryKeyDiff initializer
 
 class TypedRequestTests : XCTestCase { }
 
@@ -59,7 +59,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -93,7 +93,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -128,7 +128,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -161,7 +161,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -198,7 +198,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -232,7 +232,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -267,7 +267,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -300,7 +300,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -337,7 +337,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -371,7 +371,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -406,7 +406,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -439,7 +439,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -476,7 +476,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -513,7 +513,7 @@ extension TypedRequestTests {
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
-                // events are expected to be delivered on the subscription queue
+                // events are expected on the main thread by default
                 assertMainQueue()
                 recorder.on(event)
             }
@@ -532,32 +532,36 @@ extension TypedRequestTests {
 }
 
 extension TypedRequestTests {
-    func testPrimaryKeySortedDiff() throws {
-        try Test(testPrimaryKeySortedDiff)
+    func testPrimaryKeyDiffScanner() throws {
+        try Test(testPrimaryKeyDiffScanner)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testPrimaryKeySortedDiff(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testPrimaryKeyDiffScanner(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.order(Column("id"))
         let expectedDiffs = [
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
                 inserted: [
                     Player(id: 1, name: "Arthur", email: "arthur@example.com"),
                     Player(id: 2, name: "Barbara", email: nil)],
                 updated: [],
                 deleted: []),
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
+                inserted: [],
+                updated: [],
+                deleted: []),
+            PrimaryKeyDiff(
                 inserted: [],
                 updated: [Player(id: 2, name: "Barbie", email: nil)],
                 deleted: []),
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
                 inserted: [],
                 updated: [],
                 deleted: [
                     Player(id: 1, name: "Arthur", email: "arthur@example.com"),
                     Player(id: 2, name: "Barbie", email: nil)]),
-            PrimaryKeySortedDiff<Player>(
+            PrimaryKeyDiff(
                 inserted: [
                     Player(id: 1, name: "Craig", email: nil),
                     Player(id: 2, name: "David", email: "david@example.com")
@@ -567,9 +571,20 @@ extension TypedRequestTests {
             ]
         
         try setUpDatabase(in: writer)
-        let recorder = EventRecorder<PrimaryKeySortedDiff<Player>>(expectedEventCount: expectedDiffs.count)
-        request.rx
-            .primaryKeySortedDiff(in: writer, initialElements: [])
+        let recorder = EventRecorder<PrimaryKeyDiff<Player>>(expectedEventCount: expectedDiffs.count)
+        
+        let diffScanner = try writer.read { db in
+            try PrimaryKeyDiffScanner(
+                database: db,
+                request: request,
+                initialRecords: [])
+        }
+        request
+            .asRequest(of: Row.self)
+            .rx
+            .fetchAll(in: writer)
+            .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
+            .map { $0.diff }
             .subscribe(recorder)
             .disposed(by: disposeBag)
         try modifyDatabase(in: writer)
@@ -615,8 +630,6 @@ private struct Player : RowConvertible, MutablePersistable {
         id = rowID
     }
 }
-
-extension Player : Diffable { } // Diffable implementation is derived from RowConvertible
 
 extension Player : Equatable {
     static func == (lhs: Player, rhs: Player) -> Bool {

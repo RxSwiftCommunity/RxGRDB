@@ -35,7 +35,7 @@ extension DatabaseWriterTests {
         
         let recorder = EventRecorder<Void>(expectedEventCount: 5)
         
-        // 1 (synchronizedStart parameter is true by default)
+        // 1 (startImmediately parameter is true by default)
         AnyDatabaseWriter(writer).rx // ReactiveCompatible is unavailable: use AnyDatabaseWriter to get .rx
             .changes(in: requests)
             .map { _ in }
