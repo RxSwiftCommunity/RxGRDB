@@ -41,34 +41,81 @@ final class DatabaseRegionChangeTokensObservable : ObservableType {
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == ChangeToken {
-        return scheduler.schedule((writer, startImmediately, scheduler)) { (writer, startImmediately, scheduler) in
+        // A mutex that protects access to transactionObserver
+        let mutex = PThreadMutex()
+        var transactionObserver: DatabaseRegionChangeObserver? = nil
+        
+        let writer = self.writer
+        let startImmediately = self.startImmediately
+        let scheduler = self.scheduler
+        let observedRegion = self.observedRegion
+
+        _ = scheduler.schedule(()) { _ in
             do {
-                let transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionChangeObserver in
-                    if startImmediately {
-                        observer.onNext(ChangeToken(kind: .databaseSubscription(db), scheduler: scheduler))
+                try mutex.lock {
+                    transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionChangeObserver in
+                        if startImmediately {
+                            observer.onNext(ChangeToken(kind: .databaseSubscription(db), scheduler: scheduler))
+                        }
+                        
+                        let transactionObserver = try DatabaseRegionChangeObserver(
+                            observedRegion: observedRegion(db),
+                            onChange: { observer.onNext(ChangeToken(kind: .change(writer, db), scheduler: scheduler)) })
+                        db.add(transactionObserver: transactionObserver)
+                        return transactionObserver
                     }
                     
-                    let transactionObserver = try DatabaseRegionChangeObserver(
-                        observedRegion: self.observedRegion(db),
-                        onChange: { observer.onNext(ChangeToken(kind: .change(writer, db), scheduler: scheduler)) })
-                    db.add(transactionObserver: transactionObserver)
-                    return transactionObserver
-                }
-                
-                if startImmediately {
-                    observer.onNext(ChangeToken(kind: .subscription, scheduler: scheduler))
-                }
-                
-                return Disposables.create {
-                    writer.unsafeReentrantWrite { db in
-                        db.remove(transactionObserver: transactionObserver)
+                    if startImmediately {
+                        observer.onNext(ChangeToken(kind: .subscription, scheduler: scheduler))
                     }
                 }
+                
+                return Disposables.create { }
             } catch {
                 observer.onError(error)
                 return Disposables.create()
             }
         }
+        
+        return Disposables.create {
+            mutex.lock {
+                if let transactionObserver = transactionObserver {
+                    writer.unsafeReentrantWrite { db in
+                        db.remove(transactionObserver: transactionObserver)
+                    }
+                }
+            }
+        }
     }
 }
 
+final public class PThreadMutex {
+    private var mutex = pthread_mutex_t()
+    
+    public init() {
+        let result = pthread_mutex_init(&mutex, nil)
+        precondition(result == 0, "Failed to create pthread mutex")
+    }
+    
+    deinit {
+        let result = pthread_mutex_destroy(&mutex)
+        precondition(result == 0, "Failed to destroy mutex")
+    }
+    
+    fileprivate func lock() {
+        let result = pthread_mutex_lock(&mutex)
+        precondition(result == 0, "Failed to lock mutex")
+    }
+    
+    fileprivate func unlock() {
+        let result = pthread_mutex_unlock(&mutex)
+        precondition(result == 0, "Failed to unlock mutex")
+    }
+    
+    public func lock<T>(block: () throws -> T) rethrows -> T {
+        lock()
+        defer { unlock() }
+        let value = try block()
+        return value
+    }
+}
