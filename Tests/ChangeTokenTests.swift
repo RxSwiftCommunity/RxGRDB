@@ -70,3 +70,56 @@ extension ChangeTokenTests {
         }
     }
 }
+
+extension ChangeTokenTests {
+    
+    // This is a regression test that fails in v0.8.0
+    func testAsynchronousSubscription() throws {
+        try Test(testAsynchronousSubscription)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testAsynchronousSubscription(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        try writer.write { db in
+            try db.create(table: "t") { t in
+                t.column("id", .integer).primaryKey()
+            }
+        }
+        
+        let expectedValues: [Int] = [0, 1, 2]
+        let recorder = EventRecorder<Int>(expectedEventCount: expectedValues.count)
+        let request = SQLRequest("SELECT COUNT(*) FROM t").asRequest(of: Int.self)
+        
+        let initialFetchExpectation = expectation(description: "initial fetch")
+        initialFetchExpectation.assertForOverFulfill = false
+
+        DispatchQueue.global().async {
+            AnyDatabaseWriter(writer).rx
+                .changeTokens(in: [request])
+                .mapFetch() { db -> Int in
+                    initialFetchExpectation.fulfill()
+                    return try request.fetchOne(db)!
+                }
+                .subscribe { event in
+                    // events are expected on the main thread by default
+                    assertMainQueue()
+                    recorder.on(event)
+                }
+                .disposed(by: disposeBag)
+        }
+        
+        // wait until we have fetched initial value before we perform database changes
+        wait(for: [initialFetchExpectation], timeout: 1)
+        try writer.write { db in
+            try db.execute("INSERT INTO t DEFAULT VALUES")
+            try db.execute("INSERT INTO t DEFAULT VALUES")
+        }
+        
+        wait(for: recorder, timeout: 1)
+        for (event, value) in zip(recorder.recordedEvents, expectedValues) {
+            XCTAssertEqual(event.element!, value)
+        }
+    }
+}
+
