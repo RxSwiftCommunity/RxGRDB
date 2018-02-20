@@ -1,9 +1,11 @@
 Release Notes
 =============
 
-## Next Version
+## 0.8.1
 
-Fixes a bug that would have [values observables](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#values-observables) fail to observe some database changes.
+Released February 20, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.8.0...v0.8.1)
+
+- Fixes a bug that would have [values observables](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#values-observables) fail to observe some database changes.
 
 
 ## 0.8.0
