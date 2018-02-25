@@ -644,7 +644,9 @@ dbQueue
     })
 ```
 
-Changes and values observables don't have the same behavior, and we'd like you to understand the differences.
+As a rule of thumb, you always read `changes` in the definition of changes observables, and you always read `fetch` in the definition of values observables.
+
+Since changes and values observables don't have the same behavior, we'd like you to understand the differences.
 
 
 ## Changes Observables
