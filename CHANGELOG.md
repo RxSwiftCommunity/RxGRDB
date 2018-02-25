@@ -3,8 +3,20 @@ Release Notes
 
 ## Next Version
 
+### New
+
 - [Values observables](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#values-observables) can now be scheduled on any RxSwift scheduler (fixes [#22](https://github.com/RxSwiftCommunity/RxGRDB/issues/22)).
+
+
+### Breaking Changees
+
 - "Change Tokens" have been renamed "Fetch Tokens" in order to better reflect their purpose, and to enhance the distinction between observables that emit values on any schedulers ("values observables") and have "fetch" in their definition, from observables that emit database connections on a GRDB dispatch queue ("changes observables") and have "changes" in their definition).
+
+
+### Documentation Diff
+
+- The [Scheduling Guide](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#scheduling) has been augmented with a chapter on data consistency.
+
 
 ### API diff
 
