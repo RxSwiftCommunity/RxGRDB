@@ -54,23 +54,23 @@ extension Reactive where Base: DatabaseWriter {
         startImmediately: Bool = true)
         -> Observable<Database>
     {
-        return DatabaseRegionDatabaseObservable(
+        return DatabaseRegionChangesObservable(
             writer: base,
             startImmediately: startImmediately,
             observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
             .asObservable()
     }
     
-    /// Returns an Observable that emits a change token after each committed
+    /// Returns an Observable that emits a fetch token after each committed
     /// database transaction that has modified the tables and columns fetched by
     /// the requests.
     ///
-    /// The change tokens are meant to be used by the mapFetch operator:
+    /// The fetch tokens are meant to be used by the mapFetch operator:
     ///
     ///     // When the players table is changed, fetch the ten best ones, as well as the
     ///     // total number of players:
     ///     dbQueue.rx
-    ///         .changeTokens(in: [Player.all()])
+    ///         .fetchTokens(in: [Player.all()])
     ///         .mapFetch { (db: Database) -> ([Player], Int) in
     ///             let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
     ///             let count = try Player.fetchCount(db)
@@ -90,13 +90,29 @@ extension Reactive where Base: DatabaseWriter {
     ///   its first right upon subscription.
     /// - parameter scheduler: The scheduler on which mapFetch emits its
     ///   elements (default is MainScheduler.instance).
+    public func fetchTokens(
+        in requests: [Request],
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType = MainScheduler.instance)
+        -> Observable<FetchToken>
+    {
+        return DatabaseRegionFetchTokensObservable(
+            writer: base,
+            startImmediately: startImmediately,
+            scheduler: scheduler,
+            observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
+            .asObservable()
+    }
+    
+    /// Fixit for legacy API
+    @available(*, unavailable, renamed:"fetchTokens(in:startImmediately:scheduler:)")
     public func changeTokens(
         in requests: [Request],
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType = MainScheduler.instance)
-        -> Observable<ChangeToken>
+        -> Observable<FetchToken>
     {
-        return DatabaseRegionChangeTokensObservable(
+        return DatabaseRegionFetchTokensObservable(
             writer: base,
             startImmediately: startImmediately,
             scheduler: scheduler,

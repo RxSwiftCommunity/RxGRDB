@@ -104,7 +104,7 @@ extension Reactive where Base: Request {
     {
         let request = base
         return AnyDatabaseWriter(writer).rx
-            .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+            .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
             .mapFetch { try request.fetchCount($0) }
     }
 }

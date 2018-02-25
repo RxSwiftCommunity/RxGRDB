@@ -3,9 +3,9 @@ import GRDB
 import RxSwift
 import RxGRDB
 
-class ChangeTokenTests : XCTestCase { }
+class FetchTokenTests : XCTestCase { }
 
-extension ChangeTokenTests {
+extension FetchTokenTests {
     
     func testFetch() throws {
         try Test(testFetch)
@@ -34,7 +34,7 @@ extension ChangeTokenTests {
         
         // 1 (startImmediately parameter is true by default)
         AnyDatabaseWriter(writer).rx
-            .changeTokens(in: [request])
+            .fetchTokens(in: [request])
             .mapFetch() { db -> ([String], Int) in
                 let strings = try String.fetchAll(db, "SELECT a FROM table1")
                 let int = try Int.fetchOne(db, "SELECT COUNT(*) FROM table2")!
@@ -71,7 +71,7 @@ extension ChangeTokenTests {
     }
 }
 
-extension ChangeTokenTests {
+extension FetchTokenTests {
     
     // This is a regression test that fails in v0.8.0
     func testAsynchronousSubscription() throws {
@@ -96,7 +96,7 @@ extension ChangeTokenTests {
 
         DispatchQueue.global().async {
             AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request])
+                .fetchTokens(in: [request])
                 .mapFetch() { db -> Int in
                     initialFetchExpectation.fulfill()
                     return try request.fetchOne(db)!
