@@ -33,13 +33,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try Row.fetchAll($0, request) }
                 .distinctUntilChanged(==)
                 .map { (rows: [Row]) in rows.map { Base.RowDecoder.init(row: $0) } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchAll($0) }
         }
     }
@@ -67,13 +67,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try Row.fetchOne($0, request) }
                 .distinctUntilChanged(==)
                 .map { (row: Row?) in row.map { Base.RowDecoder.init(row: $0) } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchOne($0) }
         }
     }
@@ -105,12 +105,12 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchAll($0) }
                 .distinctUntilChanged(==)
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchAll($0) }
         }
     }
@@ -138,12 +138,12 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchOne($0) }
                 .distinctUntilChanged(==)
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchOne($0) }
         }
         
@@ -176,13 +176,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try DatabaseValue.fetchAll($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValues: [DatabaseValue]) in dbValues.map { $0.losslessConvert() as Base.RowDecoder } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchAll($0) }
         }
     }
@@ -210,13 +210,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try DatabaseValue.fetchOne($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValue: DatabaseValue?) in dbValue.map { $0.losslessConvert() as Base.RowDecoder? } ?? nil }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchOne($0) }
         }
     }
@@ -256,13 +256,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol,
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try DatabaseValue.fetchAll($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValues: [DatabaseValue]) in dbValues.map { $0.losslessConvert() as Base.RowDecoder._Wrapped? } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try Optional<Base.RowDecoder._Wrapped>.fetchAll($0, request) }
         }
     }
@@ -294,13 +294,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try DatabaseValue.fetchAll($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValues: [DatabaseValue]) in dbValues.map { $0.losslessConvert() as Base.RowDecoder } }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchAll($0) }
         }
     }
@@ -328,13 +328,13 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
         let request = base
         if distinctUntilChanged {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try DatabaseValue.fetchOne($0, request) }
                 .distinctUntilChanged(==)
                 .map { (dbValue: DatabaseValue?) in dbValue.map { $0.losslessConvert() as Base.RowDecoder? } ?? nil }
         } else {
             return AnyDatabaseWriter(writer).rx
-                .changeTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+                .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
                 .mapFetch { try request.fetchOne($0) }
         }
     }

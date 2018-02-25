@@ -5,16 +5,16 @@
 #endif
 import RxSwift
 
-final class DatabaseRegionChangeTokensObservable : ObservableType {
-    typealias E = ChangeToken
+final class DatabaseRegionFetchTokensObservable : ObservableType {
+    typealias E = FetchToken
     let writer: DatabaseWriter
     let startImmediately: Bool
     let scheduler: ImmediateSchedulerType
     let observedRegion: (Database) throws -> DatabaseRegion
     
-    /// Creates an observable that emits `.change` tokens on the database writer
-    /// queue when a transaction has modified the database in a way that impacts
-    /// some requests' selections.
+    /// Creates an observable that emits `.change` fetch tokens on the database
+    /// writer queue when a transaction has modified the database in a way that
+    /// impacts a database region.
     ///
     /// When the `startImmediately` argument is true, the observable also emits
     /// one `.databaseSubscription` and one `.subscription` token upon
@@ -40,7 +40,7 @@ final class DatabaseRegionChangeTokensObservable : ObservableType {
         self.observedRegion = observedRegion
     }
     
-    func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == ChangeToken {
+    func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == FetchToken {
         // A mutex that protects access to transactionObserver
         let mutex = PThreadMutex()
         var transactionObserver: DatabaseRegionChangeObserver? = nil
@@ -55,18 +55,18 @@ final class DatabaseRegionChangeTokensObservable : ObservableType {
                 try mutex.lock {
                     transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionChangeObserver in
                         if startImmediately {
-                            observer.onNext(ChangeToken(kind: .databaseSubscription(db), scheduler: scheduler))
+                            observer.onNext(FetchToken(kind: .databaseSubscription(db), scheduler: scheduler))
                         }
                         
                         let transactionObserver = try DatabaseRegionChangeObserver(
                             observedRegion: observedRegion(db),
-                            onChange: { observer.onNext(ChangeToken(kind: .change(writer, db), scheduler: scheduler)) })
+                            onChange: { observer.onNext(FetchToken(kind: .change(writer, db), scheduler: scheduler)) })
                         db.add(transactionObserver: transactionObserver)
                         return transactionObserver
                     }
                     
                     if startImmediately {
-                        observer.onNext(ChangeToken(kind: .subscription, scheduler: scheduler))
+                        observer.onNext(FetchToken(kind: .subscription, scheduler: scheduler))
                     }
                 }
                 

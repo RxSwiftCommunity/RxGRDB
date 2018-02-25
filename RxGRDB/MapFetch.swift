@@ -9,19 +9,19 @@ import RxSwift
 class MapFetch<ResultType> : ObservableType {
     typealias E = ResultType
     
-    private let changeTokens: Observable<ChangeToken>
+    private let fetchTokens: Observable<FetchToken>
     private let fetch: (Database) throws -> ResultType
     
     /// Creates a MapFetch observable.
     ///
     /// - parameters:
-    ///   - source: An observable sequence of ChangeToken
+    ///   - source: An observable sequence of FetchToken
     ///   - fetch: A closure that fetches elements
     init(
-        source changeTokens: Observable<ChangeToken>,
+        source fetchTokens: Observable<FetchToken>,
         fetch: @escaping (Database) throws -> ResultType)
     {
-        self.changeTokens = changeTokens
+        self.fetchTokens = fetchTokens
         self.fetch = fetch
     }
     
@@ -34,15 +34,15 @@ class MapFetch<ResultType> : ObservableType {
         // The value eventually fetched on subscription
         var initialResult: Result<ResultType>? = nil
         
-        // Makes sure fetched results are ordered like change tokens
+        // Makes sure elements are emitted in the same order as tokens
         let orderingQueue = DispatchQueue(label: "RxGRDB.MapFetch")
         
-        dbSubscription = changeTokens.subscribe { event in
+        dbSubscription = fetchTokens.subscribe { event in
             switch event {
             case .error(let error): observer.on(.error(error))
             case .completed: observer.on(.completed)
-            case .next(let changeToken):
-                switch changeToken.kind {
+            case .next(let fetchToken):
+                switch fetchToken.kind {
                     
                 case .databaseSubscription(let db):
                     // Current dispatch queue: the database writer dispatch queue
@@ -51,8 +51,8 @@ class MapFetch<ResultType> : ObservableType {
                     
                 case .subscription:
                     // Current dispatch queue: the dispatch queue of the
-                    // scheduler used to create the source observable of change
-                    // tokens.
+                    // scheduler used to create the source observable of
+                    // fetch tokens.
                     //
                     // This token is emitted upon subscription,
                     // after `databaseSubscription`.
@@ -74,7 +74,7 @@ class MapFetch<ResultType> : ObservableType {
                     // database writer (DatabaseQueue or DatabasePool).
                     //
                     // Elements must be emitted in the same order as the
-                    // change tokens: the serial orderingQueue takes care of
+                    // fetch tokens: the serial orderingQueue takes care of
                     // FIFO ordering, and a semaphore notifies when the
                     // fetch is done.
                     
@@ -97,7 +97,7 @@ class MapFetch<ResultType> : ObservableType {
                         
                         guard let result = result else { return }
                         
-                        _ = changeToken.scheduler.schedule(result) { result in
+                        _ = fetchToken.scheduler.schedule(result) { result in
                             if !subscription.isDisposed {
                                 observer.onResult(result)
                             }

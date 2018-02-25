@@ -5,7 +5,7 @@
 #endif
 import RxSwift
 
-final class DatabaseRegionDatabaseObservable : ObservableType {
+final class DatabaseRegionChangesObservable : ObservableType {
     typealias E = Database
     let writer: DatabaseWriter
     let startImmediately: Bool

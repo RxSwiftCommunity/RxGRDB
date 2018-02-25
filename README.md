@@ -340,11 +340,11 @@ Those observables can be composed together using [RxSwift operators](https://git
 
 To get a single notification when a transaction has modified several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
 
-When you need to fetch from several requests with the guarantee of consistent results, that is to say when you need values that come alltogether from a single database transaction, see [Change Tokens](#change-tokens).
+When you need to fetch from several requests with the guarantee of consistent results, that is to say when you need values that come alltogether from a single database transaction, see [Fetch Tokens](#fetch-tokens).
 
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately)
-- [Change Tokens](#change-tokens)
-- [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinstartimmediatelyscheduler)
+- [Fetch tokens](#fetch-tokens)
+- [`DatabaseWriter.rx.fetchTokens`](#databasewriterrxfetchtokensinstartimmediatelyscheduler)
 - [`Observable.mapFetch`](#observablemapfetch_)
 
 
@@ -399,9 +399,9 @@ try dbQueue.inDatabase { db in
 
 ---
 
-## Change Tokens
+## Fetch tokens
 
-**Generally speaking, *change tokens* let you turn notifications of database changes into fetched values. But the requests you observe don't have to be the same as the requests you fetch from.**
+**Generally speaking, *fetch tokens* let you turn notifications of database changes into fetched values. But the requests you observe don't have to be the same as the requests you fetch from.**
 
 To introduce them, let's start with a simple request observable:
 
@@ -417,13 +417,13 @@ The job performed by this observable is decomposed into two steps: observe datab
 ```swift
 // The very same Observable<[Player]>
 dbQueue.rx
-    .changeTokens(in: [request])        // 1. observe modifications
+    .fetchTokens(in: [request])        // 1. observe modifications
     .mapFetch { (db: Database) in       // 2. fetch fresh results
         return try request.fetchAll(db)
     }
 ```
 
-`changeTokens` emits *change tokens* for all database transactions that modifies some requests. Those change tokens are opaque values that are turned into the fetched results of your choice by the `mapFetch` operator.
+`fetchTokens` emits *fetch tokens* for all database transactions that modifies some requests. Those fetch tokens are opaque values that are turned into the fetched results of your choice by the `mapFetch` operator.
 
 When a single request is involved, it is used as both the source of tracked changes, and the source of the fetched results. But you can observe some requests and fetch from other ones:
 
@@ -431,7 +431,7 @@ When a single request is involved, it is used as both the source of tracked chan
 // When the players table is changed, fetch the ten best ones, as well as the
 // total number of players:
 dbQueue.rx
-    .changeTokens(in: [Player.all()])
+    .fetchTokens(in: [Player.all()])
     .mapFetch { (db: Database) -> ([Player], Int) in
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
         let count = try Player.fetchCount(db)
@@ -442,47 +442,47 @@ dbQueue.rx
     })
 ```
 
-- [`DatabaseWriter.rx.changeTokens`](#databasewriterrxchangetokensinstartimmediatelyscheduler)
+- [`DatabaseWriter.rx.fetchTokens`](#databasewriterrxfetchtokensinstartimmediatelyscheduler)
 - [`Observable.mapFetch`](#observablemapfetch_)
 
 
 ---
 
-#### `DatabaseWriter.rx.changeTokens(in:startImmediately:scheduler:)`
+#### `DatabaseWriter.rx.fetchTokens(in:startImmediately:scheduler:)`
 
-This observable emits a [change token](#change-tokens) after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
+This observable emits a [fetch token](#fetch-tokens) after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
 
 ```swift
 let players = Player.all()
 let teams = Team.all()
 
-// Observable<ChangeToken>
-let changeTokens = dbQueue.rx.changeTokens(in: [players, teams]) // or dbPool
+// Observable<FetchToken>
+let fetchTokens = dbQueue.rx.fetchTokens(in: [players, teams]) // or dbPool
 ```
 
-Change tokens are opaque values: you can't use them directly. Instead, sequences of change tokens are designed to be consumed by the [mapFetch](#observablemapfetch_) operator.
+Fetch tokens are opaque values: you can't use them directly. Instead, sequences of fetch tokens are designed to be consumed by the [mapFetch](#observablemapfetch_) operator.
 
 The `scheduler` and `startImmediately` parameters are used to control the delivery of fetched elements by the mapFetch operator. See below.
 
-> :point_up: **Note**: RxGRDB does not support any alteration of change tokens sequences by the way of any RxSwift operator. Don't skip elements, don't merge sequences, etc.
+> :point_up: **Note**: RxGRDB does not support any alteration of fetch tokens sequences by the way of any RxSwift operator. Don't skip elements, don't merge sequences, etc.
 
 
 ---
 
 #### `Observable.mapFetch(_:)`
 
-The `mapFetch` operator transforms a sequence of [change tokens](#change-tokens) into a [database values observable](#values-observables).
+The `mapFetch` operator transforms a sequence of [fetch tokens](#fetch-tokens) into a [database values observable](#values-observables).
 
 ```swift
-let changeTokens = dbQueue.rx.changeTokens(in: ...)
+let fetchTokens = dbQueue.rx.fetchTokens(in: ...)
     
 // Observable<[Player]>
-let players = changeTokens.mapFetch { (db: Database) in
+let players = fetchTokens.mapFetch { (db: Database) in
     try Player.fetchAll(db)
 }
 ```
 
-The `scheduler` and `startImmediately` parameters are used to build the sequence of change tokens control the delivery of fetched elements:
+The `scheduler` and `startImmediately` parameters are used to build the sequence of fetch tokens control the delivery of fetched elements:
 
 All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
@@ -492,7 +492,7 @@ All elements are emitted on `scheduler`, which defaults to `MainScheduler.instan
 // When the players table is changed, fetch the ten best ones, as well
 // as the total number of players:
 dbQueue.rx
-    .changeTokens(in: [Player.all()])
+    .fetchTokens(in: [Player.all()])
     .mapFetch { (db: Database) -> ([Player], Int) in
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
         let count = try Player.fetchCount(db)
@@ -628,12 +628,12 @@ Player.all().rx
     })
 ```
 
-[Change tokens](#change-tokens) build values observables as well:
+[Fetch tokens](#fetch-tokens) build values observables as well:
 
 ```swift
 // A values observable:
 dbQueue
-    .changeTokens(in: [Player.all()])
+    .fetchTokens(in: [Player.all()])
     .mapFetch { (db: Database) -> ([Player], Int) in
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
         let count = try Player.fetchCount(db)
@@ -806,7 +806,7 @@ Player.all().rx
 
 // On any thread
 dbQueue
-    .changeTokens(in: [Player.all()])
+    .fetchTokens(in: [Player.all()])
     .mapFetch { (db: Database) -> ([Player], Int) in
         // In a database protected dispatch queue
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
@@ -845,7 +845,7 @@ Player.all().rx
 
 // On any thread
 dbQueue
-    .changeTokens(in: [Player.all()], scheduler: scheduler)
+    .fetchTokens(in: [Player.all()], scheduler: scheduler)
     .mapFetch { (db: Database) -> ([Player], Int) in
         // In a database protected dispatch queue
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
