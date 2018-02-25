@@ -4,6 +4,19 @@ Release Notes
 ## Next Version
 
 - [Values observables](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#values-observables) can now be scheduled on any RxSwift scheduler (fixes [#22](https://github.com/RxSwiftCommunity/RxGRDB/issues/22)).
+- "Change Tokens" have been renamed "Fetch Tokens" in order to better reflect their purpose, and to enhance the distinction between observables that emit values on any schedulers ("values observables") and have "fetch" in their definition, from observables that emit database connections on a GRDB dispatch queue ("changes observables") aand have "changes" in their definition).
+
+### API diff
+
+```diff
++struct FetchToken { }
+-struct ChangeToken { }
+
+ extension Reactive where Base: DatabaseWriter {
++    func fetchTokens(in requests: [Request], startImmediately: Bool = true, scheduler: ImmediateSchedulerType = MainScheduler.instance) -> Observable<FetchToken>
+-    func changeTokens(in requests: [Request], startImmediately: Bool = true, scheduler: ImmediateSchedulerType = MainScheduler.instance) -> Observable<FetchToken>
+ }
+```
 
 
 ## 0.8.1
