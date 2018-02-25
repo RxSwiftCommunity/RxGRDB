@@ -9,7 +9,7 @@ final class DatabaseRegionChangeTokensObservable : ObservableType {
     typealias E = ChangeToken
     let writer: DatabaseWriter
     let startImmediately: Bool
-    let scheduler: SerialDispatchQueueScheduler
+    let scheduler: ImmediateSchedulerType
     let observedRegion: (Database) throws -> DatabaseRegion
     
     /// Creates an observable that emits `.change` tokens on the database writer
@@ -31,7 +31,7 @@ final class DatabaseRegionChangeTokensObservable : ObservableType {
     init(
         writer: DatabaseWriter,
         startImmediately: Bool,
-        scheduler: SerialDispatchQueueScheduler,
+        scheduler: ImmediateSchedulerType,
         observedRegion: @escaping (Database) throws -> DatabaseRegion)
     {
         self.writer = writer

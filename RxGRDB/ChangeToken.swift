@@ -31,7 +31,7 @@ public struct ChangeToken {
     }
     
     var kind: Kind
-    var scheduler: SerialDispatchQueueScheduler
+    var scheduler: ImmediateSchedulerType
 }
 
 extension ObservableType where E == ChangeToken {

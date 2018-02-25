@@ -99,7 +99,7 @@ extension Reactive where Base: Request {
     public func fetchCount(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
+        scheduler: ImmediateSchedulerType = MainScheduler.instance)
         -> Observable<Int>
     {
         let request = base

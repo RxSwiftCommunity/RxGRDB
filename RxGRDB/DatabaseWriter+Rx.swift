@@ -93,7 +93,7 @@ extension Reactive where Base: DatabaseWriter {
     public func changeTokens(
         in requests: [Request],
         startImmediately: Bool = true,
-        scheduler: SerialDispatchQueueScheduler = MainScheduler.instance)
+        scheduler: ImmediateSchedulerType = MainScheduler.instance)
         -> Observable<ChangeToken>
     {
         return DatabaseRegionChangeTokensObservable(

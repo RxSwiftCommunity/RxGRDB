@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+## Next Version
+
+- [Values observables](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#values-observables) can now be scheduled on any RxSwift scheduler (fixes [#22](https://github.com/RxSwiftCommunity/RxGRDB/issues/22)).
+
+
 ## 0.8.1
 
 Released February 20, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.8.0...v0.8.1)
