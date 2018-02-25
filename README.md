@@ -50,6 +50,7 @@ Documentation
 - [Diffs](#diffs)
 - [Scheduling](#scheduling)
     - [Scheduling Guarantees](#scheduling-guarantees)
+    - [Data Consistency](#data-consistency)
     - [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
     - [Changes Observables](#changes-observables)
     - [Values Observables](#values-observables)
@@ -342,6 +343,8 @@ To get a single notification when a transaction has modified several requests, u
 
 When you need to fetch from several requests with the guarantee of consistent results, that is to say when you need values that come alltogether from a single database transaction, see [Fetch Tokens](#fetch-tokens).
 
+See the [Data Consistency](#data-consistency) chapter for more information.
+
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately)
 - [Fetch tokens](#fetch-tokens)
 - [`DatabaseWriter.rx.fetchTokens`](#databasewriterrxfetchtokensinstartimmediatelyscheduler)
@@ -575,9 +578,12 @@ Check the [demo application](Documentation/RxGRDBDemo) for an example app that u
 
 # Scheduling
 
-GRDB and RxGRDB go a long way to make multi-threading with SQLite **safe**. But safety has constraints, and this chapter attempts at making RxGRDB scheduling as clear as possible.
+GRDB and RxGRDB go a long way in order to smooth out subtleties of multi-threaded SQLite. You're unlikely to use those libraries in a *very* wrong way.
+
+Some applications are demanding: this chapter attempts at making RxGRDB scheduling as clear as possible. Please have a look at [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency) first.
 
 - [Scheduling Guarantees](#scheduling-guarantees)
+- [Data Consistency](#data-consistency)
 - [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
 - [Changes Observables](#changes-observables)
 - [Values Observables](#values-observables)
@@ -586,26 +592,93 @@ GRDB and RxGRDB go a long way to make multi-threading with SQLite **safe**. But 
 
 ## Scheduling Guarantees
 
-GRDB provides **3 fundamental guarantees** that hold as long as you follow the [rules](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency).
+RxGRDB inherits from [GRDB guarantees](https://github.com/groue/GRDB.swift/blob/master/README.md#guarantees-and-rules), and adds two more:
 
-- :bowtie: **GRDB Guarantee 1: writes are always serialized**. At every moment, there is no more than a single thread that is writing into the database.
+- :bowtie: **RxGRDB Guarantee 1: all observables can be created and subscribed from any thread.**
     
-    *Database writes always happen in a "protected dispatch queue". All transactions that modify the database happen in this queue.*
-
-- :bowtie: **GRDB Guarantee 2: reads are always isolated**. This means that they are guaranteed an immutable view of the last committed state of the database, and that you can perform subsequent fetches without fearing eventual concurrent writes to mess with your application logic.
-    
-    *Database reads also happen in a "protected dispatch queue". It it the same queue as the writing dispatch queue when you use a [database queue]. On the other hand, a [database pool] has several distinct reading dispatch queues.*
-    
-    *When you use a database queue, isolation is just a consequence of the serialization of all database accesses. A database pool, however, leverages the *snapshot isolation* of SQLite's WAL mode (see [Isolation In SQLite]).*
-
-- :bowtie: **GRDB Guarantee 3: requests don't fail**, unless a database constraint violation, a programmer mistake, or a very low-level issue such as a disk error or an unreadable database file. GRDB grants *correct* use of SQLite, and particularly avoids locking errors and other SQLite misuses.
-
-
-On top of that, RxGRDB adds its own guarantees:
-
-- :bowtie: **RxGRDB Guarantee 1: all observables can be created and subscribed from any thread.** Not all can be observed on any thread, though: see [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
+    Not all can be observed on any thread, though: see [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
 
 - :bowtie: **RxGRDB Guarantee 2: all observables emit their values in the same chronological order as transactions.**
+
+
+## Data Consistency
+
+[Data Consistency](https://en.wikipedia.org/wiki/Consistency_(database_systems)) is the highly desirable quality that prevents your app from displaying funny values on screen, or worse.
+
+SQLite itself guarantees consistency at the database level by the mean of the database schema, relational constraints, integrity checks, foreign key actions, triggers, and transactions.
+
+At the application level, data consistency is guaranteed as long as the fetched values all come from the result of a single transaction.
+
+When you use RxGRDB to observe values that come from a [single request](#observing-individual-requests), data consistency is always guaranteed, even when the request uses several database tables:
+
+```swift
+Player.all()
+    .rx.fetchAll(in: dbQueue)
+    .subscribe(onNext: { players in
+        print("Consistent players: \(players)")
+    })
+
+SQLRequest("""
+    SELECT teams.*, COUNT(DISTINCT players.id) AS playerCount
+    FROM teams
+    LEFT JOIN players ON players.teamId = teams.id
+    GROUP BY teams.id
+    """)
+    .asRequest(of: TeamInfo.self)
+    .rx.fetchAll(in: dbQueue)
+    .subscribe(onNext: { teamInfos in
+        print("Consistent team infos: \(teamInfos)")
+    })
+```
+
+When you use RxGRDB to observe values that come from several requests, data consistency needs your help.
+
+Here is a "wrong" way to do it:
+
+```swift
+// NON-GUARANTEED DATA CONSISTENCY
+Player.all()
+    .rx.fetchAll(in: dbQueue)
+    .map { players in
+        let teams = try dbQueue.inDatabase { try Team.fetchAll($0) }
+        return (players, teams)
+    }
+    .subscribe(onNext: { (players, teams) in
+        updateView(players: players, teams: teams)
+    })
+```
+
+The above observable doesn't fetch players and teams at the same time. It may output players without any team, or teams without any players, or teams with unreferenced players, etc., despite the constraints of your database schema.
+
+This may be acceptable. Or not.
+
+When this is not acceptable, make sure to read the [Observing Multiple Requests](#observing-multiple-requests) chapter. You are likely to use [fetch tokens](#fetch-tokens):
+
+```swift
+// GUARANTEED DATA CONSISTENCY
+let playersRequest = Player.all()
+dbQueue.rx
+    .fetchTokens(in: [playersRequest])
+    .mapFetch { db in
+        try (playersRequest.fetchAll(db), Team.fetchAll(db))
+    }
+    .subscribe(onNext: { (players, teams) in
+        updateView(players: players, teams: teams)
+    })
+```
+
+When you use a [database pool](https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools), you may also find [snapshots](https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots) interesting (GRDB 2.9+):
+
+```swift
+// GUARANTEED DATA CONSISTENCY
+let playersRequest = Player.all()
+dbPool.rx
+    .changes(in: [playersRequest])
+    .map { try dbPool.makeSnapshot() }
+    .subscribe(onNext: { snapshot in
+        // use snapshot
+    })
+```
 
 
 ## Changes Observables vs. Values Observables
@@ -717,6 +790,8 @@ Is it a problem if the app draws stale database content? RxGRDB's answer is *no*
 - One needs to synchronize the content of the database file with some external resources, like other files, or system sensors like CLRegion monitoring.
 
 - On iOS, one needs to process a database transaction before the operating system had any opportunity to put the application in the suspended state.
+
+- One want to build a [database snapshots](https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots) with a guaranteed snapshot content.
 
 Outside of those use cases, it is much likely *wrong* to use a changes observables. Please [open an issue] and come discuss if you have any question.
 
