@@ -103,6 +103,22 @@ extension Reactive where Base: DatabaseWriter {
             observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
             .asObservable()
     }
+    
+    /// Fixit for legacy API
+    @available(*, unavailable, renamed:"fetchTokens(in:startImmediately:scheduler:)")
+    public func changeTokens(
+        in requests: [Request],
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType = MainScheduler.instance)
+        -> Observable<FetchToken>
+    {
+        return DatabaseRegionFetchTokensObservable(
+            writer: base,
+            startImmediately: startImmediately,
+            scheduler: scheduler,
+            observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
+            .asObservable()
+    }
 }
 
 extension Array where Element == DatabaseRegion {

@@ -50,3 +50,7 @@ extension ObservableType where E == FetchToken {
             .asObservable()
     }
 }
+
+/// Fixit for legacy API
+@available(*, unavailable, renamed:"FetchToken")
+public typealias ChangeToken = FetchToken
