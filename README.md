@@ -343,6 +343,8 @@ To get a single notification when a transaction has modified several requests, u
 
 When you need to fetch from several requests with the guarantee of consistent results, that is to say when you need values that come alltogether from a single database transaction, see [Fetch Tokens](#fetch-tokens).
 
+See the [Data Consistency](#data-consistency) chapter for more information.
+
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately)
 - [Fetch tokens](#fetch-tokens)
 - [`DatabaseWriter.rx.fetchTokens`](#databasewriterrxfetchtokensinstartimmediatelyscheduler)
