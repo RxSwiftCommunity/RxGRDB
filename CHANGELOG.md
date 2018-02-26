@@ -29,7 +29,7 @@ Released February 25, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxG
 
  extension Reactive where Base: DatabaseWriter {
 +    func fetchTokens(in requests: [Request], startImmediately: Bool = true, scheduler: ImmediateSchedulerType = MainScheduler.instance) -> Observable<FetchToken>
--    func changeTokens(in requests: [Request], startImmediately: Bool = true, scheduler: ImmediateSchedulerType = MainScheduler.instance) -> Observable<FetchToken>
+-    func changeTokens(in requests: [Request], startImmediately: Bool = true, scheduler: ImmediateSchedulerType = MainScheduler.instance) -> Observable<ChangeToken>
  }
 ```
 
