@@ -674,7 +674,7 @@ When you use a [database pool](https://github.com/groue/GRDB.swift/blob/master/R
 let playersRequest = Player.all()
 dbPool.rx
     .changes(in: [playersRequest])
-    .map { try dbPool.makeSnapshot() }
+    .map { _ in try dbPool.makeSnapshot() }
     .subscribe(onNext: { snapshot in
         // use snapshot
     })
