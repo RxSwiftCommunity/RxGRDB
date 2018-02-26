@@ -676,7 +676,7 @@ dbPool.rx
     .changes(in: [playersRequest])
     .map { _ in try dbPool.makeSnapshot() }
     .subscribe(onNext: { snapshot in
-        // use snapshot
+        updateView(from: snapshot)
     })
 ```
 
