@@ -812,7 +812,7 @@ Player.all().rx
     })
 ```
 
-The behavior of a values observable depends on whether you use a [database queue], or a [database pool].
+Depending on whether you use a [database queue], or a [database pool], the values emitted by such an observable are exactly the same. But the concurrent behavior changes.
 
 - [Values Observables in a Database Queue](#values-observables-in-a-database-queue)
 - [Values Observables in a Database Pool](#values-observables-in-a-database-pool)
