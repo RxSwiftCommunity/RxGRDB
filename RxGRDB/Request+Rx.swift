@@ -5,7 +5,7 @@
 #endif
 import RxSwift
 
-extension Reactive where Base: Request {
+extension Reactive where Base: FetchRequest {
     /// Returns an Observable that emits a database connection after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.

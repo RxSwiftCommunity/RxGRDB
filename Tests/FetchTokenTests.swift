@@ -30,7 +30,7 @@ extension FetchTokenTests {
             ([], 2)
         ]
         let recorder = EventRecorder<([String], Int)>(expectedEventCount: expectedValues.count)
-        let request = SQLRequest("SELECT * FROM table1")
+        let request = SQLRequest<Row>("SELECT * FROM table1")
         
         // 1 (startImmediately parameter is true by default)
         AnyDatabaseWriter(writer).rx
@@ -89,7 +89,7 @@ extension FetchTokenTests {
         
         let expectedValues: [Int] = [0, 1, 2]
         let recorder = EventRecorder<Int>(expectedEventCount: expectedValues.count)
-        let request = SQLRequest("SELECT COUNT(*) FROM t").asRequest(of: Int.self)
+        let request = SQLRequest<Int>("SELECT COUNT(*) FROM t")
         
         let initialFetchExpectation = expectation(description: "initial fetch")
         initialFetchExpectation.assertForOverFulfill = false

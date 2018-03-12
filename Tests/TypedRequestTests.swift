@@ -255,7 +255,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbara"],
@@ -290,7 +290,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllRowsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
@@ -358,7 +358,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
         let expectedNames = [
             "Arthur",
             "Arthur",
@@ -393,7 +393,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneRowDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT * FROM players ORDER BY name").asRequest(of: Row.self)
+        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
         let expectedNames = [
             "Arthur",
             nil,
@@ -462,7 +462,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbara"],
@@ -497,7 +497,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
@@ -531,7 +531,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
         let expectedNames = [
             "Arthur",
             "Arthur",
@@ -566,7 +566,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchOneDatabaseValueDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT name FROM players ORDER BY name").asRequest(of: String.self)
+        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
         let expectedNames = [
             "Arthur",
             nil,
@@ -601,7 +601,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT email FROM players ORDER BY name").asRequest(of: Optional<String>.self)
+        let request = SQLRequest<String?>("SELECT email FROM players ORDER BY name")
         let expectedNames = [
             ["arthur@example.com", nil],
             ["arthur@example.com", nil],
@@ -640,7 +640,7 @@ extension TypedRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest("SELECT email FROM players ORDER BY name").asRequest(of: Optional<String>.self)
+        let request = SQLRequest<String?>("SELECT email FROM players ORDER BY name")
         let expectedNames = [
             ["arthur@example.com", nil],
             [],
@@ -741,7 +741,7 @@ extension TypedRequestTests {
 
 // MARK: - Support
 
-private struct Player : RowConvertible, MutablePersistable {
+private struct Player : FetchableRecord, MutablePersistableRecord {
     var id: Int64?
     var name: String
     var email: String?

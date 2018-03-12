@@ -29,7 +29,7 @@ extension DatabaseWriterTests {
             }
         }
         
-        let requests = [
+        let requests: [SQLRequest<Row>] = [
             SQLRequest("SELECT a FROM table1"),
             SQLRequest("SELECT table1.a, table2.b FROM table1, table2")]
         

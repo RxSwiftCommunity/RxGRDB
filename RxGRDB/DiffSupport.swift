@@ -58,7 +58,7 @@ func < (lhs: DatabaseValue, rhs: DatabaseValue) -> Bool {
     }
 }
 
-extension TypedRequest where RowDecoder: TableMapping {
+extension FetchRequest where RowDecoder: TableRecord {
     /// Creates a function that extracts the primary key from a row
     ///
     ///     let request = Player.all()

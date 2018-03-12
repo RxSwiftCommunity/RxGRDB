@@ -9,7 +9,7 @@ import RxSwift
 // MARK: - RowConvertible
 
 // TODO: consider performing distinctUntilChanged comparisons in some background queue
-extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
+extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     /// Returns an Observable that emits an array of records after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -81,7 +81,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
 
 // MARK: - Row
 
-extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
+extension Reactive where Base: FetchRequest, Base.RowDecoder: Row {
     /// Returns an Observable that emits an array of rows after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -152,7 +152,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
 
 // MARK: - DatabaseValueConvertible
 
-extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConvertible {
+extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -232,7 +232,7 @@ extension Optional : _OptionalProtocol {
     public typealias _Wrapped = Wrapped
 }
 
-extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol, Base.RowDecoder._Wrapped: DatabaseValueConvertible {
+extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol, Base.RowDecoder._Wrapped: DatabaseValueConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -270,7 +270,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol,
 
 // MARK: - DatabaseValueConvertible & StatementColumnConvertible
 
-extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConvertible & StatementColumnConvertible {
+extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConvertible & StatementColumnConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.

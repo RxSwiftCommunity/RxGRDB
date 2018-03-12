@@ -6,7 +6,7 @@
 import RxSwift
 
 /// TODO
-public struct PrimaryKeyDiffScanner<Record: RowConvertible & MutablePersistable> {
+public struct PrimaryKeyDiffScanner<Record: FetchableRecord & MutablePersistableRecord> {
     private let primaryKey: (Row) -> RowValue
     private let updateRecord: (Record, Row) -> Record
     private let references: [Reference]
@@ -27,7 +27,7 @@ public struct PrimaryKeyDiffScanner<Record: RowConvertible & MutablePersistable>
         initialRecords: [Record],
         updateRecord: ((Record, Row) -> Record)? = nil)
         throws
-        where Request: TypedRequest, Request.RowDecoder == Record
+        where Request: FetchRequest, Request.RowDecoder == Record
     {
         let primaryKey = try request.primaryKey(database)
         let references = initialRecords.map { record -> Reference in
