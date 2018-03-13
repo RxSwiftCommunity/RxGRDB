@@ -49,8 +49,8 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter requests: The observed requests.
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
-    public func changes<Request: FetchRequest>(
-        in requests: [Request],
+    public func changes(
+        in requests: [DatabaseRequest],
         startImmediately: Bool = true)
         -> Observable<Database>
     {
@@ -90,8 +90,8 @@ extension Reactive where Base: DatabaseWriter {
     ///   its first right upon subscription.
     /// - parameter scheduler: The scheduler on which mapFetch emits its
     ///   elements (default is MainScheduler.instance).
-    public func fetchTokens<Request: FetchRequest>(
-        in requests: [Request],
+    public func fetchTokens(
+        in requests: [DatabaseRequest],
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType = MainScheduler.instance)
         -> Observable<FetchToken>
@@ -106,8 +106,8 @@ extension Reactive where Base: DatabaseWriter {
     
     /// Fixit for legacy API
     @available(*, unavailable, renamed:"fetchTokens(in:startImmediately:scheduler:)")
-    public func changeTokens<Request: FetchRequest>(
-        in requests: [Request],
+    public func changeTokens(
+        in requests: [DatabaseRequest],
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType = MainScheduler.instance)
         -> Observable<FetchToken>

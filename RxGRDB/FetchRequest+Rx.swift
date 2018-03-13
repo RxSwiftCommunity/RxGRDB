@@ -6,7 +6,7 @@ import Foundation
 #endif
 import RxSwift
 
-// MARK: - RowConvertible
+// MARK: - FetchableRecord
 
 // TODO: consider performing distinctUntilChanged comparisons in some background queue
 extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
