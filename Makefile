@@ -71,14 +71,14 @@ test_framework_RxGRDB: test_framework_RxGRDBmacOS test_framework_RxGRDBiOS
 test_framework_RxGRDBiOS: test_framework_RxGRDBiOS_minTarget test_framework_RxGRDBiOS_maxTarget
 test_install: test_CocoaPodsLint
 
-test_framework_RxGRDBmacOS: GRDB.swift RxSwift
+test_framework_RxGRDBmacOS:
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBmacOS \
 	  $(TEST_ACTIONS) \
 	  $(XCPRETTY)
 
-test_framework_RxGRDBiOS_minTarget: GRDB.swift RxSwift
+test_framework_RxGRDBiOS_minTarget:
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBiOS \
@@ -86,7 +86,7 @@ test_framework_RxGRDBiOS_minTarget: GRDB.swift RxSwift
 	  $(TEST_ACTIONS) \
 	  $(XCPRETTY)
 
-test_framework_RxGRDBiOS_maxTarget: GRDB.swift RxSwift
+test_framework_RxGRDBiOS_maxTarget:
 	$(XCODEBUILD) \
 	  -project RxGRDB.xcodeproj \
 	  -scheme RxGRDBiOS \
@@ -103,21 +103,6 @@ else
 	@exit 1
 endif
 
-# Target that setups GRDB.swift
-GRDB.swift: Vendor/GRDB.swift/Tests
-
-# Makes sure the Vendor/GRDB.swift submodule has been downloaded
-Vendor/GRDB.swift/Tests:
-	git submodule update --init Vendor/GRDB.swift
-
-# Target that setups RxSwift
-RxSwift: Vendor/RxSwift/Tests
-
-# Makes sure the Vendor/RxSwift submodule has been downloaded
-Vendor/RxSwift/Tests:
-	git submodule update --init Vendor/RxSwift
-
-
 # Cleanup
 # =======
 
@@ -128,4 +113,4 @@ distclean:
 	rm -rf Vendor/RxSwift && $(GIT) checkout -- Vendor/RxSwift
 	rm -rf Documentation/RxGRDBDemo/Vendor/Differ && $(GIT) checkout -- Documentation/RxGRDBDemo/Vendor/Differ
 
-.PHONY: distclean test GRDB.swift RxSwift
+.PHONY: distclean test
