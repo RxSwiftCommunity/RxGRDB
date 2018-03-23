@@ -34,7 +34,47 @@ public struct FetchToken {
     }
     
     var kind: Kind
-    var scheduler: ImmediateSchedulerType
+    var scheduler: FetchTokenScheduler
+}
+
+/// Not public: how fetched values should be scheduled
+enum FetchTokenScheduler {
+    /// Schedules with an RxSwift scheduler
+    case scheduler(ImmediateSchedulerType)
+    
+    /// Schedules on the main queue. This specific scheduling technique
+    /// guarantees that the initially fetched values are synchronous delivered
+    /// on the main queue. That last guarantee can't be fulfilled by
+    /// MainScheduler.instance.
+    case mainQueue
+    
+    func schedule(action: @escaping () -> Void) {
+        switch self {
+        case .scheduler(let scheduler):
+            _ = scheduler.schedule(()) { _ in
+                action()
+                return Disposables.create()
+            }
+        case .mainQueue:
+            if DispatchQueue.isMain {
+                action()
+            } else {
+                DispatchQueue.main.async(execute: action)
+            }
+        }
+    }
+}
+
+extension DispatchQueue {
+    private static var token: DispatchSpecificKey<()> = {
+        let key = DispatchSpecificKey<()>()
+        DispatchQueue.main.setSpecific(key: key, value: ())
+        return key
+    }()
+    
+    static var isMain: Bool {
+        return DispatchQueue.getSpecific(key: token) != nil
+    }
 }
 
 extension ObservableType where E == FetchToken {

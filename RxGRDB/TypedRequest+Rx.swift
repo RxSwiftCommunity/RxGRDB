@@ -26,7 +26,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     public func fetchAll(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<[Base.RowDecoder]>
     {
@@ -60,7 +60,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: RowConvertible {
     public func fetchOne(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<Base.RowDecoder?>
     {
@@ -98,7 +98,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     public func fetchAll(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<[Row]>
     {
@@ -131,7 +131,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: Row {
     public func fetchOne(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<Row?>
     {
@@ -169,7 +169,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     public func fetchAll(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<[Base.RowDecoder]>
     {
@@ -203,7 +203,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     public func fetchOne(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<Base.RowDecoder?>
     {
@@ -249,7 +249,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: _OptionalProtocol,
     public func fetchAll(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<[Base.RowDecoder._Wrapped?]>
     {
@@ -287,7 +287,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     public func fetchAll(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<[Base.RowDecoder]>
     {
@@ -321,7 +321,7 @@ extension Reactive where Base: TypedRequest, Base.RowDecoder: DatabaseValueConve
     public func fetchOne(
         in writer: DatabaseWriter,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        scheduler: ImmediateSchedulerType? = nil,
         distinctUntilChanged: Bool = false)
         -> Observable<Base.RowDecoder?>
     {

@@ -97,11 +97,10 @@ class MapFetch<ResultType> : ObservableType {
                         
                         guard let result = result else { return }
                         
-                        _ = fetchToken.scheduler.schedule(result) { result in
+                        fetchToken.scheduler.schedule {
                             if !subscription.isDisposed {
                                 observer.onResult(result)
                             }
-                            return Disposables.create()
                         }
                     }
                 }
