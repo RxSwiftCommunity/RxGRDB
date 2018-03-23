@@ -74,13 +74,13 @@ extension FetchTokenTests {
 extension FetchTokenTests {
     
     // This is a regression test that fails in v0.8.0
-    func testAsynchronousSubscription() throws {
-        try Test(testAsynchronousSubscription)
+    func testSubscriptionOffMainThread() throws {
+        try Test(testSubscriptionOffMainThread)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testAsynchronousSubscription(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testSubscriptionOffMainThread(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "t") { t in
                 t.column("id", .integer).primaryKey()
@@ -123,3 +123,48 @@ extension FetchTokenTests {
     }
 }
 
+extension FetchTokenTests {
+    
+    // This is a regression test that fails in v0.9.0
+    func testSubscriptionFromMainThread() throws {
+        try Test(testSubscriptionFromMainThread)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testSubscriptionFromMainThread(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        try writer.write { db in
+            try db.create(table: "t") { t in
+                t.column("id", .integer).primaryKey()
+            }
+        }
+        
+        var disposable: Disposable? {
+            willSet { disposable?.dispose() }
+            didSet { disposable?.disposed(by: disposeBag) }
+        }
+        
+        let request = SQLRequest("SELECT COUNT(*) FROM t").asRequest(of: Int.self)
+        
+        var count1: Int? = nil
+        var count2: Int? = nil
+        request.rx.fetchOne(in: writer)
+            .subscribe(onNext: {
+                XCTAssertTrue(Thread.isMainThread)
+                count1 = $0
+            })
+            .disposed(by: disposeBag)
+        try writer.write { db in
+            try db.execute("INSERT INTO t DEFAULT VALUES")
+        }
+        request.rx.fetchOne(in: writer)
+            .subscribe(onNext: {
+                XCTAssertTrue(Thread.isMainThread)
+                count2 = $0
+            })
+            .disposed(by: disposeBag)
+        
+        XCTAssertEqual(count1, 0)
+        XCTAssertEqual(count2, 1)
+    }
+}
