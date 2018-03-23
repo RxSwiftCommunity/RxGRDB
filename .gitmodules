@@ -1,9 +1,3 @@
-[submodule "Vendor/RxSwift"]
-	path = Vendor/RxSwift
-	url = https://github.com/ReactiveX/RxSwift.git
-[submodule "Vendor/GRDB.swift"]
-	path = Vendor/GRDB.swift
-	url = https://github.com/groue/GRDB.swift.git
 [submodule "Documentation/RxGRDBDemo/Vendor/Differ"]
 	path = Documentation/RxGRDBDemo/Vendor/Differ
 	url = https://github.com/tonyarnold/Differ.git
