@@ -146,25 +146,31 @@ extension FetchTokenTests {
         
         let request = SQLRequest("SELECT COUNT(*) FROM t").asRequest(of: Int.self)
         
+        let expectation1 = expectation(description: "1st subscription")
+        expectation1.expectedFulfillmentCount = 2
         var count1: Int? = nil
-        var count2: Int? = nil
         request.rx.fetchOne(in: writer)
             .subscribe(onNext: {
                 XCTAssertTrue(Thread.isMainThread)
+                expectation1.fulfill()
                 count1 = $0
             })
             .disposed(by: disposeBag)
+        XCTAssertEqual(count1, 0) // synchronous emission of the 1st event
+
         try writer.write { db in
             try db.execute("INSERT INTO t DEFAULT VALUES")
         }
+        
+        var count2: Int? = nil
         request.rx.fetchOne(in: writer)
             .subscribe(onNext: {
                 XCTAssertTrue(Thread.isMainThread)
                 count2 = $0
             })
             .disposed(by: disposeBag)
+        XCTAssertEqual(count2, 1) // synchronous emission of the 1st event
         
-        XCTAssertEqual(count1, 0)
-        XCTAssertEqual(count2, 1)
+        waitForExpectations(timeout: 1, handler: nil)
     }
 }
