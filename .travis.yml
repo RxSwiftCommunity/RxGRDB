@@ -3,7 +3,9 @@
 
 language: objective-c
 xcode_project: RxGRDB.xcodeproj
-
+before_install:
+  - gem install cocoapods -v '1.4.0'
+  
 # Disable the default Travis-CI submodule logic
 # The various make commands ensure that the appropriate submodules are retrieved
 git:
