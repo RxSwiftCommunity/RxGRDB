@@ -10,7 +10,7 @@ PODS:
   - RxSwift (4.1.2)
 
 DEPENDENCIES:
-  - Differ
+  - Differ (~> 1.0)
   - GRDB.swift (~> 2.6)
   - RxGRDB (from `.`)
   - RxSwift (~> 4.0)
@@ -25,6 +25,6 @@ SPEC CHECKSUMS:
   RxGRDB: b32e5f93f9dc1908ce418fabffccb2da8fd55901
   RxSwift: e49536837d9901277638493ea537394d4b55f570
 
-PODFILE CHECKSUM: 05f9c31f958220f6a4886198d72401ff1ddcb814
+PODFILE CHECKSUM: 8ac9c8566a41bab7006cb5d0ab8025f0daa598d4
 
 COCOAPODS: 1.4.0

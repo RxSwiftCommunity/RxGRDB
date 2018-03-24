@@ -73,14 +73,14 @@ test_install: test_CocoaPodsLint
 
 test_framework_RxGRDBmacOS: Pods
 	$(XCODEBUILD) \
-	  -project RxGRDB.xcodeproj \
+	  -workspace RxGRDB.xcworkspace \
 	  -scheme RxGRDBmacOS \
 	  $(TEST_ACTIONS) \
 	  $(XCPRETTY)
 
 test_framework_RxGRDBiOS_minTarget: Pods
 	$(XCODEBUILD) \
-	  -project RxGRDB.xcodeproj \
+	  -workspace RxGRDB.xcworkspace \
 	  -scheme RxGRDBiOS \
 	  -destination $(MIN_IOS_DESTINATION) \
 	  $(TEST_ACTIONS) \
@@ -88,7 +88,7 @@ test_framework_RxGRDBiOS_minTarget: Pods
 
 test_framework_RxGRDBiOS_maxTarget: Pods
 	$(XCODEBUILD) \
-	  -project RxGRDB.xcodeproj \
+	  -workspace RxGRDB.xcworkspace \
 	  -scheme RxGRDBiOS \
 	  -destination $(MAX_IOS_DESTINATION) \
 	  $(TEST_ACTIONS) \
@@ -104,7 +104,12 @@ else
 endif
 
 Pods:
+ifdef POD
 	$(POD) install
+else
+	@echo CocoaPods must be installed
+	@exit 1
+endif
 
 # Cleanup
 # =======
