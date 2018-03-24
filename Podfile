@@ -29,6 +29,6 @@ end
 target 'RxGRDBDemo' do
   project 'Documentation/RxGRDBDemo/RxGRDBDemo.xcodeproj'
   platform :ios, '8.0'
-  pod 'Differ'
+  pod 'Differ', '~> 1.0'
   pod 'RxGRDB', :path => '.'
 end
