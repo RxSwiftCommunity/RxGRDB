@@ -5,7 +5,7 @@
 #endif
 import RxSwift
 
-final class DatabaseRegionChangesObservable : ObservableType {
+final class ChangesObservable : ObservableType {
     typealias E = Database
     let writer: DatabaseWriter
     let startImmediately: Bool
@@ -31,12 +31,12 @@ final class DatabaseRegionChangesObservable : ObservableType {
         do {
             let writer = self.writer
             
-            let transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionChangeObserver in
+            let transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionObserver in
                 if startImmediately {
                     observer.onNext(db)
                 }
                 
-                let transactionObserver = try DatabaseRegionChangeObserver(
+                let transactionObserver = try DatabaseRegionObserver(
                     observedRegion: observedRegion(db),
                     onChange: { observer.onNext(db) })
                 db.add(transactionObserver: transactionObserver)
@@ -54,4 +54,4 @@ final class DatabaseRegionChangesObservable : ObservableType {
         }
     }
 }
- 
+

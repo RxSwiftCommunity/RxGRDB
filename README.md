@@ -800,7 +800,7 @@ Outside of those use cases, it is much likely *wrong* to use a changes observabl
 
 **Values Observables are all about getting fresh database values**.
 
-They all emit in the scheduler of your choice, the default being `MainScheduler.instance` which emits on the main queue:
+They all emit in the RxSwift scheduler of your choice, or, by default, on the main queue:
 
 ```swift
 // On any thread
@@ -810,6 +810,38 @@ Player.all().rx
         // On the main queue
         print("Players have changed.")
     })
+```
+
+When a values observable is subscribed from the main queue, and doesn't specify any specific scheduler, you are guaranteed that the initial values are synchronously fetched:
+
+```swift
+// On the main queue
+Player.all().rx
+    .fetchAll(in: dbQueue)
+    .subscribe(onNext: { players: [Player] in
+        print("Players have changed.")
+    })
+// <- Here "Players have changed" is guaranteed to be printed.
+```
+
+This guarantee is lifted whenever you provide a specific scheduler, or when the observable is not subscribed from the main queue:
+
+```swift
+Player.all().rx
+    .fetchAll(in: dbQueue, scheduler: MainScheduler.instance)
+    .subscribe(onNext: { players: [Player] in
+        print("Players have changed.")
+    })
+// <- Here "Players have changed" may not be printed yet.
+```
+
+Unlike initial values, all changes notifications are always emitted asynchronously:
+
+```swift
+try dbQueue.inDatabase { db in
+    try Player(name: "Arthur").insert(db)
+}
+// <- Here "Players have changed" may not be printed yet.
 ```
 
 Depending on whether you use a [database queue], or a [database pool], the values emitted by such an observable are exactly the same. But the concurrent behavior changes.

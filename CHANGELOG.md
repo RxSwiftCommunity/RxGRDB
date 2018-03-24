@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+## Next version
+
+### New
+
+- Unless they are provided an explicit scheduler, [values observables](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#values-observables) subscribed from the main queue are now guaranteed a synchronous emission of their initial value ([#28](https://github.com/RxSwiftCommunity/RxGRDB/pull/28)).
+
+### Documentation Diff
+
+- The [Values Observables](https://github.com/RxSwiftCommunity/RxGRDB/blob/master/README.md#values-observables) chapter now describes the scheduling of fetched values.
+
+
 ## 0.9.0
 
 Released February 25, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.8.1...v0.9.0)

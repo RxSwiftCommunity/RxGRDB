@@ -4,7 +4,7 @@
     import GRDB
 #endif
 
-final class DatabaseRegionChangeObserver : TransactionObserver {
+final class DatabaseRegionObserver : TransactionObserver {
     var changed: Bool = false
     let observedRegion: DatabaseRegion
     let change: () -> Void
@@ -44,5 +44,3 @@ final class DatabaseRegionChangeObserver : TransactionObserver {
     func databaseWillChange(with event: DatabasePreUpdateEvent) { }
     #endif
 }
-
-

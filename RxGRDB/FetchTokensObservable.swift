@@ -5,11 +5,11 @@
 #endif
 import RxSwift
 
-final class DatabaseRegionFetchTokensObservable : ObservableType {
+final class FetchTokensObservable : ObservableType {
     typealias E = FetchToken
     let writer: DatabaseWriter
     let startImmediately: Bool
-    let scheduler: ImmediateSchedulerType
+    let scheduler: FetchTokenScheduler
     let observedRegion: (Database) throws -> DatabaseRegion
     
     /// Creates an observable that emits `.change` fetch tokens on the database
@@ -31,7 +31,7 @@ final class DatabaseRegionFetchTokensObservable : ObservableType {
     init(
         writer: DatabaseWriter,
         startImmediately: Bool,
-        scheduler: ImmediateSchedulerType,
+        scheduler: FetchTokenScheduler,
         observedRegion: @escaping (Database) throws -> DatabaseRegion)
     {
         self.writer = writer
@@ -41,44 +41,49 @@ final class DatabaseRegionFetchTokensObservable : ObservableType {
     }
     
     func subscribe<O>(_ observer: O) -> Disposable where O : ObserverType, O.E == FetchToken {
-        // A mutex that protects access to transactionObserver
+        // A mutex that protects access to transactionObserver and disposed flag
         let mutex = PThreadMutex()
-        var transactionObserver: DatabaseRegionChangeObserver? = nil
-        
+        var transactionObserver: DatabaseRegionObserver? = nil
+        var disposed: Bool = false
+
         let writer = self.writer
         let startImmediately = self.startImmediately
         let scheduler = self.scheduler
         let observedRegion = self.observedRegion
-
-        _ = scheduler.schedule(()) { _ in
+        
+        scheduler.schedule {
             do {
                 try mutex.lock {
-                    transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionChangeObserver in
+                    guard !disposed else {
+                        return
+                    }
+                    
+                    transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionObserver in
                         if startImmediately {
-                            observer.onNext(FetchToken(kind: .databaseSubscription(db), scheduler: scheduler))
+                            observer.onNext(FetchToken(kind: .databaseSubscription(db)))
                         }
                         
-                        let transactionObserver = try DatabaseRegionChangeObserver(
+                        let transactionObserver = try DatabaseRegionObserver(
                             observedRegion: observedRegion(db),
-                            onChange: { observer.onNext(FetchToken(kind: .change(writer, db), scheduler: scheduler)) })
+                            onChange: { observer.onNext(FetchToken(kind: .change(writer, scheduler))) })
                         db.add(transactionObserver: transactionObserver)
                         return transactionObserver
                     }
                     
                     if startImmediately {
-                        observer.onNext(FetchToken(kind: .subscription, scheduler: scheduler))
+                        observer.onNext(FetchToken(kind: .subscription))
                     }
                 }
                 
-                return Disposables.create { }
             } catch {
                 observer.onError(error)
-                return Disposables.create()
             }
         }
         
         return Disposables.create {
             mutex.lock {
+                disposed = true
+                
                 if let transactionObserver = transactionObserver {
                     writer.unsafeReentrantWrite { db in
                         db.remove(transactionObserver: transactionObserver)
