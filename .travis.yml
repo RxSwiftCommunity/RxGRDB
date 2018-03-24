@@ -10,7 +10,7 @@ cache:
     - cocoapods
 
 # Custom CocoaPods installation so that Podfile.lock is honored
-before_script: make Pods
+install: make Pods
   
 # Disable the default Travis-CI submodule logic
 # The various make commands ensure that the appropriate submodules are retrieved
