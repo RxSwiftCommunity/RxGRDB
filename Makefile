@@ -112,8 +112,5 @@ Pods:
 distclean:
 	$(GIT) reset --hard
 	$(GIT) clean -dffx .
-	rm -rf Vendor/GRDB.swift && $(GIT) checkout -- Vendor/GRDB.swift
-	rm -rf Vendor/RxSwift && $(GIT) checkout -- Vendor/RxSwift
-	rm -rf Documentation/RxGRDBDemo/Vendor/Differ && $(GIT) checkout -- Documentation/RxGRDBDemo/Vendor/Differ
 
 .PHONY: distclean test
