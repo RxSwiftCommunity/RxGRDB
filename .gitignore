@@ -72,5 +72,4 @@ playground.xcworkspace
 .build/
 
 ##
-Podfile.lock
 Pods/

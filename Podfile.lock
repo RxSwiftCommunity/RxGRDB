@@ -1,0 +1,30 @@
+PODS:
+  - Differ (1.0.3)
+  - GRDB.swift (2.9.0)
+  - RxGRDB (0.9.0):
+    - RxGRDB/default (= 0.9.0)
+    - RxSwift (~> 4.0)
+  - RxGRDB/default (0.9.0):
+    - GRDB.swift (~> 2.6)
+    - RxSwift (~> 4.0)
+  - RxSwift (4.1.2)
+
+DEPENDENCIES:
+  - Differ
+  - GRDB.swift (~> 2.6)
+  - RxGRDB (from `.`)
+  - RxSwift (~> 4.0)
+
+EXTERNAL SOURCES:
+  RxGRDB:
+    :path: .
+
+SPEC CHECKSUMS:
+  Differ: 0c220ac75542f5f17f91b1303b85bf07d871ecd7
+  GRDB.swift: db8429f12d250f3056df82eb3409e5af083948ca
+  RxGRDB: b32e5f93f9dc1908ce418fabffccb2da8fd55901
+  RxSwift: e49536837d9901277638493ea537394d4b55f570
+
+PODFILE CHECKSUM: 05f9c31f958220f6a4886198d72401ff1ddcb814
+
+COCOAPODS: 1.4.0
