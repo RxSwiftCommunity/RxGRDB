@@ -105,6 +105,7 @@ endif
 
 Pods:
 ifdef POD
+	$(POD) repo update
 	$(POD) install
 else
 	@echo CocoaPods must be installed
