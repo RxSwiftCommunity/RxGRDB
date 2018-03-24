@@ -30,11 +30,10 @@ public struct FetchToken {
         case subscription
         
         /// Emitted from the database writer dispatch queue.
-        case change(DatabaseWriter, Database)
+        case change(DatabaseWriter, FetchTokenScheduler)
     }
     
     var kind: Kind
-    var scheduler: FetchTokenScheduler
 }
 
 /// Not public: how fetched values should be scheduled

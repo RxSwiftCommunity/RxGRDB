@@ -60,18 +60,18 @@ final class FetchTokensObservable : ObservableType {
                     
                     transactionObserver = try writer.unsafeReentrantWrite { db -> DatabaseRegionObserver in
                         if startImmediately {
-                            observer.onNext(FetchToken(kind: .databaseSubscription(db), scheduler: scheduler))
+                            observer.onNext(FetchToken(kind: .databaseSubscription(db)))
                         }
                         
                         let transactionObserver = try DatabaseRegionObserver(
                             observedRegion: observedRegion(db),
-                            onChange: { observer.onNext(FetchToken(kind: .change(writer, db), scheduler: scheduler)) })
+                            onChange: { observer.onNext(FetchToken(kind: .change(writer, scheduler))) })
                         db.add(transactionObserver: transactionObserver)
                         return transactionObserver
                     }
                     
                     if startImmediately {
-                        observer.onNext(FetchToken(kind: .subscription, scheduler: scheduler))
+                        observer.onNext(FetchToken(kind: .subscription))
                     }
                 }
                 
