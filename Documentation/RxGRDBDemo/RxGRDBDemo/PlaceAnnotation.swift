@@ -26,13 +26,13 @@ final class PlaceAnnotation: NSObject, MKAnnotation {
 // Have PlaceAnnotation adopt RowConvertible, Persistable, and Diffable, so
 // that it can feed the `primaryKeySortedDiff` observable.
 
-extension PlaceAnnotation: RowConvertible {
+extension PlaceAnnotation: FetchableRecord {
     convenience init(row: Row) {
         self.init(place: Place(row: row))
     }
 }
 
-extension PlaceAnnotation: Persistable {
+extension PlaceAnnotation: PersistableRecord {
     static let databaseTableName = Place.databaseTableName
     
     func encode(to container: inout PersistenceContainer) {
