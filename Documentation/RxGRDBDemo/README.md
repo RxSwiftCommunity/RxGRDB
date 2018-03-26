@@ -3,7 +3,12 @@ RxGRDBDemo
 
 This demo application uses [RxSwift], [RxGRDB], and [Differ](https://github.com/tonyarnold/Differ) to synchronize its view with the content of the database.
 
-To play with it, download the RxGRDB repository and all its submodules, open `RxGRDB.xcworkspace` at the root of the repository, and run the RxGRDBDemo application.
+To play with it:
+
+1. Download the RxGRDB repository
+2. Run `pod install`
+3. Open `RxGRDB.xcworkspace` at the root of the repository
+4. Run the RxGRDBDemo application.
 
 The rows of the players table view animate as you change the players ordering, delete all players, or refresh them (refreshing applies random transformations to the database)
 

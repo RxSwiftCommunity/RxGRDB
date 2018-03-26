@@ -3,13 +3,13 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-4-orange.svg?style=flat)](ht
 
 ### A set of reactive extensions for SQLite and [GRDB.swift](http://github.com/groue/GRDB.swift)
 
-**Latest release**: February 25, 2018 &bull; version 0.9.0 &bull; [Release Notes](CHANGELOG.md)
+**Latest release**: March 26, 2018 &bull; version 0.10.0 &bull; [Release Notes](CHANGELOG.md)
 
 **Requirements**: iOS 8.0+ / macOS 10.10+ / watchOS 2.0+ &bull; Swift 4.0 / Xcode 9+
 
 | Swift version | RxGRDB version                                                  |
 | ------------- | --------------------------------------------------------------- |
-| **Swift 4**   | **v0.9.0**                                                      |
+| **Swift 4**   | **v0.10.0**                                                     |
 | Swift 3.2     | [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0) |
 | Swift 3.1     | [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0) |
 | Swift 3       | [v0.3.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.3.0) |
@@ -800,7 +800,7 @@ Outside of those use cases, it is much likely *wrong* to use a changes observabl
 
 **Values Observables are all about getting fresh database values**.
 
-They all emit in the scheduler of your choice, the default being `MainScheduler.instance` which emits on the main queue:
+They all emit in the RxSwift scheduler of your choice, or, by default, on the main queue:
 
 ```swift
 // On any thread
@@ -810,6 +810,38 @@ Player.all().rx
         // On the main queue
         print("Players have changed.")
     })
+```
+
+When a values observable is subscribed from the main queue, and doesn't specify any specific scheduler, you are guaranteed that the initial values are synchronously fetched:
+
+```swift
+// On the main queue
+Player.all().rx
+    .fetchAll(in: dbQueue)
+    .subscribe(onNext: { players: [Player] in
+        print("Players have changed.")
+    })
+// <- Here "Players have changed" is guaranteed to be printed.
+```
+
+This guarantee is lifted whenever you provide a specific scheduler, or when the observable is not subscribed from the main queue:
+
+```swift
+Player.all().rx
+    .fetchAll(in: dbQueue, scheduler: MainScheduler.instance)
+    .subscribe(onNext: { players: [Player] in
+        print("Players have changed.")
+    })
+// <- Here "Players have changed" may not be printed yet.
+```
+
+Unlike initial values, all changes notifications are always emitted asynchronously:
+
+```swift
+try dbQueue.inDatabase { db in
+    try Player(name: "Arthur").insert(db)
+}
+// <- Here "Players have changed" may not be printed yet.
 ```
 
 Depending on whether you use a [database queue], or a [database pool], the values emitted by such an observable are exactly the same. But the concurrent behavior changes.

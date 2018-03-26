@@ -54,7 +54,7 @@ extension Reactive where Base: DatabaseWriter {
         startImmediately: Bool = true)
         -> Observable<Database>
     {
-        return DatabaseRegionChangesObservable(
+        return ChangesObservable(
             writer: base,
             startImmediately: startImmediately,
             observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
@@ -93,13 +93,19 @@ extension Reactive where Base: DatabaseWriter {
     public func fetchTokens(
         in requests: [DatabaseRequest],
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<FetchToken>
     {
-        return DatabaseRegionFetchTokensObservable(
+        let fetchTokenScheduler: FetchTokenScheduler
+        if let scheduler = scheduler {
+            fetchTokenScheduler = .scheduler(scheduler)
+        } else {
+            fetchTokenScheduler = .mainQueue
+        }
+        return FetchTokensObservable(
             writer: base,
             startImmediately: startImmediately,
-            scheduler: scheduler,
+            scheduler: fetchTokenScheduler,
             observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
             .asObservable()
     }
@@ -109,15 +115,10 @@ extension Reactive where Base: DatabaseWriter {
     public func changeTokens(
         in requests: [DatabaseRequest],
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType = MainScheduler.instance)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<FetchToken>
     {
-        return DatabaseRegionFetchTokensObservable(
-            writer: base,
-            startImmediately: startImmediately,
-            scheduler: scheduler,
-            observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
-            .asObservable()
+        return fetchTokens(in: requests, startImmediately: startImmediately, scheduler: scheduler)
     }
 }
 

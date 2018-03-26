@@ -61,7 +61,7 @@ class MapFetch<ResultType> : ObservableType {
                     // Several `change` token may have already been received.
                     observer.onResult(initialResult!)
                     
-                case .change(let writer, _):
+                case .change(let writer, let scheduler):
                     // Current dispatch queue: the database writer dispatch queue
                     // This token is emitted after a transaction has been committed.
                     //
@@ -97,11 +97,10 @@ class MapFetch<ResultType> : ObservableType {
                         
                         guard let result = result else { return }
                         
-                        _ = fetchToken.scheduler.schedule(result) { result in
+                        scheduler.schedule {
                             if !subscription.isDisposed {
                                 observer.onResult(result)
                             }
-                            return Disposables.create()
                         }
                     }
                 }
