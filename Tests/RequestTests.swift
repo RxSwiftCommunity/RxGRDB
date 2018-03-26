@@ -29,7 +29,7 @@ extension RequestTests {
             }
         }
         
-        let requests = [
+        let requests: [SQLRequest<Row>] = [
             SQLRequest("SELECT * FROM table1"),
             SQLRequest("SELECT id, a FROM table1"),
             SQLRequest("SELECT table1.id, table1.a, table2.a FROM table1 JOIN table2 ON table1.id = table2.id")]
@@ -162,7 +162,7 @@ extension RequestTests {
         let expectedCounts = [2, 2, 0, 3]
         let recorder = EventRecorder<Int>(expectedEventCount: expectedCounts.count)
         
-        struct Person : TableMapping { static let databaseTableName = "persons" }
+        struct Person : TableRecord { static let databaseTableName = "persons" }
         let request = Person.all()
         request.rx.fetchCount(in: writer)
             .subscribe { event in
@@ -208,7 +208,7 @@ extension RequestTests {
         expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second one on retry.
         
         // Subscribe to a request
-        struct Record : TableMapping { static let databaseTableName = "table1" }
+        struct Record : TableRecord { static let databaseTableName = "table1" }
         let request = Record.all()
         var eventsCount = 0
         var needsThrow = false

@@ -36,11 +36,11 @@ extension Place {
 
 // Adopt RowConvertible so that we can fetch places from the database.
 // Implementation is automatically derived from Codable.
-extension Place: RowConvertible { }
+extension Place: FetchableRecord { }
 
 // Adopt MutablePersistable so that we can create/update/delete places in the database.
 // Implementation is partially derived from Codable.
-extension Place: MutablePersistable {
+extension Place: MutablePersistableRecord {
     static let databaseTableName = "places"
     mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
