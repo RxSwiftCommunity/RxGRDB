@@ -47,7 +47,7 @@ extension FetchTokenTests {
             }
             .disposed(by: disposeBag)
         
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             // 2: modify observed requests
             try db.inTransaction {
                 try db.execute("INSERT INTO table1 (a) VALUES ('foo')")
@@ -111,7 +111,7 @@ extension FetchTokenTests {
         
         // wait until we have fetched initial value before we perform database changes
         wait(for: [initialFetchExpectation], timeout: 1)
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             try db.execute("INSERT INTO t DEFAULT VALUES")
             try db.execute("INSERT INTO t DEFAULT VALUES")
         }

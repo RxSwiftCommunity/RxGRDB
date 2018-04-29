@@ -42,7 +42,7 @@ extension DatabaseWriterTests {
             .subscribe(recorder)
             .disposed(by: disposeBag)
         
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             // 2 (modify both requests)
             try db.inTransaction {
                 try db.execute("INSERT INTO table1 (id, a, b) VALUES (NULL, 0, 0)")

@@ -21,7 +21,7 @@ extension TypedRequestTests {
     }
     
     func modifyDatabase(in writer: DatabaseWriter) throws {
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             try db.execute("UPDATE players SET name = name WHERE id = 1")
             try db.execute("UPDATE players SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
             _ = try Player.deleteAll(db)

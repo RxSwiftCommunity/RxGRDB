@@ -47,7 +47,7 @@ extension RequestTests {
         // Subscription immediately triggers an event
         XCTAssertEqual(changes, [true, true, true])
         
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             func reset() { changes = changes.map { _ in false } }
             
             // Transaction triggers an event for concerned requests
@@ -121,7 +121,7 @@ extension RequestTests {
 //
 //        XCTAssertEqual(changesCount, 1)
 //
-//        try writer.write { db in
+//        try writer.writeWithoutTransaction { db in
 //            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
 //            XCTAssertEqual(changesCount, 2)
 //
@@ -171,7 +171,7 @@ extension RequestTests {
                 recorder.on(event)
             }
             .disposed(by: disposeBag)
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             try db.execute("UPDATE persons SET name = name")
             try db.execute("DELETE FROM persons")
             try db.inTransaction {

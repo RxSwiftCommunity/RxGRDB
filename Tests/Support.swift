@@ -59,6 +59,3 @@ func assertMainQueue(_ message: @autoclosure () -> String = "Not on the main dis
     DispatchQueue.main.setSpecific(key: mainQueueKey, value: ())
     XCTAssertNotNil(DispatchQueue.getSpecific(key: mainQueueKey), message, file: file, line: line)
 }
-
-extension AnyDatabaseWriter: ReactiveCompatible {
-}
