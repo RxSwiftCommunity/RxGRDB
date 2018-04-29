@@ -11,7 +11,7 @@ try dbQueue.inDatabase { db in
     }
 }
 
-let request = SQLRequest("SELECT * FROM persons")
+let request = SQLRequest<Void>("SELECT * FROM persons")
 request.rx
     .changes(in: dbQueue)
     .subscribe(onNext: { db in
