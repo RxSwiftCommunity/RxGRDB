@@ -5,6 +5,69 @@
 #endif
 import RxSwift
 
+public protocol DatabaseRegionConvertible {
+    /// Returns a database region.
+    ///
+    /// - parameter db: A database connection.
+    func databaseRegion(_ db: Database) throws -> DatabaseRegion
+}
+
+extension Reactive where Base: DatabaseRegionConvertible {
+    /// Returns an Observable that emits a database connection after each
+    /// committed database transaction that has modified the tables and columns
+    /// fetched by the request.
+    ///
+    /// All elements are emitted in a protected database dispatch queue,
+    /// serialized with all database updates. If you set *startImmediately* to
+    /// true (the default value), the first element is emitted synchronously
+    /// upon subscription. See [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency)
+    /// for more information.
+    ///
+    ///     let dbQueue = DatabaseQueue()
+    ///     try dbQueue.inDatabase { db in
+    ///         try db.create(table: "persons") { t in
+    ///             t.column("id", .integer).primaryKey()
+    ///             t.column("name", .text)
+    ///         }
+    ///     }
+    ///
+    ///     let request = SQLRequest("SELECT * FROM persons")
+    ///     request.rx
+    ///         .changes(in: dbQueue)
+    ///         .subscribe(onNext: { db in
+    ///             let count = try! request.fetchCount(db)
+    ///             print("Number of persons: \(count)")
+    ///         })
+    ///     // Prints "Number of persons: 0"
+    ///
+    ///     try dbQueue.inDatabase { db in
+    ///         try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
+    ///         // Prints "Number of persons: 1"
+    ///         try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
+    ///         // Prints "Number of persons: 2"
+    ///     }
+    ///
+    ///     try dbQueue.inTransaction { db in
+    ///         try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
+    ///         try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
+    ///         return .commit
+    ///     }
+    ///     // Prints "Number of persons: 4"
+    ///
+    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted synchronously, on subscription.
+    public func changes(
+        in writer: DatabaseWriter,
+        startImmediately: Bool = true)
+        -> Observable<Database>
+    {
+        return AnyDatabaseWriter(writer).rx.changes(
+            in: [base],
+            startImmediately: startImmediately)
+    }
+}
+
 extension Reactive where Base: DatabaseWriter {
     /// Returns an Observable that emits a database connection after each
     /// committed database transaction that has modified the tables and columns
@@ -50,14 +113,14 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     public func changes(
-        in requests: [DatabaseRequest],
+        in requests: [DatabaseRegionConvertible],
         startImmediately: Bool = true)
         -> Observable<Database>
     {
         return ChangesObservable(
             writer: base,
             startImmediately: startImmediately,
-            observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
+            observedRegion: { db in try requests.map { try $0.databaseRegion(db) }.union() })
             .asObservable()
     }
     
@@ -91,7 +154,7 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter scheduler: The scheduler on which mapFetch emits its
     ///   elements (default is MainScheduler.instance).
     public func fetchTokens(
-        in requests: [DatabaseRequest],
+        in requests: [DatabaseRegionConvertible],
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<FetchToken>
@@ -106,14 +169,14 @@ extension Reactive where Base: DatabaseWriter {
             writer: base,
             startImmediately: startImmediately,
             scheduler: fetchTokenScheduler,
-            observedRegion: { db in try requests.map { try $0.fetchedRegion(db) }.union() })
+            observedRegion: { db in try requests.map { try $0.databaseRegion(db) }.union() })
             .asObservable()
     }
     
     /// Fixit for legacy API
     @available(*, unavailable, renamed:"fetchTokens(in:startImmediately:scheduler:)")
     public func changeTokens(
-        in requests: [DatabaseRequest],
+        in requests: [DatabaseRegionConvertible],
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<FetchToken>

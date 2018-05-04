@@ -9,7 +9,55 @@ import RxSwift
 // MARK: - FetchableRecord
 
 // TODO: consider performing distinctUntilChanged comparisons in some background queue
-extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
+extension Reactive where Base: FetchRequest & DatabaseRegionConvertible, Base.RowDecoder: FetchableRecord {
+    /// Returns an Observable that emits after each committed database
+    /// transaction that has modified the tables and columns fetched by
+    /// the request.
+    ///
+    /// All values are emitted on *scheduler*, which defaults to
+    /// `MainScheduler.instance`. If you set *startImmediately* to true (the
+    /// default value), the first element is emitted right upon subscription.
+    ///
+    ///     let dbQueue = DatabaseQueue()
+    ///     let request = Person.all()
+    ///     request.rx
+    ///         .fetchCount(in: dbQueue)
+    ///         .subscribe(onNext: { count in
+    ///             print("Number of persons: \(count)")
+    ///         })
+    ///     // Prints "Number of persons: 0"
+    ///
+    ///     try dbQueue.inDatabase { db in
+    ///         try Person(name: "Arthur").insert(db)
+    ///         // Prints "Number of persons: 1"
+    ///         try Person(name: "Barbara").insert(db)
+    ///         // Prints "Number of persons: 2"
+    ///     }
+    ///
+    ///     try dbQueue.inTransaction { db in
+    ///         try Person(name: "Craig").insert(db)
+    ///         try Person(name: "David").insert(db)
+    ///         return .commit
+    ///     }
+    ///     // Prints "Number of persons: 4"
+    ///
+    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted right upon subscription.
+    /// - parameter scheduler: The scheduler on which elements are emitted
+    ///   (default is MainScheduler.instance).
+    public func fetchCount(
+        in writer: DatabaseWriter,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Int>
+    {
+        let request = base
+        return AnyDatabaseWriter(writer).rx
+            .fetchTokens(in: [request], startImmediately: startImmediately, scheduler: scheduler)
+            .mapFetch { try request.fetchCount($0) }
+    }
+    
     /// Returns an Observable that emits an array of records after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -81,7 +129,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
 
 // MARK: - Row
 
-extension Reactive where Base: FetchRequest, Base.RowDecoder: Row {
+extension Reactive where Base: FetchRequest & DatabaseRegionConvertible, Base.RowDecoder: Row {
     /// Returns an Observable that emits an array of rows after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -152,7 +200,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: Row {
 
 // MARK: - DatabaseValueConvertible
 
-extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConvertible {
+extension Reactive where Base: FetchRequest & DatabaseRegionConvertible, Base.RowDecoder: DatabaseValueConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -232,7 +280,7 @@ extension Optional : _OptionalProtocol {
     public typealias _Wrapped = Wrapped
 }
 
-extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol, Base.RowDecoder._Wrapped: DatabaseValueConvertible {
+extension Reactive where Base: FetchRequest & DatabaseRegionConvertible, Base.RowDecoder: _OptionalProtocol, Base.RowDecoder._Wrapped: DatabaseValueConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.
@@ -270,7 +318,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
 
 // MARK: - DatabaseValueConvertible & StatementColumnConvertible
 
-extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConvertible & StatementColumnConvertible {
+extension Reactive where Base: FetchRequest & DatabaseRegionConvertible, Base.RowDecoder: DatabaseValueConvertible & StatementColumnConvertible {
     /// Returns an Observable that emits an array of values after each
     /// committed database transaction that has modified the tables and columns
     /// fetched by the request.

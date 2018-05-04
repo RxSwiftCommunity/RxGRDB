@@ -6,10 +6,10 @@
 import RxSwift
 
 // TypedRequest
-extension AdaptedFetchRequest : ReactiveCompatible { }
-extension AnyFetchRequest : ReactiveCompatible { }
-extension QueryInterfaceRequest : ReactiveCompatible { }
-extension SQLRequest : ReactiveCompatible { }
+extension AdaptedFetchRequest : ReactiveCompatible, DatabaseRegionConvertible { }
+extension AnyFetchRequest : ReactiveCompatible, DatabaseRegionConvertible { }
+extension QueryInterfaceRequest : ReactiveCompatible, DatabaseRegionConvertible { }
+extension SQLRequest : ReactiveCompatible, DatabaseRegionConvertible { }
 
 // DatabaseWriter
 extension DatabasePool : ReactiveCompatible { }
