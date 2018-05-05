@@ -175,7 +175,7 @@ All elements are emitted in a protected database dispatch queue, serialized with
 **You can also track SQL requests:**
 
 ```swift
-let request = SQLRequest("SELECT * FROM players")
+let request = SQLRequest<Row>("SELECT * FROM players")
 request.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Players table has changed.")
@@ -251,7 +251,7 @@ All elements are emitted on `scheduler`, which defaults to `MainScheduler.instan
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest("SELECT MAX(score) FROM rounds").asRequest(of: Int.self)
+let request = SQLRequest<Int>("SELECT MAX(score) FROM rounds")
 request.rx.fetchOne(in: dbQueue)
     .subscribe(onNext: { maxScore: Int? in
         print(maxScore)
@@ -298,7 +298,7 @@ All elements are emitted on `scheduler`, which defaults to `MainScheduler.instan
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest("SELECT url FROM links").asRequest(of: URL.self)
+let request = SQLRequest<URL>("SELECT url FROM links")
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { urls: [URL] in
         print(urls)
@@ -308,7 +308,7 @@ request.rx.fetchAll(in: dbQueue)
 When tracking *values*, make sure to ask for optionals when database may contain NULL:
 
 ```swift
-let request = SQLRequest("SELECT email FROM players").asRequest(of: Optional<String>.self)
+let request = SQLRequest<String?>("SELECT email FROM players")
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { emails: [String?] in
         print(emails)
@@ -383,8 +383,8 @@ All elements are emitted in a protected database dispatch queue, serialized with
 **You can also track SQL requests:**
 
 ```swift
-let players = SQLRequest("SELECT * FROM players")
-let teams = SQLRequest("SELECT * FROM teams")
+let players = SQLRequest<Row>("SELECT * FROM players")
+let teams = SQLRequest<Row>("SELECT * FROM teams")
 dbQueue.rx.changes(in: [players, teams])
     .subscribe(onNext: { db: Database in
         print("Changes in players or teams table")
@@ -554,13 +554,12 @@ Player.all()
         print("Consistent players: \(players)")
     })
 
-SQLRequest("""
+SQLRequest<TeamInfo>("""
     SELECT teams.*, COUNT(DISTINCT players.id) AS playerCount
     FROM teams
     LEFT JOIN players ON players.teamId = teams.id
     GROUP BY teams.id
     """)
-    .asRequest(of: TeamInfo.self)
     .rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { teamInfos in
         print("Consistent team infos: \(teamInfos)")
