@@ -157,17 +157,14 @@ request.rx.changes(in: dbQueue) // or dbPool
         print("Players table has changed.")
     })
 
-try dbQueue.inDatabase { db in
+try dbQueue.write { db in
     try Player.deleteAll(db)
-    // Prints "Players table has changed."
-}
+} // Prints "Players table has changed."
 
-try dbQueue.inTransaction { db in
+try dbQueue.write { db in
     try Player(name: "Arthur").insert(db)
     try Player(name: "Barbara").insert(db)
-    return .commit
-    // Prints "Players table has changed."
-}
+} // Prints "Players table has changed."
 ```
 
 All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted synchronously, right upon subscription. See [GRDB Concurrency Guide] for more information.
@@ -181,10 +178,9 @@ request.rx.changes(in: dbQueue)
         print("Players table has changed.")
     })
 
-try dbQueue.inDatabase { db in
+try dbQueue.write { db in
     try db.execute("DELETE FROM players")
-    // Prints "Players table has changed."
-}
+} // Prints "Players table has changed."
 ```
 
 > :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
@@ -203,12 +199,10 @@ request.rx.fetchCount(in: dbQueue) // or dbPool
         print("Number of players: \(count)")
     })
 
-try dbQueue.inTransaction { db in
+try dbQueue.write { db in
     try Player.deleteAll(db)
     try Player(name: "Arthur").insert(db)
-    return .commit
-    // Eventually prints "Number of players: 1"
-}
+} // Eventually prints "Number of players: 1"
 ```
 
 All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
@@ -234,16 +228,11 @@ request.rx.fetchOne(in: dbQueue) // or dbPool
         print("Player has changed")
     })
 
-try dbQueue.inDatabase { db in
+try dbQueue.write { db in
     guard let player = Player.fetchOne(key: playerId) else { return }
-    
     player.score += 100
     try player.update(db)
-    // Eventually prints "Player has changed"
-    
-    try player.delete(db)
-    // Eventually prints "Player has changed"
-}
+} // Eventually prints "Player has changed"
 ```
 
 All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
@@ -284,13 +273,11 @@ request.rx.fetchAll(in: dbQueue) // or dbPool
         print(players.map { $0.name })
     })
 
-try dbQueue.inTransaction { db in
+try dbQueue.write { db in
     try Player.deleteAll(db)
     try Player(name: "Arthur").insert(db)
     try Player(name: "Barbara").insert(db)
-    return .commit
-    // Eventually prints "[Arthur, Barbara]"
-}
+} // Eventually prints "[Arthur, Barbara]"
 ```
 
 All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
@@ -389,18 +376,15 @@ dbQueue.rx.changes(in: [players, teams]) // or dbPool
         print("Changes in players or teams table")
     })
 
-try dbQueue.inDatabase { db in
+try dbQueue.write { db in
     try Player.deleteAll(db)
-    // Prints "Changes in players or teams table"
-}
+} // Prints "Changes in players or teams table"
 
-try dbQueue.inTransaction { db in
+try dbQueue.write { db in
     let team = Team(name: "Blue")
     try team.insert(db)
     try Player(name: "Arthur", teamId: team.id).insert(db)
-    return .commit
-    // Prints "Changes in players or teams table"
-}
+} // Prints "Changes in players or teams table"
 ```
 
 All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted synchronously, right upon subscription. See [GRDB Concurrency Guide] for more information.
@@ -415,10 +399,9 @@ dbQueue.rx.changes(in: [players, teams])
         print("Changes in players or teams table")
     })
 
-try dbQueue.inDatabase { db in
+try dbQueue.write { db in
     try db.execute("DELETE FROM players")
-    // Prints "Changes in players or teams table"
-}
+} // Prints "Changes in players or teams table"
 ```
 
 > :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
@@ -509,7 +492,7 @@ let request = Place.order(Column("id"))
 You then create the PrimaryKeyDiffScanner, with a database connection and an eventual initial array of records which is used to compute the first diff:
 
 ```swift
-let scanner = try dbQueue.inDatabase { db in
+let scanner = try dbQueue.read { db in
     try PrimaryKeyDiffScanner(
         database: db,
         request: request,
@@ -618,8 +601,7 @@ When this is not acceptable, make sure to read the [Observing Multiple Requests]
 // GUARANTEED DATA CONSISTENCY
 let playersRequest = Player.all()
 dbQueue.rx
-    .fetchTokens(in: [playersRequest])
-    .mapFetch { db in
+    .fetch(from: [playersRequest]) { db in
         try (playersRequest.fetchAll(db), Team.fetchAll(db))
     }
     .subscribe(onNext: { (players, teams) in
@@ -666,8 +648,7 @@ Player.all().rx
 ```swift
 // A values observable:
 dbQueue
-    .fetchTokens(in: [Player.all()])
-    .mapFetch { (db: Database) -> ([Player], Int) in
+    .fetch(from: [Player.all()]) { (db: Database) -> ([Player], Int) in
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
         let count = try Player.fetchCount(db)
         return (players, count)
@@ -728,10 +709,9 @@ Player.all().rx
     })
 
 print(Date())
-try dbQueue.inTransaction { db in
+try dbQueue.write { db in
     try Player(name: "Arthur").insert(db)
-    return .commit // Triggers the observable, and waits 1 second
-}
+} // Triggers the observable, and waits 1 second
 print(Date()) // 1+ second later
 ```
 
@@ -824,10 +804,9 @@ Player.all().rx
         print("Players have changed.")
     })
     
-try dbQueue.inTransaction { db in
+try dbQueue.write { db in
     try Player(name: "Arthur").insert(db)
-    return .commit // waits until fresh players have been fetched
-}
+} // waits until fresh players have been fetched
 ```
 
 Fortunately, fetching values is usually [quite fast](https://github.com/groue/GRDB.swift/wiki/Performance).
@@ -849,10 +828,9 @@ Player.all().rx
         print("Players have changed.")
     })
     
-try dbPool.writeInTransaction { db in
+try dbPool.write { db in
     try Player(name: "Arthur").insert(db)
-    return .commit // waits for snapshot isolation establishment
-}
+} // waits for snapshot isolation establishment
 ```
 
 Acquiring snapshot isolation is very fast. The only limiting resource is the maximum number of concurrent reads (see [database pool configuration]).
@@ -875,8 +853,7 @@ Player.all().rx
 
 // On any thread
 dbQueue
-    .fetchTokens(in: [Player.all()])
-    .mapFetch { (db: Database) -> ([Player], Int) in
+    .fetch(from: [Player.all()]) { (db: Database) -> ([Player], Int) in
         // In a database protected dispatch queue
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
         let count = try Player.fetchCount(db)
@@ -914,8 +891,7 @@ Player.all().rx
 
 // On any thread
 dbQueue
-    .fetchTokens(in: [Player.all()], scheduler: scheduler)
-    .mapFetch { (db: Database) -> ([Player], Int) in
+    .fetch(from: [Player.all()], scheduler: scheduler) { (db: Database) -> ([Player], Int) in
         // In a database protected dispatch queue
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
         let count = try Player.fetchCount(db)
