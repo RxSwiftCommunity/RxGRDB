@@ -338,16 +338,41 @@ request.rx.fetchOne(in: dbQueue)   // Observable<Player?>
 request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 ```
 
-Those observables can be composed together using [RxSwift operators](https://github.com/ReactiveX/RxSwift). However, be careful: those operators are unable to fulfill some database-specific requirements:
+Those observables can be composed together using [RxSwift operators](https://github.com/ReactiveX/RxSwift). However, be careful: those operators are unable to fulfill [data consistency](#data-consistency):
 
-To get a single notification when a transaction has modified several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
+```swift
+// Non-guaranteed data consistency
+let teams = Team.all().rx.fetchAll(in: dbQueue)
+let players = Player.all().rx.fetchAll(in: dbQueue)
 
-When you need to fetch from several requests with the guarantee of consistent results, that is to say when you need values that come alltogether from a single database transaction, see [Fetch Tokens](#fetch-tokens).
+Observable.combineLatest(teams, players) { ($0, $1) }
+    .subscribe(onNext: { (teams: [Team], players: [Player]) in
+        // teams and players are not guaranteed to match
+    })
+```
 
-See the [Data Consistency](#data-consistency) chapter for more information.
+Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
+
+And when you need to fetch database values, with the guarantee of consistent results, use [`DatabaseWriter.rx.fetch`](#databasewriterrxfetchfromstartimmediatelyschedulervalues).
+
+For example, the above code should be written as below:
+
+```swift
+// Guaranteed data consistency
+let teams = Team.all()
+let players = Player.all()
+dbQueue
+    .fetch(from: [teams, players]) { db in
+        try (teams.fetchAll(db), players.fetchAll(db))
+    }
+    .subscribe(onNext: { (teams: [Team], players: [Player]) in
+        // teams and players are guaranteed to match
+    })
+```
 
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately)
 - [`DatabaseWriter.rx.fetch`](#databasewriterrxfetchfromstartimmediatelyschedulervalues)
+- [Data Consistency](#data-consistency)
 
 
 ---
