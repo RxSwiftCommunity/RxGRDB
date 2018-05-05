@@ -340,7 +340,7 @@ Observable.combineLatest(teams, players) { ($0, $1) }
 
 Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
 
-And when you need to fetch database values, with the guarantee of consistent results, use [`DatabaseWriter.rx.fetch`](#databasewriterrxfetchfromstartimmediatelyschedulervalues).
+And when you need to fetch database values, with the guarantee of consistent results, use [DatabaseWriter.rx.fetch](#databasewriterrxfetchfromstartimmediatelyschedulervalues).
 
 For example, the above code should be written as below:
 
