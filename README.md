@@ -609,7 +609,7 @@ dbQueue.rx
     })
 ```
 
-When you use a [database pool](https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools), you may also find [snapshots](https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots) interesting (GRDB 2.9+):
+When you use a [database pool](https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools), you may also find [snapshots](https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots) interesting:
 
 ```swift
 // GUARANTEED DATA CONSISTENCY
