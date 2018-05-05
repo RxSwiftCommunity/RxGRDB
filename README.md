@@ -47,6 +47,7 @@ Documentation
 - [What is Database Observation?](#what-is-database-observation)
 - [Observing Individual Requests](#observing-individual-requests)
 - [Observing Multiple Requests](#observing-multiple-requests)
+- [DatabaseRegionConvertible Protocol](#databaseregionconvertible-protocol)
 - [Diffs](#diffs)
 - [Scheduling](#scheduling)
     - [Scheduling Guarantees](#scheduling-guarantees)
@@ -346,9 +347,7 @@ When you need to fetch from several requests with the guarantee of consistent re
 See the [Data Consistency](#data-consistency) chapter for more information.
 
 - [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately)
-- [Fetch tokens](#fetch-tokens)
-- [`DatabaseWriter.rx.fetchTokens`](#databasewriterrxfetchtokensinstartimmediatelyscheduler)
-- [`Observable.mapFetch`](#observablemapfetch_)
+- [`DatabaseWriter.rx.fetch`](#databasewriterrxfetchfromstartimmediatelyschedulervalues)
 
 
 ---
@@ -402,40 +401,15 @@ try dbQueue.inDatabase { db in
 
 ---
 
-## Fetch tokens
+#### `DatabaseWriter.rx.fetch(from:startImmediately:scheduler:values:)`
 
-**Generally speaking, *fetch tokens* let you turn notifications of database changes into fetched values. But the requests you observe don't have to be the same as the requests you fetch from.**
-
-To introduce them, let's start with a simple request observable:
-
-```swift
-let request = Player.all()
-request.rx.fetchAll(in: dbQueue) // Observable<[Player]>
-```
-
-After each modification of the players database table, the observable above emits a fresh array of players (see [rx.fetchAll](#typedrequestrxfetchallinstartimmediatelyschedulerdistinctuntilchanged) for more options).
-
-The job performed by this observable is decomposed into two steps: observe database modifications, and fetch fresh results after each modification. These two steps are made visible below:
-
-```swift
-// The very same Observable<[Player]>
-dbQueue.rx
-    .fetchTokens(in: [request])        // 1. observe modifications
-    .mapFetch { (db: Database) in       // 2. fetch fresh results
-        return try request.fetchAll(db)
-    }
-```
-
-`fetchTokens` emits *fetch tokens* for all database transactions that modifies some requests. Those fetch tokens are opaque values that are turned into the fetched results of your choice by the `mapFetch` operator.
-
-When a single request is involved, it is used as both the source of tracked changes, and the source of the fetched results. But you can observe some requests and fetch from other ones:
+This [database values observable](#values-observables) emits fetched values after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
 
 ```swift
 // When the players table is changed, fetch the ten best ones, as well as the
 // total number of players:
 dbQueue.rx
-    .fetchTokens(in: [Player.all()])
-    .mapFetch { (db: Database) -> ([Player], Int) in
+    .fetch(from: [Player.all()]) { db -> ([Player], Int) in
         let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
         let count = try Player.fetchCount(db)
         return (players, count)
@@ -443,68 +417,30 @@ dbQueue.rx
     .subscribe(onNext: { (players, count) in
         print("Best ten players out of \(count): \(players)")
     })
-```
 
-- [`DatabaseWriter.rx.fetchTokens`](#databasewriterrxfetchtokensinstartimmediatelyscheduler)
-- [`Observable.mapFetch`](#observablemapfetch_)
-
-
----
-
-#### `DatabaseWriter.rx.fetchTokens(in:startImmediately:scheduler:)`
-
-This observable emits a [fetch token](#fetch-tokens) after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
-
-```swift
-let players = Player.all()
-let teams = Team.all()
-
-// Observable<FetchToken>
-let fetchTokens = dbQueue.rx.fetchTokens(in: [players, teams]) // or dbPool
-```
-
-Fetch tokens are opaque values: you can't use them directly. Instead, sequences of fetch tokens are designed to be consumed by the [mapFetch](#observablemapfetch_) operator.
-
-The `scheduler` and `startImmediately` parameters are used to control the delivery of fetched elements by the mapFetch operator. See below.
-
-> :point_up: **Note**: RxGRDB does not support any alteration of fetch tokens sequences by the way of any RxSwift operator. Don't skip elements, don't merge sequences, etc.
-
-
----
-
-#### `Observable.mapFetch(_:)`
-
-The `mapFetch` operator transforms a sequence of [fetch tokens](#fetch-tokens) into a [database values observable](#values-observables).
-
-```swift
-let fetchTokens = dbQueue.rx.fetchTokens(in: ...)
-    
-// Observable<[Player]>
-let players = fetchTokens.mapFetch { (db: Database) in
-    try Player.fetchAll(db)
-}
-```
-
-The `scheduler` and `startImmediately` parameters are used to build the sequence of fetch tokens control the delivery of fetched elements:
-
-All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
-
-**The closure provided to `mapFetch` is guaranteed an immutable view of the last committed state of the database.** This means that you can perform several fetches without fearing eventual concurrent writes to mess with your application logic:
-
-```swift
-// When the players table is changed, fetch the ten best ones, as well
-// as the total number of players:
+// Track a team and its players
+let teamId = 1
 dbQueue.rx
-    .fetchTokens(in: [Player.all()])
-    .mapFetch { (db: Database) -> ([Player], Int) in
-        let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
-        let count = try Player.fetchCount(db)
-        return (players, count)
+    .fetch(from: [Team.filter(key: teamId), Player.all()]) { db in
+        let team = try Team.fetchOne(key: teamId)
+        let players = team.players.fetchAll(db)
+        return (team, players)
     }
-    .subscribe(onNext: { (players, count) in
-        print("Best ten players out of \(count): \(players)")
+    .subscribe(onNext: { (team, players) in
+        print("Players in \(team.name): \(players.map { $0.name }.joined(separator: ", "))")
     })
 ```
+
+The `fetch` method takes a closure parametrer that is called after each impactful transaction, and returns the values emitted by the observable. It runs in a protected database queue.
+
+The elements returned by the closure are emitted on the main queue, unless you provide a specific scheduler. If you set startImmediately to true (the default value), the first element is emitted right upon subscription.
+
+**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes.
+
+
+# DatabaseRegionConvertible Protocol
+
+TODO
 
 
 # Diffs

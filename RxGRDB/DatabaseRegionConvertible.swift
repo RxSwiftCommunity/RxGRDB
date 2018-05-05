@@ -12,6 +12,13 @@ public protocol DatabaseRegionConvertible {
     func databaseRegion(_ db: Database) throws -> DatabaseRegion
 }
 
+extension DatabaseRegion: DatabaseRegionConvertible {
+    /// :nodoc:
+    public func databaseRegion(_ db: Database) throws -> DatabaseRegion {
+        return self
+    }
+}
+
 extension Reactive where Base: DatabaseRegionConvertible {
     /// Returns an Observable that emits a database connection after each
     /// committed database transaction that has modified the tables and columns
@@ -70,8 +77,8 @@ extension Reactive where Base: DatabaseRegionConvertible {
 
 extension Reactive where Base: DatabaseWriter {
     /// Returns an Observable that emits a database connection after each
-    /// committed database transaction that has modified the tables and columns
-    /// fetched by the requests.
+    /// committed database transaction that has modified the tables, columns,
+    /// and rows defined by the *regions*.
     ///
     /// All elements are emitted in a protected database dispatch queue,
     /// serialized with all database updates. If you set *startImmediately* to
@@ -109,32 +116,29 @@ extension Reactive where Base: DatabaseWriter {
     ///     }
     ///     // Prints "Number of persons: 4"
     ///
-    /// - parameter requests: The observed requests.
+    /// - parameter regions: The observed regions.
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted synchronously, on subscription.
     public func changes(
-        in requests: [DatabaseRegionConvertible],
+        in regions: [DatabaseRegionConvertible],
         startImmediately: Bool = true)
         -> Observable<Database>
     {
         return ChangesObservable(
             writer: base,
             startImmediately: startImmediately,
-            observedRegion: { db in try requests.map { try $0.databaseRegion(db) }.union() })
+            observedRegion: { db in try regions.map { try $0.databaseRegion(db) }.union() })
             .asObservable()
     }
     
-    /// Returns an Observable that emits a fetch token after each committed
-    /// database transaction that has modified the tables and columns fetched by
-    /// the requests.
+    /// Returns an Observable that emits values after each committed
+    /// database transaction that has modified the tables, columns,
+    /// and rows defined by some *regions*.
     ///
-    /// The fetch tokens are meant to be used by the mapFetch operator:
-    ///
-    ///     // When the players table is changed, fetch the ten best ones, as well as the
-    ///     // total number of players:
+    ///     // When the players table is changed, fetch the ten best ones,
+    ///     // as well as the total number of players:
     ///     dbQueue.rx
-    ///         .fetchTokens(in: [Player.all()])
-    ///         .mapFetch { (db: Database) -> ([Player], Int) in
+    ///         .fetch(from: [Player.all()]) { (db: Database) -> ([Player], Int) in
     ///             let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
     ///             let count = try Player.fetchCount(db)
     ///             return (players, count)
@@ -143,18 +147,45 @@ extension Reactive where Base: DatabaseWriter {
     ///             print("Best players out of \(count): \(players)")
     ///         })
     ///
-    /// All values from the mapFetch operator are emitted on *scheduler*, which
-    /// defaults to `MainScheduler.instance`. If you set *startImmediately* to
-    /// true (the default value), the first element is emitted right
-    /// upon subscription.
+    /// The `values` closure argument is called after each impactful
+    /// transaction, and returns the values emitted by the observable. It runs
+    /// in a protected database queue.
     ///
-    /// - parameter requests: The observed requests.
-    /// - parameter startImmediately: When true (the default), mapFetch emits
-    ///   its first right upon subscription.
-    /// - parameter scheduler: The scheduler on which mapFetch emits its
-    ///   elements (default is MainScheduler.instance).
+    /// By default, all values are emitted on the main dispatch queue. If you
+    /// give a *scheduler*, values are emitted on that scheduler.
+    ///
+    /// If you set *startImmediately* to true (the default value), the first
+    /// element is emitted right upon subscription. It is *synchronously*
+    /// emitted if and only if the observable is subscribed on the main queue,
+    /// and is given a nil *scheduler* argument:
+    ///
+    ///     // on the main queue
+    ///     dbQueue.rx
+    ///         .fetch(from: [request, ...]) { db in ... }
+    ///         .subscribe(onNext: { values in
+    ///             // on the main queue
+    ///             print("Values have changed")
+    ///         })
+    ///     // <- here "Values have changed" has been printed
+    ///
+    ///     // on any queue
+    ///     request.rx
+    ///         .fetch(from: [request, ...], scheduler: MainScheduler.instance) { db in ... }
+    ///         .subscribe(onNext: { values in
+    ///             // on the main queue
+    ///             print("Values have changed")
+    ///         })
+    ///     // <- here "Values have changed" may not be printed yet
+    ///
+    /// - parameter regions: The observed regions.
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted right upon subscription.
+    /// - parameter scheduler: The eventual scheduler on which elements
+    ///   are emitted.
+    /// - parameter values: A closure that returns the values emitted by
+    ///   the observable
     public func fetch<T>(
-        from requests: [DatabaseRegionConvertible],
+        from regions: [DatabaseRegionConvertible],
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil,
         values: @escaping (Database) throws -> T)
@@ -170,7 +201,7 @@ extension Reactive where Base: DatabaseWriter {
             writer: base,
             startImmediately: startImmediately,
             scheduler: fetchTokenScheduler,
-            observedRegion: { db in try requests.map { try $0.databaseRegion(db) }.union() })
+            observedRegion: { db in try regions.map { try $0.databaseRegion(db) }.union() })
             .asObservable()
             .mapFetch(values)
     }

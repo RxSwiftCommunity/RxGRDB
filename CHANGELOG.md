@@ -10,7 +10,7 @@ Release Notes
 
 ### Breaking Changes
 
-- "Fetch tokens" and the `mapFetch` operators were ill-advised, and have been removed. Now please use the new `DatabaseWriter.fetch(from:startImmediately:scheduler:values:)` method instead, which produces exactly the same observable:
+- "Fetch tokens" and the `mapFetch` operator were ill-advised, and have been removed. Now please use the new `DatabaseWriter.fetch(from:startImmediately:scheduler:values:)` method instead, which produces exactly the same observable:
     
     ```diff
      // Old way
