@@ -34,8 +34,7 @@ extension FetchTokenTests {
         
         // 1 (startImmediately parameter is true by default)
         AnyDatabaseWriter(writer).rx
-            .fetchTokens(in: [request])
-            .mapFetch() { db -> ([String], Int) in
+            .fetch(from: [request]) { db -> ([String], Int) in
                 let strings = try String.fetchAll(db, "SELECT a FROM table1")
                 let int = try Int.fetchOne(db, "SELECT COUNT(*) FROM table2")!
                 return (strings, int)
@@ -96,8 +95,7 @@ extension FetchTokenTests {
 
         DispatchQueue.global().async {
             AnyDatabaseWriter(writer).rx
-                .fetchTokens(in: [request])
-                .mapFetch() { db -> Int in
+                .fetch(from: [request]) { db -> Int in
                     initialFetchExpectation.fulfill()
                     return try request.fetchOne(db)!
                 }

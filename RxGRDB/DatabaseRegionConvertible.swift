@@ -153,11 +153,12 @@ extension Reactive where Base: DatabaseWriter {
     ///   its first right upon subscription.
     /// - parameter scheduler: The scheduler on which mapFetch emits its
     ///   elements (default is MainScheduler.instance).
-    public func fetchTokens(
-        in requests: [DatabaseRegionConvertible],
+    public func fetch<T>(
+        from requests: [DatabaseRegionConvertible],
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil)
-        -> Observable<FetchToken>
+        scheduler: ImmediateSchedulerType? = nil,
+        values: @escaping (Database) throws -> T)
+        -> Observable<T>
     {
         let fetchTokenScheduler: FetchTokenScheduler
         if let scheduler = scheduler {
@@ -171,17 +172,7 @@ extension Reactive where Base: DatabaseWriter {
             scheduler: fetchTokenScheduler,
             observedRegion: { db in try requests.map { try $0.databaseRegion(db) }.union() })
             .asObservable()
-    }
-    
-    /// Fixit for legacy API
-    @available(*, unavailable, renamed:"fetchTokens(in:startImmediately:scheduler:)")
-    public func changeTokens(
-        in requests: [DatabaseRegionConvertible],
-        startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil)
-        -> Observable<FetchToken>
-    {
-        return fetchTokens(in: requests, startImmediately: startImmediately, scheduler: scheduler)
+            .mapFetch(values)
     }
 }
 

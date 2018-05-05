@@ -189,7 +189,6 @@
 			isa = PBXGroup;
 			children = (
 				5653EC22209C36FD00F46237 /* DatabaseRegionConvertible.swift */,
-				565933ED1F0D72A400707571 /* FetchToken.swift */,
 				56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */,
 				5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */,
 				565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */,
@@ -225,6 +224,7 @@
 		56DBA5691F0BF1EF00C90A18 /* Implementations */ = {
 			isa = PBXGroup;
 			children = (
+				565933ED1F0D72A400707571 /* FetchToken.swift */,
 				569E8510200A695A0028D1EC /* ChangesObservable.swift */,
 				569E8513200A69D20028D1EC /* DatabaseRegionObserver.swift */,
 				561782561F655DAC00CEAA55 /* DiffSupport.swift */,
