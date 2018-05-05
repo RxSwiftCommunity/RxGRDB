@@ -24,14 +24,14 @@ struct AppDatabase {
         var migrator = DatabaseMigrator()
         
         migrator.registerMigration("v1.0") { db in
-            try db.create(table: "players") { t in
-                t.column("id", .integer).primaryKey()
+            try db.create(table: "player") { t in
+                t.autoIncrementedPrimaryKey("id")
                 t.column("name", .text).notNull().collate(.localizedCaseInsensitiveCompare)
                 t.column("score", .integer).notNull()
             }
             
-            try db.create(table: "places") { t in
-                t.column("id", .integer).primaryKey()
+            try db.create(table: "place") { t in
+                t.autoIncrementedPrimaryKey("id")
                 t.column("latitude", .double).notNull()
                 t.column("longitude", .double).notNull()
             }

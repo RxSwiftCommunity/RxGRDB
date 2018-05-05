@@ -23,8 +23,8 @@ final class PlaceAnnotation: NSObject, MKAnnotation {
     }
 }
 
-// Have PlaceAnnotation adopt RowConvertible, Persistable, and Diffable, so
-// that it can feed the `primaryKeySortedDiff` observable.
+// Have PlaceAnnotation adopt FetchableRecord and PersistableRecord, so
+// that it can feed PrimaryKeyDiffScanner:
 
 extension PlaceAnnotation: FetchableRecord {
     convenience init(row: Row) {
@@ -39,4 +39,3 @@ extension PlaceAnnotation: PersistableRecord {
         place.encode(to: &container)
     }
 }
-
