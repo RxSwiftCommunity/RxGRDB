@@ -71,3 +71,50 @@ extension DatabaseWriterTests {
         wait(for: recorder, timeout: 1)
     }
 }
+
+extension DatabaseWriterTests {
+    
+    func testChangesInFullDatabase() throws {
+        try Test(testChangesInFullDatabase)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testChangesInFullDatabase(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        try writer.write { db in
+            try db.create(table: "table1") { t in
+                t.column("id", .integer).primaryKey()
+                t.column("a", .text).notNull()
+            }
+            try db.create(table: "table2") { t in
+                t.column("id", .integer).primaryKey()
+            }
+        }
+        
+        let recorder = EventRecorder<Void>(expectedEventCount: 4)
+        
+        // 1
+        AnyDatabaseWriter(writer).rx // ReactiveCompatible is unavailable: use AnyDatabaseWriter to get .rx
+            .changes(in: [DatabaseRegion.fullDatabase])
+            .map { _ in }
+            .subscribe(recorder)
+            .disposed(by: disposeBag)
+        
+        try writer.writeWithoutTransaction { db in
+            // 2
+            try db.inTransaction {
+                try db.execute("INSERT INTO table1 (a) VALUES ('foo')")
+                try db.execute("INSERT INTO table1 (a) VALUES ('bar')")
+                try db.execute("INSERT INTO table2 DEFAULT VALUES")
+                return .commit
+            }
+            
+            // 3
+            try db.execute("INSERT INTO table2 DEFAULT VALUES")
+            
+            // 4
+            try db.execute("DELETE FROM table1")
+        }
+        wait(for: recorder, timeout: 1)
+    }
+}

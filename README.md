@@ -553,6 +553,16 @@ struct TeamInfoRequest: DatabaseRegionConvertible {
 }
 ```
 
+As a closing example, database regions let you observe the full database, and get notified of all transactions:
+
+```swift
+dbQueue.rx
+    .changes(in: [DatabaseRegion.fullDatabase])
+    .subscribe(onNext: { db: Database in
+        print("Database has changed.")
+    })
+```
+
 
 # Diffs
 
