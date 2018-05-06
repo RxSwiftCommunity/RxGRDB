@@ -469,9 +469,6 @@ The `DatabaseRegionConvertible` protocol lets you better encapsulate your most c
 
 ```swift
 protocol DatabaseRegionConvertible {
-    /// Returns a database region.
-    ///
-    /// - parameter db: A database connection.
     func databaseRegion(_ db: Database) throws -> DatabaseRegion
 }
 ```
@@ -734,9 +731,10 @@ dbPool.rx
     .changes(in: [playersRequest, teamsRequest])
     .map { _ in try dbPool.makeSnapshot() }
     .subscribe(onNext: { snapshot in
-        // Players and teams are guaranteed to match
-        let players = snapshot.read { players.fetchAll($0) }
-        let teams = snapshot.read { teams.fetchAll($0) }
+        // Each snapshot has an immutable content: players and teams are
+        // guaranteed to match, regardless of concurrent writes.
+        let players = snapshot.read { playersRequest.fetchAll($0) }
+        let teams = snapshot.read { teamsRequest.fetchAll($0) }
     })
 ```
 
