@@ -159,12 +159,14 @@ request.rx.changes(in: dbQueue) // or dbPool
 
 try dbQueue.write { db in
     try Player.deleteAll(db)
-} // Prints "Players table has changed."
+}
+// Prints "Players table has changed."
 
 try dbQueue.write { db in
     try Player(name: "Arthur").insert(db)
     try Player(name: "Barbara").insert(db)
-} // Prints "Players table has changed."
+} 
+// Prints "Players table has changed."
 ```
 
 All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted synchronously, right upon subscription. See [GRDB Concurrency Guide] for more information.
@@ -180,7 +182,8 @@ request.rx.changes(in: dbQueue)
 
 try dbQueue.write { db in
     try db.execute("DELETE FROM players")
-} // Prints "Players table has changed."
+}
+// Prints "Players table has changed."
 ```
 
 > :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
@@ -202,7 +205,8 @@ request.rx.fetchCount(in: dbQueue) // or dbPool
 try dbQueue.write { db in
     try Player.deleteAll(db)
     try Player(name: "Arthur").insert(db)
-} // Eventually prints "Number of players: 1"
+}
+// Eventually prints "Number of players: 1"
 ```
 
 All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
@@ -232,7 +236,8 @@ try dbQueue.write { db in
     guard let player = Player.fetchOne(key: playerId) else { return }
     player.score += 100
     try player.update(db)
-} // Eventually prints "Player has changed"
+}
+// Eventually prints "Player has changed"
 ```
 
 All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
@@ -277,7 +282,8 @@ try dbQueue.write { db in
     try Player.deleteAll(db)
     try Player(name: "Arthur").insert(db)
     try Player(name: "Barbara").insert(db)
-} // Eventually prints "[Arthur, Barbara]"
+}
+// Eventually prints "[Arthur, Barbara]"
 ```
 
 All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
@@ -329,12 +335,11 @@ Those observables can be composed together using [RxSwift operators](https://git
 
 ```swift
 // Non-guaranteed data consistency
-let teams = Team.all().rx.fetchAll(in: dbQueue)
 let players = Player.all().rx.fetchAll(in: dbQueue)
-
-Observable.combineLatest(teams, players) { ($0, $1) }
-    .subscribe(onNext: { (teams: [Team], players: [Player]) in
-        // teams and players are not guaranteed to match
+let teams = Team.all().rx.fetchAll(in: dbQueue)
+Observable.combineLatest(players, teams) { ($0, $1) }
+    .subscribe(onNext: { (players: [Player], teams: [Team]) in
+        // players and teams are not guaranteed to match
     })
 ```
 
@@ -346,14 +351,14 @@ For example, the above code should be written as below:
 
 ```swift
 // Guaranteed data consistency
-let teams = Team.all()
-let players = Player.all()
+let playersRequest = Player.all()
+let teamsRequest = Team.all()
 dbQueue
-    .fetch(from: [teams, players]) { db in
-        try (teams.fetchAll(db), players.fetchAll(db))
+    .fetch(from: [playersRequest, teamsRequest]) { db in
+        try (playersRequest.fetchAll(db), teamsRequest.fetchAll(db))
     }
-    .subscribe(onNext: { (teams: [Team], players: [Player]) in
-        // teams and players are guaranteed to match
+    .subscribe(onNext: { (players: [Player], teams: [Team]) in
+        // players and teams are guaranteed to match
     })
 ```
 
@@ -369,22 +374,24 @@ dbQueue
 This [database changes observable](#changes-observables) emits a database connection after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
 
 ```swift
-let players = Player.all()
-let teams = Team.all()
-dbQueue.rx.changes(in: [players, teams]) // or dbPool
+let playersRequest = Player.all()
+let teamsRequest = Team.all()
+dbQueue.rx.changes(in: [playersRequest, teamsRequest]) // or dbPool
     .subscribe(onNext: { db: Database in
         print("Changes in players or teams table")
     })
 
 try dbQueue.write { db in
     try Player.deleteAll(db)
-} // Prints "Changes in players or teams table"
+}
+// Prints "Changes in players or teams table"
 
 try dbQueue.write { db in
-    let team = Team(name: "Blue")
+    var team = Team(name: "Blue")
     try team.insert(db)
     try Player(name: "Arthur", teamId: team.id).insert(db)
-} // Prints "Changes in players or teams table"
+}
+// Prints "Changes in players or teams table"
 ```
 
 All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted synchronously, right upon subscription. See [GRDB Concurrency Guide] for more information.
@@ -401,7 +408,8 @@ dbQueue.rx.changes(in: [players, teams])
 
 try dbQueue.write { db in
     try db.execute("DELETE FROM players")
-} // Prints "Changes in players or teams table"
+}
+// Prints "Changes in players or teams table"
 ```
 
 > :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
@@ -418,7 +426,10 @@ This [database values observable](#values-observables) emits fetched values afte
 // total number of players:
 dbQueue.rx
     .fetch(from: [Player.all()]) { db -> ([Player], Int) in
-        let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
+        let players = try Player
+            .order(scoreColumn.desc)
+            .limit(10)
+            .fetchAll(db)
         let count = try Player.fetchCount(db)
         return (players, count)
     }
@@ -432,14 +443,19 @@ dbQueue.rx
     .fetch(from: [Team.filter(key: teamId), Player.all()]) { db in
         let team = try Team.fetchOne(key: teamId)
         let players = team.players.fetchAll(db)
-        return (team, players)
+        return TeamInfo(team: team, players: players)
     }
-    .subscribe(onNext: { (team, players) in
-        print("Players in \(team.name): \(players.map { $0.name }.joined(separator: ", "))")
+    .subscribe(onNext: { teamInfo in
+        print("Players in team \(teamInfo.team.name):")
+        for player in teamInfo.players {
+            print("- \(player.name)")
+        }
     })
 ```
 
-The `fetch` method takes a closure parametrer that is called after each impactful transaction, and returns the values emitted by the observable. It runs in a protected database queue.
+The first argument of the `fetch` method is a list of tracked requests. Any transaction that affects one of them will trigger the observable.
+
+The last argument is a closure that is called after each impactful transaction, and returns the values emitted by the observable. It runs in a protected database queue. It is also guaranteed an immutable view of the last committed state of the database, which means that you can perform several fetches without fearing eventual concurrent writes to mess with your application logic.
 
 The elements returned by the closure are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
@@ -447,6 +463,39 @@ The elements returned by the closure are emitted on the main queue, unless you p
 
 
 # DatabaseRegionConvertible Protocol
+
+The `DatabaseRegionConvertible` protocol lets you better encapsulate your most complex requests, and streamline your application code.
+
+```swift
+protocol DatabaseRegionConvertible {
+    /// Returns a database region.
+    ///
+    /// - parameter db: A database connection.
+    func databaseRegion(_ db: Database) throws -> DatabaseRegion
+}
+```
+
+A **Database Region** is a GRDB type that defines a set of database tables, columns, and rows. They are the unit of database observation in RxGRDB
+
+For example, let's see how this sample code can be improved:
+
+```swift
+// Track a team and its players
+let teamId = 1
+dbQueue.rx
+    .fetch(from: [Team.filter(key: teamId), Player.all()]) { db in
+        let team = try Team.fetchOne(key: teamId)
+        let players = team.players.fetchAll(db)
+        return TeamInfo(team: team, players: players)
+    }
+    .subscribe(onNext: { teamInfo in
+        print("Players in team \(teamInfo.team.name):")
+        for player in teamInfo.players {
+            print("- \(player.name)")
+        }
+    })
+```
+
 
 # Diffs
 
@@ -573,49 +622,61 @@ SQLRequest<TeamInfo>("""
 
 When you use RxGRDB to observe values that come from several requests, data consistency needs your help.
 
-Here is a "wrong" way to do it:
+Here are two "wrong" ways to do it:
 
 ```swift
-// NON-GUARANTEED DATA CONSISTENCY
+// Non-guaranteed data consistency, example 1
 Player.all()
     .rx.fetchAll(in: dbQueue)
-    .map { players in
+    .map { players: [Player] in
         let teams = try dbQueue.inDatabase { try Team.fetchAll($0) }
         return (players, teams)
     }
-    .subscribe(onNext: { (players, teams) in
-        updateView(players: players, teams: teams)
+    .subscribe(onNext: { (players: [Player], teams: [Team]) in
+        // players and teams are not guaranteed to match
+    })
+
+// Non-guaranteed data consistency, example 2
+let players = Player.all().rx.fetchAll(in: dbQueue)
+let teams = Team.all().rx.fetchAll(in: dbQueue)
+Observable.combineLatest(players, teams) { ($0, $1) }
+    .subscribe(onNext: { (players: [Player], teams: [Team]) in
+        // players and teams are not guaranteed to match
     })
 ```
 
-The above observable doesn't fetch players and teams at the same time. It may output players without any team, or teams without any players, or teams with unreferenced players, etc., despite the constraints of your database schema.
+The above observables doesn't fetch players and teams from the same state of the database. They may output players without any team, or teams without any players, or teams with unreferenced players, etc., despite the constraints of your database schema.
 
 This may be acceptable. Or not.
 
-When this is not acceptable, make sure to read the [Observing Multiple Requests](#observing-multiple-requests) chapter. You are likely to use [fetch tokens](#fetch-tokens):
+When this is not acceptable, make sure to read the [Observing Multiple Requests](#observing-multiple-requests) chapter. You are likely to write instead:
 
 ```swift
-// GUARANTEED DATA CONSISTENCY
+// Guaranteed data consistency
 let playersRequest = Player.all()
-dbQueue.rx
-    .fetch(from: [playersRequest]) { db in
-        try (playersRequest.fetchAll(db), Team.fetchAll(db))
+let teamsRequest = Team.all()
+dbQueue
+    .fetch(from: [playersRequest, teamsRequest]) { db in
+        try (playersRequest.fetchAll(db), teamsRequest.fetchAll(db))
     }
-    .subscribe(onNext: { (players, teams) in
-        updateView(players: players, teams: teams)
+    .subscribe(onNext: { (players: [Player], teams: [Team]) in
+        // players and teams are guaranteed to match
     })
 ```
 
 When you use a [database pool](https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools), you may also find [snapshots](https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots) interesting:
 
 ```swift
-// GUARANTEED DATA CONSISTENCY
+// Guaranteed data consistency
 let playersRequest = Player.all()
+let teamsRequest = Team.all()
 dbPool.rx
-    .changes(in: [playersRequest])
+    .changes(in: [playersRequest, teamsRequest])
     .map { _ in try dbPool.makeSnapshot() }
     .subscribe(onNext: { snapshot in
-        updateView(from: snapshot)
+        // players and teams are guaranteed to match
+        let players = snapshot.read { players.fetchAll($0) }
+        let teams = snapshot.read { teams.fetchAll($0) }
     })
 ```
 
@@ -638,15 +699,14 @@ Player.all().rx
     .subscribe(onNext: { players: [Player] in
         print("Players have changed.")
     })
-```
 
-[Fetch tokens](#fetch-tokens) build values observables as well:
-
-```swift
 // A values observable:
 dbQueue
     .fetch(from: [Player.all()]) { (db: Database) -> ([Player], Int) in
-        let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
+        let players = try Player
+            .order(scoreColumn.desc)
+            .limit(10)
+            .fetchAll(db)
         let count = try Player.fetchCount(db)
         return (players, count)
     }
@@ -706,9 +766,10 @@ Player.all().rx
     })
 
 print(Date())
+// Trigger the observable, and waits 1 second
 try dbQueue.write { db in
     try Player(name: "Arthur").insert(db)
-} // Triggers the observable, and waits 1 second
+}
 print(Date()) // 1+ second later
 ```
 
@@ -761,7 +822,7 @@ Player.all().rx
 // <- Here "Players have changed" is guaranteed to be printed.
 ```
 
-This guarantee is lifted whenever you provide a specific scheduler, or when the observable is not subscribed from the main queue:
+This guarantee is lifted whenever you provide a specific scheduler (including `MainScheduler.instance`), or when the observable is not subscribed from the main queue:
 
 ```swift
 Player.all().rx
@@ -801,9 +862,10 @@ Player.all().rx
         print("Players have changed.")
     })
     
+// Insert, and wait until fresh players have been fetched
 try dbQueue.write { db in
     try Player(name: "Arthur").insert(db)
-} // waits until fresh players have been fetched
+}
 ```
 
 Fortunately, fetching values is usually [quite fast](https://github.com/groue/GRDB.swift/wiki/Performance).
@@ -824,10 +886,11 @@ Player.all().rx
         // On the main queue
         print("Players have changed.")
     })
-    
+
+// Insert, and wait for snapshot isolation establishment
 try dbPool.write { db in
     try Player(name: "Arthur").insert(db)
-} // waits for snapshot isolation establishment
+}
 ```
 
 Acquiring snapshot isolation is very fast. The only limiting resource is the maximum number of concurrent reads (see [database pool configuration]).
@@ -852,7 +915,10 @@ Player.all().rx
 dbQueue
     .fetch(from: [Player.all()]) { (db: Database) -> ([Player], Int) in
         // In a database protected dispatch queue
-        let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
+        let players = try Player
+            .order(scoreColumn.desc)
+            .limit(10)
+            .fetchAll(db)
         let count = try Player.fetchCount(db)
         return (players, count)
     }
@@ -890,7 +956,10 @@ Player.all().rx
 dbQueue
     .fetch(from: [Player.all()], scheduler: scheduler) { (db: Database) -> ([Player], Int) in
         // In a database protected dispatch queue
-        let players = try Player.order(scoreColumn.desc).limit(10).fetchAll(db)
+        let players = try Player
+            .order(scoreColumn.desc)
+            .limit(10)
+            .fetchAll(db)
         let count = try Player.fetchCount(db)
         return (players, count)
     }
