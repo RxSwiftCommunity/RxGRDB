@@ -534,7 +534,7 @@ struct TeamInfoRequest: DatabaseRegionConvertible {
     private var teamRequest: QueryInterfaceRequest<Team> {
         return Team.filter(key: teamId)
     }
-    private var playersRequest: QueryInterfaceRequest<Team> {
+    private var playersRequest: QueryInterfaceRequest<Player> {
         return Player.filter(teamId: teamId)
     }
     
