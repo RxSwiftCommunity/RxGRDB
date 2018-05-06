@@ -152,7 +152,7 @@ This [database changes observable](#changes-observables) emits a database connec
 
 ```swift
 let request = Player.all()
-request.rx.changes(in: dbQueue) // or dbPool
+request.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Players have changed.")
     })
@@ -197,7 +197,7 @@ This [database values observable](#values-observables) emits a count after each 
 
 ```swift
 let request = Player.all()
-request.rx.fetchCount(in: dbQueue) // or dbPool
+request.rx.fetchCount(in: dbQueue)
     .subscribe(onNext: { count: Int in
         print("Number of players: \(count)")
     })
@@ -227,7 +227,7 @@ This [database values observable](#values-observables) emits a value after each 
 ```swift
 let playerId = 42
 let request = Player.filter(key: playerId)
-request.rx.fetchOne(in: dbQueue) // or dbPool
+request.rx.fetchOne(in: dbQueue)
     .subscribe(onNext: { player: Player? in
         print("Player has changed")
     })
@@ -273,7 +273,7 @@ This [database values observable](#values-observables) emits an array of values 
 
 ```swift
 let request = Player.order(Column("name"))
-request.rx.fetchAll(in: dbQueue) // or dbPool
+request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { players: [Player] in
         print(players.map { $0.name })
     })
@@ -376,7 +376,7 @@ This [database changes observable](#changes-observables) emits a database connec
 ```swift
 let playersRequest = Player.all()
 let teamsRequest = Team.all()
-dbQueue.rx.changes(in: [playersRequest, teamsRequest]) // or dbPool
+dbQueue.rx.changes(in: [playersRequest, teamsRequest])
     .subscribe(onNext: { db: Database in
         print("Players or teams have changed.")
     })
