@@ -1,35 +1,54 @@
-//: Playground - noun: a place where people can play
-
+//: To run this playground:
+//:
+//: - Run `pod install` in the terminal
+//: - Open RxGRDB.xcworkspace
+//: - Select the RxGRDBmacOS scheme: menu Product > Scheme > RxGRDBmacOS
+//: - Build: menu Product > Build
+//: - Select the playground in the Playgrounds Group
+//: - Run the playground
 import GRDB
 import RxGRDB
+import PlaygroundSupport
+PlaygroundPage.current.needsIndefiniteExecution = true
 
+//: Create a database:
 let dbQueue = DatabaseQueue()
-try dbQueue.inDatabase { db in
-    try db.create(table: "persons") { t in
-        t.column("id", .integer).primaryKey()
-        t.column("name", .text)
+try dbQueue.write { db in
+    try db.create(table: "player") { t in
+        t.autoIncrementedPrimaryKey("id")
+        t.column("name", .text).notNull()
+        t.column("score", .integer).notNull()
     }
 }
 
-let request = SQLRequest<Void>("SELECT * FROM persons")
-request.rx
-    .changes(in: dbQueue)
-    .subscribe(onNext: { db in
-        let count = try! request.fetchCount(db)
-        print("Number of persons: \(count)")
+//: Define a Player record:
+struct Player: Codable, FetchableRecord, MutablePersistableRecord {
+    var id: Int64?
+    var name: String
+    var score: Int
+    
+    static let databaseTableName = "player"
+    mutating func didInsert(with rowID: Int64, for column: String?) {
+        id = rowID
+    }
+}
+
+//: Track the number of players:
+Player.all().rx
+    .fetchCount(in: dbQueue)
+    .subscribe(onNext: { count in
+        print("Number of players: \(count)")
     })
-// Prints "Number of persons: 0"
 
-try dbQueue.inDatabase { db in
-    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
-    // Prints "Number of persons: 1"
-    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
-    // Prints "Number of persons: 2"
+//: Modify the database:
+try dbQueue.write { db in
+    var player = Player(id: nil, name: "Arthur", score: 100)
+    try player.insert(db)
 }
 
-try dbQueue.inTransaction { db in
-    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
-    try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
-    return .commit
+try dbQueue.write { db in
+    var player = Player(id: nil, name: "Barbara", score: 250)
+    try player.insert(db)
+    player = Player(id: nil, name: "Craig", score: 150)
+    try player.insert(db)
 }
-// Prints "Number of persons: 4"
