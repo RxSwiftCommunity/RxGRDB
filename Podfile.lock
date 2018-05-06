@@ -11,7 +11,7 @@ PODS:
 
 DEPENDENCIES:
   - Differ (~> 1.0)
-  - GRDB.swift (from `https://github.com/groue/GRDB.swift.git`, branch `GRDB3-Associations`)
+  - GRDB.swift (from `https://github.com/groue/GRDB.swift.git`, branch `GRDB3`)
   - RxGRDB (from `.`)
   - RxSwift (~> 4.0)
 
@@ -22,14 +22,14 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   GRDB.swift:
-    :branch: GRDB3-Associations
+    :branch: GRDB3
     :git: https://github.com/groue/GRDB.swift.git
   RxGRDB:
     :path: "."
 
 CHECKOUT OPTIONS:
   GRDB.swift:
-    :commit: 83104769ef9d7e35db14d415dfb5b90a6617cf06
+    :commit: 0a6b34bb8525cf255ba3d668da2ea6d9da98ae30
     :git: https://github.com/groue/GRDB.swift.git
 
 SPEC CHECKSUMS:
@@ -38,6 +38,6 @@ SPEC CHECKSUMS:
   RxGRDB: c69107bb2efe89aaea39e60817fc4dcf12deb816
   RxSwift: e49536837d9901277638493ea537394d4b55f570
 
-PODFILE CHECKSUM: 347ff14fccf9b8dfd1c545204165b07c5a3de977
+PODFILE CHECKSUM: 3d782197abe7bbfd0452788f32003d41dfcb2f9f
 
 COCOAPODS: 1.5.0
