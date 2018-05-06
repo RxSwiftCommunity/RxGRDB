@@ -5,11 +5,11 @@ RxGRDB [![Swift](https://img.shields.io/badge/swift-4-orange.svg?style=flat)](ht
 
 **Latest release**: March 26, 2018 &bull; version 0.10.0 &bull; [Release Notes](CHANGELOG.md)
 
-**Requirements**: iOS 8.0+ / macOS 10.10+ / watchOS 2.0+ &bull; Swift 4.0 / Xcode 9+
+**Requirements**: iOS 8.0+ / macOS 10.10+ / watchOS 2.0+ &bull; Swift 4+ / Xcode 9+
 
 | Swift version | RxGRDB version                                                  |
 | ------------- | --------------------------------------------------------------- |
-| **Swift 4**   | **v0.10.0**                                                     |
+| **Swift 4+**  | **v0.10.0**                                                     |
 | Swift 3.2     | [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0) |
 | Swift 3.1     | [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0) |
 | Swift 3       | [v0.3.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.3.0) |
@@ -205,7 +205,7 @@ try dbQueue.write { db in
 } // Eventually prints "Number of players: 1"
 ```
 
-All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 **This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator in order to avoid duplicates:
 
@@ -235,7 +235,7 @@ try dbQueue.write { db in
 } // Eventually prints "Player has changed"
 ```
 
-All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
@@ -280,7 +280,7 @@ try dbQueue.write { db in
 } // Eventually prints "[Arthur, Barbara]"
 ```
 
-All elements are emitted on `scheduler`, which defaults to `MainScheduler.instance`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
@@ -441,15 +441,12 @@ dbQueue.rx
 
 The `fetch` method takes a closure parametrer that is called after each impactful transaction, and returns the values emitted by the observable. It runs in a protected database queue.
 
-The elements returned by the closure are emitted on the main queue, unless you provide a specific scheduler. If you set startImmediately to true (the default value), the first element is emitted right upon subscription.
+The elements returned by the closure are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 **This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes.
 
 
 # DatabaseRegionConvertible Protocol
-
-TODO
-
 
 # Diffs
 
