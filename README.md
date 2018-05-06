@@ -439,12 +439,14 @@ dbQueue.rx
 
 // Track a team and its players
 let teamId = 1
+let teamRequest = Team.filter(key: teamId)
+let playersRequest = Player.filter(teamId: teamId)
 dbQueue.rx
-    .fetch(from: [Team.filter(key: teamId), Player.all()]) { db -> TeamInfo? in
-        guard let team = try Team.fetchOne(db, key: teamId) else {
+    .fetch(from: [teamRequest, playersRequest]) { db -> TeamInfo? in
+        guard let team = try teamRequest.fetchOne(db) else {
             return nil
         }
-        let players = team.players.fetchAll(db)
+        let players = try playersRequest.fetchAll(db)
         return TeamInfo(team: team, players: players)
     }
     .subscribe(onNext: { teamInfo: TeamInfo? in
@@ -488,20 +490,22 @@ try dbQueue.read { db in
     
     // Region: "player(id,name,score), team(id,name,color)[1]"
     let region = playerRegion.union(teamRegion)
+}
 ```
 
-
-For example, let's see how this sample code can be improved:
+To understand how regions and DatabaseRegionConvertible can improve your application code, let's look at this sample code, which doesn't profit from their help:
 
 ```swift
 // Track a team and its players
 let teamId = 1
+let teamRequest = Team.filter(key: teamId)
+let playersRequest = Player.filter(teamId: teamId)
 dbQueue.rx
-    .fetch(from: [Team.filter(key: teamId), Player.all()]) { db -> TeamInfo? in
-        guard let team = try Team.fetchOne(db, key: teamId) else {
+    .fetch(from: [teamRequest, playersRequest]) { db -> TeamInfo? in
+        guard let team = try teamRequest.fetchOne(db) else {
             return nil
         }
-        let players = team.players.fetchAll(db)
+        let players = try playersRequest.fetchAll(db)
         return TeamInfo(team: team, players: players)
     }
     .subscribe(onNext: { teamInfo: TeamInfo? in
@@ -509,19 +513,19 @@ dbQueue.rx
     })
 ```
 
-The list of tracked requests and the fetching code are highly coupled. What if we could wrap them in a dedicated type, and simply write instead:
+Thanks to DatabaseRegionConvertible, we'll wrap the complex request in a single type, and write instead:
 
 ```swift
 // Track a team and its players
 let request = TeamInfoRequest(teamId: 1)
 dbQueue.rx
-    .fetch(from: [request]) { db in try request.fetchOne(db) }
+    .fetch(from: [request]) { try request.fetchOne($0) }
     .subscribe(onNext: { teamInfo: TeamInfo? in
         ...
     })
 ```
 
-Well, this is exactly the purpose of DatabaseRegionConvertible. In our case, TeamInfoRequest could be defined as below:
+TeamInfoRequest could be defined as below:
 
 ```swift
 struct TeamInfoRequest: DatabaseRegionConvertible {
@@ -531,17 +535,17 @@ struct TeamInfoRequest: DatabaseRegionConvertible {
         return Team.filter(key: teamId)
     }
     private var playersRequest: QueryInterfaceRequest<Team> {
-        return Player.filter(Column("teamId") == teamId)
+        return Player.filter(teamId: teamId)
     }
     
-    // DatabaseRegionConvertible adoption that allows change tracking
+    // The DatabaseRegion that lets RxGRDB track changes
     func databaseRegion(_ db: Database) throws -> DatabaseRegion {
         let teamRegion = try teamRequest.databaseRegion(db)
         let playersRegion = try playersRequest.databaseRegion(db)
         return teamRegion.union(playersRegion)
     }
     
-    // A fetching method that does the rest of the job
+    // The fetching method that does the rest of the job
     func fetchOne(_ db: Database) throws -> TeamInfo? {
         guard let team = try teamRequest.fetchOne(db) else {
             return nil
