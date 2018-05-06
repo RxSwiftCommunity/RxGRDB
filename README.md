@@ -656,28 +656,9 @@ SQLite itself guarantees consistency at the database level by the mean of the da
 
 At the application level, data consistency is guaranteed as long as the fetched values all come from the result of a single transaction.
 
-When you use RxGRDB to observe values that come from a [single request](#observing-individual-requests), data consistency is always guaranteed, even when the request uses several database tables:
+When you use RxGRDB to observe values that come from a [single request](#observing-individual-requests), data consistency is always guaranteed, even when the request uses several database tables.
 
-```swift
-Player.all()
-    .rx.fetchAll(in: dbQueue)
-    .subscribe(onNext: { players in
-        print("Consistent players: \(players)")
-    })
-
-SQLRequest<TeamInfo>("""
-    SELECT teams.*, COUNT(DISTINCT player.id) AS playerCount
-    FROM team
-    LEFT JOIN player ON player.teamId = team.id
-    GROUP BY team.id
-    """)
-    .rx.fetchAll(in: dbQueue)
-    .subscribe(onNext: { teamInfos in
-        print("Consistent team infos: \(teamInfos)")
-    })
-```
-
-When you use RxGRDB to observe values that come from several requests, data consistency needs your help.
+But when you use RxGRDB to observe values that come from several requests, data consistency needs your help.
 
 Here are two "wrong" ways to do it:
 
