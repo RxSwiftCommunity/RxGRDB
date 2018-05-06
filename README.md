@@ -550,7 +550,7 @@ struct TeamInfoRequest: DatabaseRegionConvertible {
         guard let team = try teamRequest.fetchOne(db) else {
             return nil
         }
-        let players = team.players.fetchAll(db)
+        let players = playersRequest.fetchAll(db)
         return TeamInfo(team: team, players: players)
     }
 }
