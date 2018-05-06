@@ -440,16 +440,15 @@ dbQueue.rx
 // Track a team and its players
 let teamId = 1
 dbQueue.rx
-    .fetch(from: [Team.filter(key: teamId), Player.all()]) { db in
-        let team = try Team.fetchOne(key: teamId)
+    .fetch(from: [Team.filter(key: teamId), Player.all()]) { db -> TeamInfo? in
+        guard let team = try Team.fetchOne(db, key: teamId) else {
+            return nil
+        }
         let players = team.players.fetchAll(db)
         return TeamInfo(team: team, players: players)
     }
-    .subscribe(onNext: { teamInfo in
-        print("Players in team \(teamInfo.team.name):")
-        for player in teamInfo.players {
-            print("- \(player.name)")
-        }
+    .subscribe(onNext: { teamInfo: TeamInfo? in
+        ...
     })
 ```
 
@@ -475,7 +474,22 @@ protocol DatabaseRegionConvertible {
 }
 ```
 
-A **Database Region** is a GRDB type that defines a set of database tables, columns, and rows. They are the unit of database observation in RxGRDB
+[DatabaseRegion] is a GRDB type that defines a set of database tables, columns, and rows. They are the unit of database observation in RxGRDB. And it is the type that fuels the most fundamentals RxGRDB observable: [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately) and [`DatabaseWriter.rx.fetch`](#databasewriterrxfetchfromstartimmediatelyschedulervalues). They don't really track "requests": they track regions.
+
+You can build regions from DatabaseRegionConvertible types such as GRDB requests, or by grouping several regions in a single one:
+
+```swift
+try dbQueue.read { db in
+    // Region: "player(id,name,score)"
+    let playerRegion = try SQLRequest<Player>("SELECT * FROM player").databaseRegion(db)
+    
+    // Region: "team(id,name,color)[1]"
+    let teamRegion = try Team.filter(key: 1).databaseRegion(db)
+    
+    // Region: "player(id,name,score), team(id,name,color)[1]"
+    let region = playerRegion.union(teamRegion)
+```
+
 
 For example, let's see how this sample code can be improved:
 
@@ -483,17 +497,59 @@ For example, let's see how this sample code can be improved:
 // Track a team and its players
 let teamId = 1
 dbQueue.rx
-    .fetch(from: [Team.filter(key: teamId), Player.all()]) { db in
-        let team = try Team.fetchOne(key: teamId)
+    .fetch(from: [Team.filter(key: teamId), Player.all()]) { db -> TeamInfo? in
+        guard let team = try Team.fetchOne(db, key: teamId) else {
+            return nil
+        }
         let players = team.players.fetchAll(db)
         return TeamInfo(team: team, players: players)
     }
-    .subscribe(onNext: { teamInfo in
-        print("Players in team \(teamInfo.team.name):")
-        for player in teamInfo.players {
-            print("- \(player.name)")
-        }
+    .subscribe(onNext: { teamInfo: TeamInfo? in
+        ...
     })
+```
+
+The list of tracked requests and the fetching code are highly coupled. What if we could wrap them in a dedicated type, and simply write instead:
+
+```swift
+// Track a team and its players
+let request = TeamInfoRequest(teamId: 1)
+dbQueue.rx
+    .fetch(from: [request]) { db in try request.fetchOne(db) }
+    .subscribe(onNext: { teamInfo: TeamInfo? in
+        ...
+    })
+```
+
+Well, this is exactly the purpose of DatabaseRegionConvertible. In our case, TeamInfoRequest could be defined as below:
+
+```swift
+struct TeamInfoRequest: DatabaseRegionConvertible {
+    var teamId: int64
+    
+    private var teamRequest: QueryInterfaceRequest<Team> {
+        return Team.filter(key: teamId)
+    }
+    private var playersRequest: QueryInterfaceRequest<Team> {
+        return Player.filter(Column("teamId") == teamId)
+    }
+    
+    // DatabaseRegionConvertible adoption that allows change tracking
+    func databaseRegion(_ db: Database) throws -> DatabaseRegion {
+        let teamRegion = try teamRequest.databaseRegion(db)
+        let playersRegion = try playersRequest.databaseRegion(db)
+        return teamRegion.union(playersRegion)
+    }
+    
+    // A fetching method that does the rest of the job
+    func fetchOne(_ db: Database) throws -> TeamInfo? {
+        guard let team = try teamRequest.fetchOne(db) else {
+            return nil
+        }
+        let players = team.players.fetchAll(db)
+        return TeamInfo(team: team, players: players)
+    }
+}
 ```
 
 
@@ -981,3 +1037,4 @@ dbQueue
 [GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [open an issue]: https://github.com/RxSwiftCommunity/RxGRDB/issues
 [TransactionObserver]: https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol
+[DatabaseRegion]: https://groue.github.io/GRDB.swift/docs/3.0/Structs/DatabaseRegion.html
