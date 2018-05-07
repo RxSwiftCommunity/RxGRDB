@@ -684,7 +684,7 @@ Here are two "wrong" ways to do it:
 Player.all()
     .rx.fetchAll(in: dbQueue)
     .map { players: [Player] in
-        let teams = try dbQueue.inDatabase { try Team.fetchAll($0) }
+        let teams = try dbQueue.read { try Team.fetchAll($0) }
         return (players, teams)
     }
     .subscribe(onNext: { (players: [Player], teams: [Team]) in
@@ -890,7 +890,7 @@ Player.all().rx
 Unlike initial values, all changes notifications are always emitted asynchronously:
 
 ```swift
-try dbQueue.inDatabase { db in
+try dbQueue.write { db in
     try Player(name: "Arthur").insert(db)
 }
 // <- Here "Players have changed" may not be printed yet.
