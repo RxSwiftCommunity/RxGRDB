@@ -843,7 +843,7 @@ Is it a problem if the app draws stale database content? RxGRDB's answer is *no*
 
 - On iOS, one needs to process a database transaction before the operating system had any opportunity to put the application in the suspended state.
 
-- One want to build a [database snapshots](https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots) with a guaranteed snapshot content.
+- One want to build a [database snapshot](https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots) with a guaranteed snapshot content.
 
 Outside of those use cases, it is much likely *wrong* to use a changes observables. Please [open an issue] and come discuss if you have any question.
 
