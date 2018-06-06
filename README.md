@@ -599,13 +599,23 @@ struct PrimaryKeyDiff<Record> {
 }
 ```
 
-Everything starts from a GRDB [record type](https://github.com/groue/GRDB.swift/blob/master/README.md#records), and a request, ordered by primary key, whose results are used to compute diffs after each [impactful](#what-is-database-observation) database transaction:
+Everything starts from a GRDB [record type](https://github.com/groue/GRDB.swift/blob/master/README.md#records), and a request ordered by primary key, whose results are used to compute diffs after each [impactful](#what-is-database-observation) database transaction:
 
 ```swift
-let request = Place.order(Column("id"))
+let request = Place.orderByPrimaryKey()
 ```
 
-> :point_up: **Note**: if the primary key contains string column(s), then they must be sorted according to the default [BINARY collation](https://www.sqlite.org/datatype3.html#collation) of SQLite (which lexicographically sorts the UTF8 representation of strings).
+> :point_up: **Note**: PrimaryKeyDiffScanner expects string columns of the primary key to be sorted according to the default [BINARY collation](https://www.sqlite.org/datatype3.html#collation) of SQLite. When this is not the case, restore the binary ordering in the request:
+>
+> ```swift
+> try db.create(table: "place") { t in
+>     t.column("uuid", .text).unique().collate(.nocase)
+>     ...
+> }
+>
+> // Restore binary ordering
+> let request = Place.order(Column("uuid").collating(.binary))
+> ```
 
 You then create the PrimaryKeyDiffScanner, with a database connection and an eventual initial array of records which is used to compute the first diff:
 
@@ -614,7 +624,7 @@ let scanner = try dbQueue.read { db in
     try PrimaryKeyDiffScanner(
         database: db,       // extracts primary key information
         request: request,   // the diffed request
-        initialRecords: []) // initial records must be sorted by primary key
+        initialRecords: []) // initial records, if any, must be sorted by primary key
 }
 ```
 

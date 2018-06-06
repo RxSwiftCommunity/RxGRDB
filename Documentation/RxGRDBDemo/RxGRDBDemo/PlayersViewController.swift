@@ -120,8 +120,10 @@ extension PlayersViewController {
     }
     
     @IBAction func stressTest() {
-        DispatchQueue.concurrentPerform(iterations: 50) { _ in
-            self.refresh()
+        for _ in 0..<50 {
+            DispatchQueue.global().async {
+                self.refresh()
+            }
         }
     }
 }

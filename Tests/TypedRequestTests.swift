@@ -677,7 +677,7 @@ extension TypedRequestTests {
     }
     
     func testPrimaryKeyDiffScanner(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Player.order(Column("id"))
+        let request = Player.orderByPrimaryKey()
         let expectedDiffs = [
             PrimaryKeyDiff(
                 inserted: [

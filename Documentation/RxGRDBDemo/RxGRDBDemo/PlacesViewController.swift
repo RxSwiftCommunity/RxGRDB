@@ -73,8 +73,10 @@ extension PlacesViewController {
     }
     
     @IBAction func stressTest() {
-        DispatchQueue.concurrentPerform(iterations: 50) { _ in
-            self.refresh()
+        for _ in 0..<50 {
+            DispatchQueue.global().async {
+                self.refresh()
+            }
         }
     }
 }
@@ -89,7 +91,7 @@ extension PlacesViewController: MKMapViewDelegate {
         // To efficiently update the map view as database content changes, we
         // use PrimaryKeyDiffScanner. It requires the tracked database request
         // to be sorted by primary key:
-        let placeAnnotations = PlaceAnnotation.order(Place.Columns.id)
+        let placeAnnotations = PlaceAnnotation.orderByPrimaryKey()
         
         let diffScanner = try! dbPool.read { db in
             try PrimaryKeyDiffScanner(
