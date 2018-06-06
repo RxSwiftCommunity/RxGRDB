@@ -609,7 +609,7 @@ let request = Place.orderByPrimaryKey()
 >
 > ```swift
 > try db.create(table: "place") { t in
->     t.column("uuid", .text).unique().collate(.nocase)
+>     t.column("uuid", .text).primaryKey().collate(.nocase)
 >     ...
 > }
 >
