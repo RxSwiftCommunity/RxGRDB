@@ -605,7 +605,7 @@ Everything starts from a GRDB [record type](https://github.com/groue/GRDB.swift/
 let request = Place.orderByPrimaryKey()
 ```
 
-> :point_up: **Note**: PrimaryKeyDiffScanner expects string columns of the primary key to be sorted according to the default [BINARY collation](https://www.sqlite.org/datatype3.html#collation) of SQLite. When this is not the case, restore the binary ordering in the request:
+> :point_up: **Note**: PrimaryKeyDiffScanner expects string columns of the primary key to be sorted according to the default [BINARY collation](https://www.sqlite.org/datatype3.html#collation) of SQLite. When this is not the case, restore the binary ordering in the diffed request:
 >
 > ```swift
 > try db.create(table: "place") { t in
