@@ -19,6 +19,7 @@ XCODEBUILD := set -o pipefail && $(shell command -v xcodebuild)
 XCODEVERSION_FULL := $(word 2, $(shell xcodebuild -version))
 XCODEVERSION_MAJOR := $(shell xcodebuild -version 2>&1 | grep Xcode | cut -d' ' -f2 | cut -d'.' -f1)
 XCODEVERSION_MINOR := $(shell xcodebuild -version 2>&1 | grep Xcode | cut -d' ' -f2 | cut -d'.' -f2)
+XCODEVERSION_PATCH := $(shell xcodebuild -version 2>&1 | grep Xcode | cut -d' ' -f2 | cut -d'.' -f3)
 
 # The Xcode Version, containing only the "MAJOR.MINOR" (ex. "8.3" for Xcode 8.3, 8.3.1, etc.)
 XCODEVERSION := $(XCODEVERSION_MAJOR).$(XCODEVERSION_MINOR)
@@ -34,7 +35,10 @@ XCPRETTY_PATH := $(shell command -v xcpretty 2> /dev/null)
 TEST_ACTIONS = clean build build-for-testing test-without-building
 
 # When adding support for an Xcode version, look for available devices with `instruments -s devices`
-ifeq ($(XCODEVERSION),9.3)
+ifeq ($(XCODEVERSION),9.4)
+  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.4"
+  MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
+else ifeq ($(XCODEVERSION),9.3)
   MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.3"
   MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
 else
