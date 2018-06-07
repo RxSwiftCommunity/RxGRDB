@@ -27,27 +27,25 @@ struct Place: Codable {
     }
 }
 
-// Define colums so that we can build GRDB requests
-extension Place {
-    enum Columns {
-        static let id = Column("id")
-    }
-}
-
 // Adopt RowConvertible so that we can fetch places from the database.
 // Implementation is automatically derived from Codable.
-extension Place: RowConvertible { }
+extension Place: FetchableRecord { }
 
 // Adopt MutablePersistable so that we can create/update/delete places in the database.
 // Implementation is partially derived from Codable.
-extension Place: MutablePersistable {
-    static let databaseTableName = "places"
+extension Place: MutablePersistableRecord {
+    static let databaseTableName = "place"
+    
+    enum Columns: String, ColumnExpression {
+        case id, latitude, longitude
+    }
+    
     mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
     }
 }
 
-// Support for place randomization
+// Place randomization
 extension Place {
     static func randomCoordinate() -> CLLocationCoordinate2D {
         let paris = CLLocationCoordinate2D(latitude: 48.8534100, longitude: 2.3488000)

@@ -29,7 +29,7 @@ extension DatabaseWriterTests {
             }
         }
         
-        let requests = [
+        let requests: [SQLRequest<Row>] = [
             SQLRequest("SELECT a FROM table1"),
             SQLRequest("SELECT table1.a, table2.b FROM table1, table2")]
         
@@ -42,7 +42,7 @@ extension DatabaseWriterTests {
             .subscribe(recorder)
             .disposed(by: disposeBag)
         
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             // 2 (modify both requests)
             try db.inTransaction {
                 try db.execute("INSERT INTO table1 (id, a, b) VALUES (NULL, 0, 0)")
@@ -68,6 +68,53 @@ extension DatabaseWriterTests {
             try db.execute("INSERT INTO table2 (id, a, b) VALUES (NULL, 0, 0)")
         }
 
+        wait(for: recorder, timeout: 1)
+    }
+}
+
+extension DatabaseWriterTests {
+    
+    func testChangesInFullDatabase() throws {
+        try Test(testChangesInFullDatabase)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testChangesInFullDatabase(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        try writer.write { db in
+            try db.create(table: "table1") { t in
+                t.column("id", .integer).primaryKey()
+                t.column("a", .text).notNull()
+            }
+            try db.create(table: "table2") { t in
+                t.column("id", .integer).primaryKey()
+            }
+        }
+        
+        let recorder = EventRecorder<Void>(expectedEventCount: 4)
+        
+        // 1
+        AnyDatabaseWriter(writer).rx // ReactiveCompatible is unavailable: use AnyDatabaseWriter to get .rx
+            .changes(in: [DatabaseRegion.fullDatabase])
+            .map { _ in }
+            .subscribe(recorder)
+            .disposed(by: disposeBag)
+        
+        try writer.writeWithoutTransaction { db in
+            // 2
+            try db.inTransaction {
+                try db.execute("INSERT INTO table1 (a) VALUES ('foo')")
+                try db.execute("INSERT INTO table1 (a) VALUES ('bar')")
+                try db.execute("INSERT INTO table2 DEFAULT VALUES")
+                return .commit
+            }
+            
+            // 3
+            try db.execute("INSERT INTO table2 DEFAULT VALUES")
+            
+            // 4
+            try db.execute("DELETE FROM table1")
+        }
         wait(for: recorder, timeout: 1)
     }
 }

@@ -30,12 +30,11 @@ extension FetchTokenTests {
             ([], 2)
         ]
         let recorder = EventRecorder<([String], Int)>(expectedEventCount: expectedValues.count)
-        let request = SQLRequest("SELECT * FROM table1")
+        let request = SQLRequest<Row>("SELECT * FROM table1")
         
         // 1 (startImmediately parameter is true by default)
         AnyDatabaseWriter(writer).rx
-            .fetchTokens(in: [request])
-            .mapFetch() { db -> ([String], Int) in
+            .fetch(from: [request]) { db -> ([String], Int) in
                 let strings = try String.fetchAll(db, "SELECT a FROM table1")
                 let int = try Int.fetchOne(db, "SELECT COUNT(*) FROM table2")!
                 return (strings, int)
@@ -47,7 +46,7 @@ extension FetchTokenTests {
             }
             .disposed(by: disposeBag)
         
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             // 2: modify observed requests
             try db.inTransaction {
                 try db.execute("INSERT INTO table1 (a) VALUES ('foo')")
@@ -89,15 +88,14 @@ extension FetchTokenTests {
         
         let expectedValues: [Int] = [0, 1, 2]
         let recorder = EventRecorder<Int>(expectedEventCount: expectedValues.count)
-        let request = SQLRequest("SELECT COUNT(*) FROM t").asRequest(of: Int.self)
+        let request = SQLRequest<Int>("SELECT COUNT(*) FROM t")
         
         let initialFetchExpectation = expectation(description: "initial fetch")
         initialFetchExpectation.assertForOverFulfill = false
 
         DispatchQueue.global().async {
             AnyDatabaseWriter(writer).rx
-                .fetchTokens(in: [request])
-                .mapFetch() { db -> Int in
+                .fetch(from: [request]) { db -> Int in
                     initialFetchExpectation.fulfill()
                     return try request.fetchOne(db)!
                 }
@@ -111,7 +109,7 @@ extension FetchTokenTests {
         
         // wait until we have fetched initial value before we perform database changes
         wait(for: [initialFetchExpectation], timeout: 1)
-        try writer.write { db in
+        try writer.writeWithoutTransaction { db in
             try db.execute("INSERT INTO t DEFAULT VALUES")
             try db.execute("INSERT INTO t DEFAULT VALUES")
         }
@@ -144,7 +142,7 @@ extension FetchTokenTests {
             didSet { disposable?.disposed(by: disposeBag) }
         }
         
-        let request = SQLRequest("SELECT COUNT(*) FROM t").asRequest(of: Int.self)
+        let request = SQLRequest<Int>("SELECT COUNT(*) FROM t")
         
         let expectation1 = expectation(description: "1st subscription")
         expectation1.expectedFulfillmentCount = 2

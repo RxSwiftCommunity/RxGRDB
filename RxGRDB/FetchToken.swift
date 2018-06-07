@@ -20,8 +20,8 @@ import RxSwift
 ///         .subscribe(onNext: { values in
 ///             ...                 // use fetched values
 ///         }
-public struct FetchToken {
-    /// Not public: the kind of token
+struct FetchToken {
+    /// The kind of token
     enum Kind {
         /// Emitted upon subscription, from the database writer dispatch queue.
         case databaseSubscription(Database)
@@ -36,7 +36,7 @@ public struct FetchToken {
     var kind: Kind
 }
 
-/// Not public: how fetched values should be scheduled
+/// How fetched values should be scheduled
 enum FetchTokenScheduler {
     /// Schedules with an RxSwift scheduler
     case scheduler(ImmediateSchedulerType)
@@ -82,14 +82,10 @@ extension ObservableType where E == FetchToken {
     /// - parameter fetch: A function that accepts a database connection and
     ///   returns fetched value.
     /// - returns: An observable sequence whose elements are the fetched values.
-    public func mapFetch<R>(_ fetch: @escaping (Database) throws -> R) -> Observable<R> {
+    func mapFetch<R>(_ fetch: @escaping (Database) throws -> R) -> Observable<R> {
         return MapFetch(
             source: asObservable(),
             fetch: fetch)
             .asObservable()
     }
 }
-
-/// Fixit for legacy API
-@available(*, unavailable, renamed:"FetchToken")
-public typealias ChangeToken = FetchToken

@@ -8,8 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		560F92CB1E94DF7E0077EADF /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
-		560F92CF1E94DF830077EADF /* TypedRequest+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */; };
+		560F92CF1E94DF830077EADF /* FetchRequest+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */; };
 		561782571F655DAC00CEAA55 /* DiffSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782561F655DAC00CEAA55 /* DiffSupport.swift */; };
 		561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561782561F655DAC00CEAA55 /* DiffSupport.swift */; };
 		5617825D1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */; };
@@ -26,10 +25,11 @@
 		5650291F1E8FDF5600615A2C /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565029151E8FDF5600615A2C /* RxGRDB.framework */; };
 		565029241E8FDF5600615A2C /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
 		565029261E8FDF5600615A2C /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		565029B31E8FE12C00615A2C /* TypedRequest+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */; };
-		565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B91E91265A00615A2C /* Request+Rx.swift */; };
+		565029B31E8FE12C00615A2C /* FetchRequest+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */; };
 		565029C41E9130F600615A2C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
 		565029C61E91318F00615A2C /* TypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* TypedRequestTests.swift */; };
+		5653EC23209C36FD00F46237 /* DatabaseRegionConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5653EC22209C36FD00F46237 /* DatabaseRegionConvertible.swift */; };
+		5653EC24209C36FD00F46237 /* DatabaseRegionConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5653EC22209C36FD00F46237 /* DatabaseRegionConvertible.swift */; };
 		565933EE1F0D72A400707571 /* FetchToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565933ED1F0D72A400707571 /* FetchToken.swift */; };
 		565934181F0E157800707571 /* FetchTokensObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934171F0E157800707571 /* FetchTokensObservable.swift */; };
 		565934191F0E157800707571 /* FetchTokensObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934171F0E157800707571 /* FetchTokensObservable.swift */; };
@@ -47,8 +47,6 @@
 		56DBA5301F0BB02200C90A18 /* MapFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA52E1F0BB02200C90A18 /* MapFetch.swift */; };
 		56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */; };
 		56DBA5431F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */; };
-		56DBA5671F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */; };
-		56DBA5681F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */; };
 		A362BD5B2DEFD11686782D1A /* Pods_RxGRDBmacOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA8B516D1A1DA52925A30C9 /* Pods_RxGRDBmacOS.framework */; };
 		A4B026157539E608ECC97D62 /* Pods_RxGRDBiOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02EC464A1CA3B744FF371822 /* Pods_RxGRDBiOSTests.framework */; };
 		BCEC800F7000170F0EE210B3 /* Pods_RxGRDBiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6949C145CE7FB5807620153C /* Pods_RxGRDBiOS.framework */; };
@@ -90,10 +88,10 @@
 		5650291E1E8FDF5600615A2C /* RxGRDBiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		565029231E8FDF5600615A2C /* RequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestTests.swift; sourceTree = "<group>"; };
 		565029251E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TypedRequest+Rx.swift"; sourceTree = "<group>"; };
-		565029B91E91265A00615A2C /* Request+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Request+Rx.swift"; sourceTree = "<group>"; };
+		565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FetchRequest+Rx.swift"; sourceTree = "<group>"; };
 		565029C31E9130F600615A2C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
 		565029C51E91318F00615A2C /* TypedRequestTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypedRequestTests.swift; sourceTree = "<group>"; };
+		5653EC22209C36FD00F46237 /* DatabaseRegionConvertible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseRegionConvertible.swift; sourceTree = "<group>"; };
 		565933ED1F0D72A400707571 /* FetchToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchToken.swift; sourceTree = "<group>"; };
 		565934171F0E157800707571 /* FetchTokensObservable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchTokensObservable.swift; sourceTree = "<group>"; };
 		565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseWriterTests.swift; sourceTree = "<group>"; };
@@ -106,7 +104,6 @@
 		56DBA52E1F0BB02200C90A18 /* MapFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapFetch.swift; sourceTree = "<group>"; };
 		56DBA5311F0BC0C000C90A18 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GRDB+Rx.swift"; sourceTree = "<group>"; };
-		56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseWriter+Rx.swift"; sourceTree = "<group>"; };
 		5A188A66CB167C18650FBE5B /* Pods-RxGRDBiOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBiOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RxGRDBiOSTests/Pods-RxGRDBiOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6949C145CE7FB5807620153C /* Pods_RxGRDBiOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxGRDBiOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BF0D0B1F6507696ECEC3D45 /* Pods-RxGRDBmacOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBmacOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RxGRDBmacOSTests/Pods-RxGRDBmacOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -191,12 +188,10 @@
 		565029171E8FDF5600615A2C /* RxGRDB */ = {
 			isa = PBXGroup;
 			children = (
-				565933ED1F0D72A400707571 /* FetchToken.swift */,
-				56DBA5661F0BF1A500C90A18 /* DatabaseWriter+Rx.swift */,
+				5653EC22209C36FD00F46237 /* DatabaseRegionConvertible.swift */,
 				56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */,
 				5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */,
-				565029B91E91265A00615A2C /* Request+Rx.swift */,
-				565029B21E8FE12C00615A2C /* TypedRequest+Rx.swift */,
+				565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */,
 				56DBA5691F0BF1EF00C90A18 /* Implementations */,
 				56DBA56A1F0BF20500C90A18 /* Lib */,
 				560F92D91E9509990077EADF /* Support */,
@@ -229,6 +224,7 @@
 		56DBA5691F0BF1EF00C90A18 /* Implementations */ = {
 			isa = PBXGroup;
 			children = (
+				565933ED1F0D72A400707571 /* FetchToken.swift */,
 				569E8510200A695A0028D1EC /* ChangesObservable.swift */,
 				569E8513200A69D20028D1EC /* DatabaseRegionObserver.swift */,
 				561782561F655DAC00CEAA55 /* DiffSupport.swift */,
@@ -304,7 +300,6 @@
 				560F92BF1E94DF280077EADF /* Frameworks */,
 				560F92C01E94DF280077EADF /* Headers */,
 				560F92C11E94DF280077EADF /* Resources */,
-				D92C0D30D0E7FE617C6103EC /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -324,7 +319,6 @@
 				562755D41E962BFD0035B653 /* Frameworks */,
 				562755D51E962BFD0035B653 /* Resources */,
 				9324F24F42A42F903085A163 /* [CP] Embed Pods Frameworks */,
-				D0A8F3116F60649A900BA622 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -345,7 +339,6 @@
 				565029111E8FDF5600615A2C /* Frameworks */,
 				565029121E8FDF5600615A2C /* Headers */,
 				565029131E8FDF5600615A2C /* Resources */,
-				2992BF668ACC54FBCA10B7E0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -365,7 +358,6 @@
 				5650291B1E8FDF5600615A2C /* Frameworks */,
 				5650291C1E8FDF5600615A2C /* Resources */,
 				2DC3B64874F5936E61D2E6AE /* [CP] Embed Pods Frameworks */,
-				556660BF4928A22DC6C1F1FF /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -478,21 +470,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2992BF668ACC54FBCA10B7E0 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RxGRDBiOS/Pods-RxGRDBiOS-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		2DC3B64874F5936E61D2E6AE /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -529,21 +506,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		556660BF4928A22DC6C1F1FF /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RxGRDBiOSTests/Pods-RxGRDBiOSTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		5E591F0B5385CFB07E43F16C /* [CP] Check Pods Manifest.lock */ = {
@@ -602,36 +564,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D0A8F3116F60649A900BA622 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RxGRDBmacOSTests/Pods-RxGRDBmacOSTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D92C0D30D0E7FE617C6103EC /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RxGRDBmacOS/Pods-RxGRDBmacOS-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -643,15 +575,14 @@
 				562EA7F51F17A2A600FA528C /* FetchToken.swift in Sources */,
 				5617825E1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */,
 				561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
-				560F92CC1E94DF830077EADF /* Request+Rx.swift in Sources */,
+				5653EC24209C36FD00F46237 /* DatabaseRegionConvertible.swift in Sources */,
 				569E8512200A695A0028D1EC /* ChangesObservable.swift in Sources */,
 				565934191F0E157800707571 /* FetchTokensObservable.swift in Sources */,
 				562756591E963C1B0035B653 /* Result.swift in Sources */,
 				564E73AF203C99A7000C443C /* PThreadMutex.swift in Sources */,
-				56DBA5681F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */,
 				56DBA5431F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
+				560F92CF1E94DF830077EADF /* FetchRequest+Rx.swift in Sources */,
 				569E8515200A69D20028D1EC /* DatabaseRegionObserver.swift in Sources */,
-				560F92CF1E94DF830077EADF /* TypedRequest+Rx.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -676,13 +607,12 @@
 				562756581E963C1B0035B653 /* Result.swift in Sources */,
 				5617825D1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */,
 				561782571F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
-				565029BA1E91265A00615A2C /* Request+Rx.swift in Sources */,
+				5653EC23209C36FD00F46237 /* DatabaseRegionConvertible.swift in Sources */,
 				569E8511200A695A0028D1EC /* ChangesObservable.swift in Sources */,
-				56DBA5671F0BF1A500C90A18 /* DatabaseWriter+Rx.swift in Sources */,
 				56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
 				564E73AE203C99A7000C443C /* PThreadMutex.swift in Sources */,
 				565933EE1F0D72A400707571 /* FetchToken.swift in Sources */,
-				565029B31E8FE12C00615A2C /* TypedRequest+Rx.swift in Sources */,
+				565029B31E8FE12C00615A2C /* FetchRequest+Rx.swift in Sources */,
 				569E8514200A69D20028D1EC /* DatabaseRegionObserver.swift in Sources */,
 				565934181F0E157800707571 /* FetchTokensObservable.swift in Sources */,
 			);

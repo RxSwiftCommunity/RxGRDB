@@ -129,7 +129,6 @@
 				56E1F9771F8101EE00793BFA /* Resources */,
 				569E8501200A5C720028D1EC /* Embed Frameworks */,
 				B0756943CADD6226BB774BD5 /* [CP] Embed Pods Frameworks */,
-				141918CC9EFD532C181264F0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -188,21 +187,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		141918CC9EFD532C181264F0 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/../../Pods/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		95963AD3C11B669F6A76FFF0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

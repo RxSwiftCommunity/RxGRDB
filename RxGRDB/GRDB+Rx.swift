@@ -5,15 +5,11 @@
 #endif
 import RxSwift
 
-// Request
-extension AdaptedRequest : ReactiveCompatible { }
-extension AnyRequest : ReactiveCompatible { }
-extension SQLRequest : ReactiveCompatible { }
-
 // TypedRequest
-extension AdaptedTypedRequest : ReactiveCompatible { }
-extension AnyTypedRequest : ReactiveCompatible { }
-extension QueryInterfaceRequest : ReactiveCompatible { }
+extension AdaptedFetchRequest : ReactiveCompatible, DatabaseRegionConvertible { }
+extension AnyFetchRequest : ReactiveCompatible, DatabaseRegionConvertible { }
+extension QueryInterfaceRequest : ReactiveCompatible, DatabaseRegionConvertible { }
+extension SQLRequest : ReactiveCompatible, DatabaseRegionConvertible { }
 
 // DatabaseWriter
 extension DatabasePool : ReactiveCompatible { }

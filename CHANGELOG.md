@@ -1,6 +1,34 @@
 Release Notes
 =============
 
+## 0.11.0
+
+Released June 7, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.10.0...v0.11.0)
+
+### New
+
+- Support for GRDB 3.0
+- The new DatabaseRegionConvertible protocol allows better request encapsulation ([documentation](README.md#databaseregionconvertible-protocol))
+
+### Breaking Changes
+
+- "Fetch tokens" and the `mapFetch` operator were ill-advised, and have been removed. Now please use the new `DatabaseWriter.fetch(from:startImmediately:scheduler:values:)` method instead, which produces exactly the same observable:
+    
+    ```diff
+     // Old way
+    -let values = dbQueue.rx
+    -    .fetchTokens(in: [request, ...])
+    -    .mapFetch { db in
+    -        try fetchResults(db)
+    -    }
+     
+     // New way
+    +let values = dbQueue.rx.fetch(from: [request, ...]) { db in
+    +    try fetchResults(db)
+    +}
+    ```
+
+
 ## 0.10.0
 
 Released March 26, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.9.0...v0.10.0)

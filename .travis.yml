@@ -26,28 +26,28 @@ jobs:
     ###########################################
     ## Test RxGRDB
 
-    # Test RxGRDBmacOS (Xcode 9.1)
+    # Test RxGRDBmacOS (Xcode 9.3)
     - stage: Test RxGRDB
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode9.1
+      osx_image: xcode9.3
       env:
-        - TID=RxGRDBOSX (Xcode 9.1, macOS)
+        - TID=RxGRDBOSX (Xcode 9.3, macOS)
       script: make test_framework_RxGRDBmacOS
 
-    # Test RxGRDBiOS (Xcode 9.1, iOS <MAXIMUM VERSION>)
+    # Test RxGRDBiOS (Xcode 9.3, iOS <MAXIMUM VERSION>)
     - stage: Test RxGRDB
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode9.1
+      osx_image: xcode9.3
       env:
-        - TID=RxGRDBiOS (Xcode 9.1, iOS <MAX>)
+        - TID=RxGRDBiOS (Xcode 9.3, iOS <MAX>)
       script: make test_framework_RxGRDBiOS_maxTarget
 
-    # Test RxGRDBiOS (Xcode 9.1, iOS <MINIMUM VERSION>))
+    # Test RxGRDBiOS (Xcode 9.3, iOS <MINIMUM VERSION>))
     - stage: Test RxGRDB
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode9.1
+      osx_image: xcode9.3
       env:
-        - TID=RxGRDBiOS (Xcode 9.1, iOS <MIN>)
+        - TID=RxGRDBiOS (Xcode 9.3, iOS <MIN>)
       script: make test_framework_RxGRDBiOS_minTarget
 
     ###########################################
@@ -55,7 +55,7 @@ jobs:
 
     # Cocoapods Lint
     - stage: Test Installation
-      osx_image: xcode9.1
+      osx_image: xcode9.3
       install:
         - gem install cocoapods # Since Travis is not always on latest version
       env:
