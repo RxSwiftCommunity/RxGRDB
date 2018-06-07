@@ -1,7 +1,9 @@
 Release Notes
 =============
 
-## Next Version
+## 0.11.0
+
+Released June 7, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.10.0...v0.11.0)
 
 ### New
 
