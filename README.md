@@ -1045,4 +1045,4 @@ dbQueue
 [GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [open an issue]: https://github.com/RxSwiftCommunity/RxGRDB/issues
 [TransactionObserver]: https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol
-[DatabaseRegion]: https://groue.github.io/GRDB.swift/docs/2.10/Structs/DatabaseRegion.html
+[DatabaseRegion]: https://groue.github.io/GRDB.swift/docs/3.0/Structs/DatabaseRegion.html
