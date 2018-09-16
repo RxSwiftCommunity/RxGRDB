@@ -476,7 +476,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-RxGRDBiOSTests/Pods-RxGRDBiOSTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-RxGRDBiOSTests/Pods-RxGRDBiOSTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/GRDB.swift-iOS/GRDB.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift-iOS/RxSwift.framework",
 			);
@@ -487,7 +487,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RxGRDBiOSTests/Pods-RxGRDBiOSTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RxGRDBiOSTests/Pods-RxGRDBiOSTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		35D4423601C315F8BDDE2301 /* [CP] Check Pods Manifest.lock */ = {
@@ -532,7 +532,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-RxGRDBmacOSTests/Pods-RxGRDBmacOSTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-RxGRDBmacOSTests/Pods-RxGRDBmacOSTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/GRDB.swift-macOS/GRDB.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift-macOS/RxSwift.framework",
 			);
@@ -543,7 +543,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RxGRDBmacOSTests/Pods-RxGRDBmacOSTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RxGRDBmacOSTests/Pods-RxGRDBmacOSTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		BF9D8B4ADD1115DABDFCE9F0 /* [CP] Check Pods Manifest.lock */ = {
