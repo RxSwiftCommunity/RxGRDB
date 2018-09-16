@@ -63,7 +63,7 @@ jobs:
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10
       env:
-        - TID=RxGRDBiOS (Xcode 10, Swift 4.2, iOS <MIN>)
+        - TID=RxGRDBiOS (Xcode 10, Swift 4.2, iOS <MAX>)
       script: make test_framework_RxGRDBiOS_maxTarget_maxSwift
 
     # Test RxGRDBiOS (Xcode 10, iOS <MAXIMUM VERSION>))
@@ -71,7 +71,7 @@ jobs:
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10
       env:
-        - TID=RxGRDBiOS (Xcode 10, Swift 4.0, iOS <MIN>)
+        - TID=RxGRDBiOS (Xcode 10, Swift 4.0, iOS <MAX>)
       script: make test_framework_RxGRDBiOS_maxTarget_minSwift
 
     # Test RxGRDBiOS (Xcode 10, iOS <MINIMUM VERSION>))
