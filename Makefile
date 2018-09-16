@@ -35,10 +35,19 @@ XCPRETTY_PATH := $(shell command -v xcpretty 2> /dev/null)
 TEST_ACTIONS = clean build build-for-testing test-without-building
 
 # When adding support for an Xcode version, look for available devices with `instruments -s devices`
-ifeq ($(XCODEVERSION),9.4)
+ifeq ($(XCODEVERSION),10.0)
+  MIN_SWIFT_VERSION = 4.0
+  MAX_SWIFT_VERSION = 4.2
+  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=12.0"
+  MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
+else ifeq ($(XCODEVERSION),9.4)
+  # MIN_SWIFT_VERSION undefined: only check MAX_SWIFT_VERSION
+  MAX_SWIFT_VERSION = 4.0
   MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.4"
   MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
 else ifeq ($(XCODEVERSION),9.3)
+  # MIN_SWIFT_VERSION undefined: only check MAX_SWIFT_VERSION
+  MAX_SWIFT_VERSION = 4.0
   MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.3"
   MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
 else
@@ -70,28 +79,56 @@ test_framework_RxGRDB: test_framework_RxGRDBmacOS test_framework_RxGRDBiOS
 test_framework_RxGRDBiOS: test_framework_RxGRDBiOS_minTarget test_framework_RxGRDBiOS_maxTarget
 test_install: test_CocoaPodsLint
 
-test_framework_RxGRDBmacOS: Pods
+test_framework_RxGRDBmacOS: test_framework_RxGRDBmacOS_maxSwift test_framework_RxGRDBmacOS_minSwift
+
+test_framework_RxGRDBmacOS_maxSwift: Pods
 	$(XCODEBUILD) \
 	  -workspace RxGRDB.xcworkspace \
 	  -scheme RxGRDBmacOS \
+	  SWIFT_VERSION=$(MAX_SWIFT_VERSION) \
 	  $(TEST_ACTIONS) \
 	  $(XCPRETTY)
+
+test_framework_RxGRDBmacOS_minSwift: Pods
+ifdef MIN_SWIFT_VERSION
+	$(XCODEBUILD) \
+	  -workspace RxGRDB.xcworkspace \
+	  -scheme RxGRDBmacOS \
+	  SWIFT_VERSION=$(MIN_SWIFT_VERSION) \
+	  $(TEST_ACTIONS) \
+	  $(XCPRETTY)
+endif
 
 test_framework_RxGRDBiOS_minTarget: Pods
 	$(XCODEBUILD) \
 	  -workspace RxGRDB.xcworkspace \
 	  -scheme RxGRDBiOS \
 	  -destination $(MIN_IOS_DESTINATION) \
+	  SWIFT_VERSION=$(MAX_SWIFT_VERSION) \
 	  $(TEST_ACTIONS) \
 	  $(XCPRETTY)
 
-test_framework_RxGRDBiOS_maxTarget: Pods
+test_framework_RxGRDBiOS_maxTarget: test_framework_RxGRDBiOS_maxTarget_maxSwift test_framework_RxGRDBiOS_maxTarget_minSwift
+
+test_framework_RxGRDBiOS_maxTarget_maxSwift: Pods
 	$(XCODEBUILD) \
 	  -workspace RxGRDB.xcworkspace \
 	  -scheme RxGRDBiOS \
 	  -destination $(MAX_IOS_DESTINATION) \
+	  SWIFT_VERSION=$(MAX_SWIFT_VERSION) \
 	  $(TEST_ACTIONS) \
 	  $(XCPRETTY)
+
+test_framework_RxGRDBiOS_maxTarget_minSwift: Pods
+ifdef MIN_SWIFT_VERSION
+	$(XCODEBUILD) \
+	  -workspace RxGRDB.xcworkspace \
+	  -scheme RxGRDBiOS \
+	  -destination $(MAX_IOS_DESTINATION) \
+	  SWIFT_VERSION=$(MIN_SWIFT_VERSION) \
+	  $(TEST_ACTIONS) \
+	  $(XCPRETTY)
+endif
 
 test_CocoaPodsLint:
 ifdef POD
