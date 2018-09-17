@@ -5,9 +5,9 @@ PODS:
     - RxGRDB/default (= 0.11.0)
     - RxSwift (~> 4.0)
   - RxGRDB/default (0.11.0):
-    - GRDB.swift (~> 3.0)
+    - GRDB.swift (~> 3.3.0)
     - RxSwift (~> 4.0)
-  - RxSwift (4.2.0)
+  - RxSwift (4.3.0)
 
 DEPENDENCIES:
   - Differ (~> 1.0)
@@ -28,8 +28,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Differ: 061f3298ea9408494c43b530c44583e555884daf
   GRDB.swift: 38e06d01606220169a91713c0e5a5046fab70bce
-  RxGRDB: 83f4ae962b65d6ae9642a2265ede4fcdc261a617
-  RxSwift: 99e10317ddfcc7fbe01356aafd118fde4a0be104
+  RxGRDB: 3446ed63a36378753963b94322a874fc7dd2d9ac
+  RxSwift: a9717a34df3179fe63563f76e046ad345078dd3a
 
 PODFILE CHECKSUM: 9de9eb2e2229995097879fd73226d9d7ed54014c
 
