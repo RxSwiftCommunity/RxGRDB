@@ -105,7 +105,7 @@ jobs:
     - stage: Test Installation
       osx_image: xcode10
       install:
-        - gem install cocoapods # Since Travis is not always on latest version
+        - gem install cocoapods --pre # >= 1.6.0.beta.1 for cocoapods lint
       env:
         - TID=Cocoapods
       script: make test_CocoaPodsLint
@@ -114,7 +114,7 @@ jobs:
     - stage: Test Installation
       osx_image: xcode9.3
       install:
-        - gem install cocoapods # Since Travis is not always on latest version
+        - gem install cocoapods --pre # >= 1.6.0.beta.1 for cocoapods lint
       env:
         - TID=Cocoapods
       script: make test_CocoaPodsLint
