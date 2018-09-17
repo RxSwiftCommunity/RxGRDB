@@ -1,7 +1,9 @@
 Release Notes
 =============
 
-## Next Version
+## 0.12.0
+
+Released Septembre 17, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.11.0...v0.12.0)
 
 - [#39](https://github.com/RxSwiftCommunity/RxGRDB/pull/39): Xcode 10 & GRDB 3.3.0
 
