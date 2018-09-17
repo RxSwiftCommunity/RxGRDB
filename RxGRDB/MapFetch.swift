@@ -45,7 +45,9 @@ class MapFetch<ResultType> : ObservableType {
                 switch fetchToken.kind {
                     
                 case .databaseSubscription(let db):
-                    // Current dispatch queue: the database writer dispatch queue
+                    // Current dispatch queue: the database writer
+                    // dispatch queue.
+                    //
                     // This token is emitted upon subscription.
                     initialResult = Result { try self.fetch(db) }
                     
@@ -62,41 +64,24 @@ class MapFetch<ResultType> : ObservableType {
                     observer.onResult(initialResult!)
                     
                 case .change(let writer, let scheduler):
-                    // Current dispatch queue: the database writer dispatch queue
-                    // This token is emitted after a transaction has been committed.
+                    // Current dispatch queue: the database writer
+                    // dispatch queue.
+                    //
+                    // This token is emitted after a transaction has
+                    // been committed.
                     //
                     // We need a read access to fetch values, and we should
                     // release the writer queue as soon as possible.
                     //
-                    // This is the exact job of the writer.readFromCurrentState
-                    // method. This method can be synchronous, or
-                    // asynchrounous, depending on the actual type of
-                    // database writer (DatabaseQueue or DatabasePool).
+                    // This is the exact job of the writer.concurrentRead
+                    // method.
                     //
-                    // Elements must be emitted in the same order as the
-                    // fetch tokens: the serial orderingQueue takes care of
-                    // FIFO ordering, and a semaphore notifies when the
-                    // fetch is done.
-                    
-                    let semaphore = DispatchSemaphore(value: 0)
-                    var result: Result<E>? = nil
-                    do {
-                        try writer.readFromCurrentState { db in
-                            if !subscription.isDisposed {
-                                result = Result { try self.fetch(db) }
-                            }
-                            semaphore.signal()
-                        }
-                    } catch {
-                        result = .failure(error)
-                        semaphore.signal()
-                    }
-                    
+                    // Fetched elements must be emitted in the same order as the
+                    // tokens: the serial orderingQueue takes care of
+                    // FIFO ordering.
+                    let future = writer.concurrentRead { try self.fetch($0) }
                     orderingQueue.async {
-                        _ = semaphore.wait(timeout: .distantFuture)
-                        
-                        guard let result = result else { return }
-                        
+                        let result = Result { try future.wait() }
                         scheduler.schedule {
                             if !subscription.isDisposed {
                                 observer.onResult(result)
