@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+## 0.12.1
+
+Released October 25, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.12.0...v0.12.1)
+
+- Fixed GRDB Cocoapods dependency.
+
+
 ## 0.12.0
 
 Released Septembre 17, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.11.0...v0.12.0)
