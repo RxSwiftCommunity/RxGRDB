@@ -3,7 +3,7 @@ workspace 'RxGRDB.xcworkspace'
 
 def common
     pod 'RxSwift', '~> 4.0'
-    pod 'GRDB.swift', '~> 3.3.0'
+    pod 'GRDB.swift', '~> 3.3'
 end
 
 target 'RxGRDBiOS' do
