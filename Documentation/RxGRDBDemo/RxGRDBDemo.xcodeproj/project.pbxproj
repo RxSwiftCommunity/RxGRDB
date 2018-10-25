@@ -211,7 +211,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo-frameworks.sh",
+				"${SRCROOT}/../../Pods/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/GRDB.swift-iOS/GRDB.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift-iOS/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/Differ/Differ.framework",
@@ -226,7 +226,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/../../Pods/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
