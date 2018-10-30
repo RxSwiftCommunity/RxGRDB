@@ -5,20 +5,6 @@
 #endif
 import RxSwift
 
-public protocol DatabaseRegionConvertible {
-    /// Returns a database region.
-    ///
-    /// - parameter db: A database connection.
-    func databaseRegion(_ db: Database) throws -> DatabaseRegion
-}
-
-extension DatabaseRegion: DatabaseRegionConvertible {
-    /// :nodoc:
-    public func databaseRegion(_ db: Database) throws -> DatabaseRegion {
-        return self
-    }
-}
-
 extension Reactive where Base: DatabaseRegionConvertible {
     /// Returns an Observable that emits a database connection after each
     /// committed database transaction that has modified the tables and columns
@@ -130,7 +116,9 @@ extension Reactive where Base: DatabaseWriter {
             observedRegion: { db in try regions.map { try $0.databaseRegion(db) }.union() })
             .asObservable()
     }
-    
+}
+
+extension Reactive where Base: DatabaseReader {
     /// Returns an Observable that emits values after each committed
     /// database transaction that has modified the tables, columns,
     /// and rows defined by some *regions*.
@@ -191,22 +179,21 @@ extension Reactive where Base: DatabaseWriter {
         values: @escaping (Database) throws -> T)
         -> Observable<T>
     {
-        let fetchTokenScheduler: FetchTokenScheduler
-        if let scheduler = scheduler {
-            fetchTokenScheduler = .scheduler(scheduler)
-        } else {
-            fetchTokenScheduler = .mainQueue
+        let region = AnyDatabaseRegionConvertible { db in
+            try regions.reduce(into: DatabaseRegion()) {
+                try $0.formUnion($1.databaseRegion(db))
+            }
         }
-        return FetchTokensObservable(
-            writer: base,
-            startImmediately: startImmediately,
-            scheduler: fetchTokenScheduler,
-            observedRegion: { db in try regions.map { try $0.databaseRegion(db) }.union() })
-            .asObservable()
-            .mapFetch(values)
+        return ValueObservation
+            .tracking(region, fetch: values)
+            .rx.start(
+                in: base,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
     }
 }
 
+/// TODO: remove
 extension Array where Element == DatabaseRegion {
     func union() -> DatabaseRegion {
         if let initial = first {

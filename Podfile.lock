@@ -11,26 +11,27 @@ PODS:
 
 DEPENDENCIES:
   - Differ (~> 1.0)
-  - GRDB.swift (~> 3.3)
+  - GRDB.swift (from `../GRDB.swift`)
   - RxGRDB (from `.`)
   - RxSwift (~> 4.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Differ
-    - GRDB.swift
     - RxSwift
 
 EXTERNAL SOURCES:
+  GRDB.swift:
+    :path: "../GRDB.swift"
   RxGRDB:
     :path: "."
 
 SPEC CHECKSUMS:
   Differ: 9fcee7602542d7c6484ce05a0faec1c11258ed63
-  GRDB.swift: 0100cdc153f3a42348652e33e0b5697c53eee792
+  GRDB.swift: 47f23dd94d4c40e32f7d70465c296951e6dc4820
   RxGRDB: 2c0e8e9f1e052bb225712c90c1a599fbdbcd7239
   RxSwift: fe0fd770a43acdb7d0a53da411c9b892e69bb6e4
 
-PODFILE CHECKSUM: 819b3e856a17f10d96b77a1f7e02caa41d582160
+PODFILE CHECKSUM: f639668003ab1d7ccf2cab6ede992cf296ccb120
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0.beta.1
