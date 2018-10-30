@@ -19,10 +19,6 @@
 		562756041E962C5B0035B653 /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
 		562756061E962C5B0035B653 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
 		562756081E962C5B0035B653 /* TypedRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* TypedRequestTests.swift */; };
-		562756581E963C1B0035B653 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* Result.swift */; };
-		562756591E963C1B0035B653 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562756571E963C1B0035B653 /* Result.swift */; };
-		564E73AE203C99A7000C443C /* PThreadMutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564E73AD203C99A7000C443C /* PThreadMutex.swift */; };
-		564E73AF203C99A7000C443C /* PThreadMutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564E73AD203C99A7000C443C /* PThreadMutex.swift */; };
 		5650291F1E8FDF5600615A2C /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565029151E8FDF5600615A2C /* RxGRDB.framework */; };
 		565029241E8FDF5600615A2C /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
 		565029261E8FDF5600615A2C /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -37,10 +33,6 @@
 		565934491F0F419600707571 /* FetchTokenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934471F0F419600707571 /* FetchTokenTests.swift */; };
 		567043E21F66A7B9000A44BA /* RowValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567043E11F66A7B9000A44BA /* RowValueTests.swift */; };
 		567043E31F66A7B9000A44BA /* RowValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567043E11F66A7B9000A44BA /* RowValueTests.swift */; };
-		569E8511200A695A0028D1EC /* ChangesObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E8510200A695A0028D1EC /* ChangesObservable.swift */; };
-		569E8512200A695A0028D1EC /* ChangesObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E8510200A695A0028D1EC /* ChangesObservable.swift */; };
-		569E8514200A69D20028D1EC /* DatabaseRegionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E8513200A69D20028D1EC /* DatabaseRegionObserver.swift */; };
-		569E8515200A69D20028D1EC /* DatabaseRegionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E8513200A69D20028D1EC /* DatabaseRegionObserver.swift */; };
 		56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */; };
 		56DBA5431F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */; };
 		A362BD5B2DEFD11686782D1A /* Pods_RxGRDBmacOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA8B516D1A1DA52925A30C9 /* Pods_RxGRDBmacOS.framework */; };
@@ -77,8 +69,6 @@
 		5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryKeyDiffScanner.swift; sourceTree = "<group>"; };
 		561E25E62188398E0019F3F0 /* ValueObservation+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ValueObservation+Rx.swift"; sourceTree = "<group>"; };
 		562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBmacOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		562756571E963C1B0035B653 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
-		564E73AD203C99A7000C443C /* PThreadMutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PThreadMutex.swift; sourceTree = "<group>"; };
 		565029151E8FDF5600615A2C /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		565029181E8FDF5600615A2C /* RxGRDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RxGRDB.h; sourceTree = "<group>"; };
 		565029191E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -92,8 +82,6 @@
 		565934441F0EB6BC00707571 /* DatabaseWriterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseWriterTests.swift; sourceTree = "<group>"; };
 		565934471F0F419600707571 /* FetchTokenTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchTokenTests.swift; sourceTree = "<group>"; };
 		567043E11F66A7B9000A44BA /* RowValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowValueTests.swift; sourceTree = "<group>"; };
-		569E8510200A695A0028D1EC /* ChangesObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangesObservable.swift; sourceTree = "<group>"; };
-		569E8513200A69D20028D1EC /* DatabaseRegionObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseRegionObserver.swift; sourceTree = "<group>"; };
 		56D65F031EF8F5740098466C /* RxGRDB.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = RxGRDB.podspec; sourceTree = "<group>"; };
 		56D65F261EF8F5C60098466C /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		56DBA5311F0BC0C000C90A18 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
@@ -183,12 +171,11 @@
 			isa = PBXGroup;
 			children = (
 				5653EC22209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift */,
+				561782561F655DAC00CEAA55 /* DiffSupport.swift */,
 				565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */,
 				56DBA5411F0BF12B00C90A18 /* GRDB+Rx.swift */,
 				5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */,
 				561E25E62188398E0019F3F0 /* ValueObservation+Rx.swift */,
-				56DBA5691F0BF1EF00C90A18 /* Implementations */,
-				56DBA56A1F0BF20500C90A18 /* Lib */,
 				560F92D91E9509990077EADF /* Support */,
 			);
 			path = RxGRDB;
@@ -214,25 +201,6 @@
 				565029251E8FDF5600615A2C /* Info.plist */,
 			);
 			name = Support;
-			sourceTree = "<group>";
-		};
-		56DBA5691F0BF1EF00C90A18 /* Implementations */ = {
-			isa = PBXGroup;
-			children = (
-				569E8510200A695A0028D1EC /* ChangesObservable.swift */,
-				569E8513200A69D20028D1EC /* DatabaseRegionObserver.swift */,
-				561782561F655DAC00CEAA55 /* DiffSupport.swift */,
-			);
-			name = Implementations;
-			sourceTree = "<group>";
-		};
-		56DBA56A1F0BF20500C90A18 /* Lib */ = {
-			isa = PBXGroup;
-			children = (
-				564E73AD203C99A7000C443C /* PThreadMutex.swift */,
-				562756571E963C1B0035B653 /* Result.swift */,
-			);
-			name = Lib;
 			sourceTree = "<group>";
 		};
 		99591BC2758D6AF8761725F3 /* Pods */ = {
@@ -567,12 +535,8 @@
 				5617825E1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */,
 				561782581F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
 				5653EC24209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift in Sources */,
-				569E8512200A695A0028D1EC /* ChangesObservable.swift in Sources */,
-				562756591E963C1B0035B653 /* Result.swift in Sources */,
-				564E73AF203C99A7000C443C /* PThreadMutex.swift in Sources */,
 				56DBA5431F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
 				560F92CF1E94DF830077EADF /* FetchRequest+Rx.swift in Sources */,
-				569E8515200A69D20028D1EC /* DatabaseRegionObserver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -594,15 +558,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				561E25E72188398E0019F3F0 /* ValueObservation+Rx.swift in Sources */,
-				562756581E963C1B0035B653 /* Result.swift in Sources */,
 				5617825D1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift in Sources */,
 				561782571F655DAC00CEAA55 /* DiffSupport.swift in Sources */,
 				5653EC23209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift in Sources */,
-				569E8511200A695A0028D1EC /* ChangesObservable.swift in Sources */,
 				56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
-				564E73AE203C99A7000C443C /* PThreadMutex.swift in Sources */,
 				565029B31E8FE12C00615A2C /* FetchRequest+Rx.swift in Sources */,
-				569E8514200A69D20028D1EC /* DatabaseRegionObserver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

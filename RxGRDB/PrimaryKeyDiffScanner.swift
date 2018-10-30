@@ -3,7 +3,6 @@
 #else
     import GRDB
 #endif
-import RxSwift
 
 /// TODO
 public struct PrimaryKeyDiffScanner<Record: FetchableRecord & MutablePersistableRecord> {
