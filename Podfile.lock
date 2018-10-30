@@ -11,7 +11,7 @@ PODS:
 
 DEPENDENCIES:
   - Differ (~> 1.0)
-  - GRDB.swift (from `../GRDB.swift`)
+  - GRDB.swift (from `https://github.com/groue/GRDB.swift.git`, branch `feature/ValueObservation`)
   - RxGRDB (from `.`)
   - RxSwift (~> 4.0)
 
@@ -22,16 +22,22 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   GRDB.swift:
-    :path: "../GRDB.swift"
+    :branch: feature/ValueObservation
+    :git: https://github.com/groue/GRDB.swift.git
   RxGRDB:
     :path: "."
 
+CHECKOUT OPTIONS:
+  GRDB.swift:
+    :commit: 6fa72ebea1697ef7a7cba2829f9e5db9b880b7b7
+    :git: https://github.com/groue/GRDB.swift.git
+
 SPEC CHECKSUMS:
   Differ: 9fcee7602542d7c6484ce05a0faec1c11258ed63
-  GRDB.swift: 47f23dd94d4c40e32f7d70465c296951e6dc4820
+  GRDB.swift: 0100cdc153f3a42348652e33e0b5697c53eee792
   RxGRDB: 2c0e8e9f1e052bb225712c90c1a599fbdbcd7239
   RxSwift: fe0fd770a43acdb7d0a53da411c9b892e69bb6e4
 
-PODFILE CHECKSUM: f639668003ab1d7ccf2cab6ede992cf296ccb120
+PODFILE CHECKSUM: 4179637f483c7207349d5c45b71ab5cbbfe20eb6
 
 COCOAPODS: 1.6.0.beta.1

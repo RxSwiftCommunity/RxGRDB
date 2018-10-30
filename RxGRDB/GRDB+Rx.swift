@@ -11,7 +11,7 @@ extension DatabaseQueue : ReactiveCompatible { }
 extension AnyDatabaseReader : ReactiveCompatible { }
 extension AnyDatabaseWriter : ReactiveCompatible { }
 
-// TypedRequest
+// FetchRequest
 extension AdaptedFetchRequest : ReactiveCompatible { }
 extension AnyFetchRequest : ReactiveCompatible { }
 extension QueryInterfaceRequest : ReactiveCompatible { }
