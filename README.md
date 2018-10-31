@@ -731,7 +731,7 @@ try dbPool.write { db in
 
 Acquiring snapshot isolation is very fast. The only limiting resource is the maximum number of concurrent reads (see [database pool configuration]).
 
-After snapshot isolation has been established, the values observable fetches fresh values. Meanwhile, other threads can freely read and write in the database :tada:!
+After snapshot isolation has been established, the values observable fetches fresh values. Meanwhile, other threads can freely read and write in the database.
 
 
 ## Common Use Cases of Values Observables
