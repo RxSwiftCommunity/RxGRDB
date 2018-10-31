@@ -545,17 +545,17 @@ RxGRDB inherits from [GRDB guarantees](https://github.com/groue/GRDB.swift/blob/
 
 ```swift
 // A changes observable:
-Player.filter(key: 1).rx
+Player.all().rx
     .changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
-        print("Player 1 has changed.")
+        print("Players have changed.")
     })
 
 // A values observable:
 Player.all().rx
     .fetchAll(in: dbQueue)
     .subscribe(onNext: { players: [Player] in
-        print("Players have changed.")
+        print("Players have changed: \(players)")
     })
 ```
 
@@ -573,14 +573,6 @@ Player.all().rx
     .subscribe(onNext: { db: Database in
         // On the database protected dispatch queue
         print("Players have changed.")
-    })
-
-// On any thread
-dbQueue.rx
-    .changes(in: [Player.all(), Team.all()])
-    .subscribe(onNext: { db: Database in
-        // On the database protected dispatch queue
-        print("Players or teams have changed.")
     })
 ```
 
@@ -626,6 +618,8 @@ This application needs to update its UI, on the main thread, from the freshest d
 Is it a problem if the app draws stale database content? RxGRDB's answer is *no*, as long as the application is eventually notified with refreshed values. And this is the job of [values observables](#values-observables).
 
 **There are very few use cases for changes observables.** For example:
+
+- One needs to write in the database after an impactful transaction.
 
 - One needs to synchronize the content of the database file with some external resources, like other files, or system sensors like CLRegion monitoring.
 
