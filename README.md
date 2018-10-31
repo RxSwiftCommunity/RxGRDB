@@ -52,7 +52,6 @@ Documentation
 - [Diffs](#diffs)
 - [Scheduling](#scheduling)
     - [Scheduling Guarantees](#scheduling-guarantees)
-    - [Data Consistency](#data-consistency)
     - [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
     - [Changes Observables](#changes-observables)
     - [Values Observables](#values-observables)
@@ -332,7 +331,7 @@ request.rx.fetchOne(in: dbQueue)   // Observable<Player?>
 request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 ```
 
-:warning: **DO NOT compose those observables with [RxSwift operators](https://github.com/ReactiveX/RxSwift)**: they can not fulfill [data consistency](#data-consistency).
+:warning: **DO NOT compose those observables with [RxSwift operators](https://github.com/ReactiveX/RxSwift)**: they can not fulfill [data consistency](https://en.wikipedia.org/wiki/Consistency_(database_systems)).
 
 Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
 
@@ -523,7 +522,6 @@ GRDB and RxGRDB go a long way in order to smooth out subtleties of multi-threade
 Some applications are demanding: this chapter attempts at making RxGRDB scheduling as clear as possible. Please have a look at [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency) first.
 
 - [Scheduling Guarantees](#scheduling-guarantees)
-- [Data Consistency](#data-consistency)
 - [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
 - [Changes Observables](#changes-observables)
 - [Values Observables](#values-observables)
@@ -539,78 +537,6 @@ RxGRDB inherits from [GRDB guarantees](https://github.com/groue/GRDB.swift/blob/
     Not all can be observed on any thread, though: see [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
 
 - :bowtie: **RxGRDB Guarantee 2: all observables emit their values in the same chronological order as transactions.**
-
-
-## Data Consistency
-
-[Data Consistency](https://en.wikipedia.org/wiki/Consistency_(database_systems)) is the highly desirable quality that prevents your app from displaying funny values on screen, or worse.
-
-SQLite itself guarantees consistency at the database level by the mean of the database schema, relational constraints, integrity checks, foreign key actions, triggers, and transactions.
-
-At the application level, data consistency is guaranteed as long as the fetched values all come from the result of a single transaction.
-
-When you use RxGRDB to observe values that come from a [single request](#observing-individual-requests), data consistency is always guaranteed, even when the request uses several database tables.
-
-But when you use RxGRDB to observe values that come from several requests, data consistency needs your help.
-
-Here are two "wrong" ways to do it:
-
-```swift
-// Non-guaranteed data consistency, example 1
-Player.all()
-    .rx.fetchAll(in: dbQueue)
-    .map { players: [Player] in
-        let teams = try dbQueue.read { try Team.fetchAll($0) }
-        return (players, teams)
-    }
-    .subscribe(onNext: { (players: [Player], teams: [Team]) in
-        // Players and teams are not guaranteed to match
-    })
-
-// Non-guaranteed data consistency, example 2
-let players = Player.all().rx.fetchAll(in: dbQueue)
-let teams = Team.all().rx.fetchAll(in: dbQueue)
-Observable.combineLatest(players, teams) { ($0, $1) }
-    .subscribe(onNext: { (players: [Player], teams: [Team]) in
-        // Players and teams are not guaranteed to match
-    })
-```
-
-The above observables doesn't fetch players and teams from the same state of the database. They may output players without any team, or teams without any players, or teams with unreferenced players, etc., despite the constraints of your database schema.
-
-This may be acceptable. Or not.
-
-When this is not acceptable, make sure to read the [Observing Multiple Requests](#observing-multiple-requests) chapter. You are likely to write instead:
-
-```swift
-// Guaranteed data consistency
-let playersRequest = Player.all()
-let teamsRequest = Team.all()
-dbQueue
-    .fetch(from: [playersRequest, teamsRequest]) { db in
-        try (playersRequest.fetchAll(db), teamsRequest.fetchAll(db))
-    }
-    .subscribe(onNext: { (players: [Player], teams: [Team]) in
-        // Players and teams are guaranteed to match
-    })
-```
-
-When you use a [database pool](https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools), you may also find [snapshots](https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots) interesting:
-
-```swift
-// Guaranteed data consistency
-let playersRequest = Player.all()
-let teamsRequest = Team.all()
-dbPool.rx
-    .changes(in: [playersRequest, teamsRequest])
-    .map { _ in try dbPool.makeSnapshot() }
-    .subscribe(onNext: { snapshot in
-        // Each snapshot has an immutable content: players and teams are
-        // guaranteed to match, regardless of concurrent writes.
-        let players = snapshot.read { playersRequest.fetchAll($0) }
-        let teams = snapshot.read { teamsRequest.fetchAll($0) }
-    })
-```
 
 
 ## Changes Observables vs. Values Observables
