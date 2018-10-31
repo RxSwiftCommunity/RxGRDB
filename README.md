@@ -49,7 +49,6 @@ Documentation
 - [What is Database Observation?](#what-is-database-observation)
 - [Observing Individual Requests](#observing-individual-requests)
 - [Observing Multiple Requests](#observing-multiple-requests)
-- [DatabaseRegionConvertible Protocol](#databaseregionconvertible-protocol)
 - [Diffs](#diffs)
 - [Scheduling](#scheduling)
     - [Scheduling Guarantees](#scheduling-guarantees)
@@ -117,7 +116,7 @@ For example, if you track `Player.select(max(scoreColumn))`, then you'll get a n
 
 It is possible to avoid notifications of identical consecutive values. For example you can use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator of RxSwift. You can also let RxGRDB perform efficient deduplication at the database level: see the documentation of each reactive method for more information.
 
-**RxGRDB observables are based on GRDB's [TransactionObserver] protocol.** If your application needs change notifications that are not built in RxGRDB, this versatile protocol will probably provide a solution.
+**RxGRDB observables are based on GRDB's [ValueObservation] and [TransactionObserver].** If your application needs change notifications that are not built in RxGRDB, those versatile tools will probably provide a solution.
 
 
 # Observing Individual Requests
@@ -333,40 +332,11 @@ request.rx.fetchOne(in: dbQueue)   // Observable<Player?>
 request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 ```
 
-Those observables can be composed together using [RxSwift operators](https://github.com/ReactiveX/RxSwift). However, be careful: those operators are unable to fulfill [data consistency](#data-consistency):
-
-```swift
-// Non-guaranteed data consistency
-let players = Player.all().rx.fetchAll(in: dbQueue)
-let teams = Team.all().rx.fetchAll(in: dbQueue)
-Observable.combineLatest(players, teams) { ($0, $1) }
-    .subscribe(onNext: { (players: [Player], teams: [Team]) in
-        // Players and teams are not guaranteed to match
-    })
-```
+:warning: **DO NOT compose those observables with [RxSwift operators](https://github.com/ReactiveX/RxSwift)**: they can not fulfill [data consistency](#data-consistency).
 
 Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
 
-And when you need to fetch database values, with the guarantee of consistent results, use [DatabaseWriter.rx.fetch](#databasewriterrxfetchfromstartimmediatelyschedulervalues).
-
-For example, the above code should be written as below:
-
-```swift
-// Guaranteed data consistency
-let playersRequest = Player.all()
-let teamsRequest = Team.all()
-dbQueue
-    .fetch(from: [playersRequest, teamsRequest]) { db in
-        try (playersRequest.fetchAll(db), teamsRequest.fetchAll(db))
-    }
-    .subscribe(onNext: { (players: [Player], teams: [Team]) in
-        // Players and teams are guaranteed to match
-    })
-```
-
-- [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately)
-- [`DatabaseWriter.rx.fetch`](#databasewriterrxfetchfromstartimmediatelyschedulervalues)
-- [Data Consistency](#data-consistency)
+And when you need to fetch database values, with the guarantee of consistent results, use [ValueObservation.rx.fetch](#valueobservationrxfetchinstartimmediatelyscheduler).
 
 
 ---
@@ -419,22 +389,23 @@ try dbQueue.write { db in
 
 ---
 
-#### `DatabaseWriter.rx.fetch(from:startImmediately:scheduler:values:)`
+#### `ValueObservation.rx.fetch(in:startImmediately:scheduler:)`
 
-This [database values observable](#values-observables) emits fetched values after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
+This [database values observable](#values-observables) emits the same values as a [ValueObservation]:
 
 ```swift
 // When the players' table is changed, fetch the ten best ones,
 // and the total number of players:
-dbQueue.rx
-    .fetch(from: [Player.all()]) { db -> ([Player], Int) in
-        let players = try Player
-            .order(scoreColumn.desc)
-            .limit(10)
-            .fetchAll(db)
-        let count = try Player.fetchCount(db)
-        return (players, count)
-    }
+let observation = ValueObservation.tracking(Player.all(), fetch: { db -> ([Player], Int) in
+    let players = try Player
+        .order(scoreColumn.desc)
+        .limit(10)
+        .fetchAll(db)
+    let count = try Player.fetchCount(db)
+    return (players, count)
+})
+observation.rx
+    .fetch(in: dbQueue)
     .subscribe(onNext: { (players, count) in
         print("Best ten players out of \(count): \(players)")
     })
@@ -443,127 +414,21 @@ dbQueue.rx
 let teamId = 1
 let teamRequest = Team.filter(key: teamId)
 let playersRequest = Player.filter(teamId: teamId)
-dbQueue.rx
-    .fetch(from: [teamRequest, playersRequest]) { db -> TeamInfo? in
-        guard let team = try teamRequest.fetchOne(db) else {
-            return nil
-        }
-        let players = try playersRequest.fetchAll(db)
-        return TeamInfo(team: team, players: players)
+let observation = ValueObservation.tracking(teamRequest, playersRequest, fetch: { db -> TeamInfo? in
+    guard let team = try teamRequest.fetchOne(db) else {
+        return nil
     }
+    let players = try playersRequest.fetchAll(db)
+    return TeamInfo(team: team, players: players)
+})
+observation.rx
+    .fetch(in: dbQueue)
     .subscribe(onNext: { teamInfo: TeamInfo? in
-        ...
+        print("Team and its player have changed")
     })
 ```
 
-The first argument of the `fetch` method is a list of tracked requests. Any transaction that affects one of them will trigger the observable.
-
-The last argument is a closure that is called after each impactful transaction, and returns the values emitted by the observable. It runs in a protected database queue. It is also guaranteed an immutable view of the last committed state of the database, which means that you can perform several fetches without fearing eventual concurrent writes to mess with your application logic.
-
-The elements returned by the closure are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
-
-**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes.
-
-
-# DatabaseRegionConvertible Protocol
-
-The `DatabaseRegionConvertible` protocol lets you better encapsulate your most complex requests, and streamline your application code.
-
-```swift
-protocol DatabaseRegionConvertible {
-    func databaseRegion(_ db: Database) throws -> DatabaseRegion
-}
-```
-
-[DatabaseRegion] is a GRDB type that defines a set of database tables, columns, and rows. They are the unit of database observation in RxGRDB. And it is the type that fuels the most fundamentals RxGRDB observable: [`DatabaseWriter.rx.changes`](#databasewriterrxchangesinstartimmediately) and [`DatabaseWriter.rx.fetch`](#databasewriterrxfetchfromstartimmediatelyschedulervalues). They don't really track "requests": they track regions.
-
-You can build regions from DatabaseRegionConvertible types such as GRDB requests, or by grouping several regions in a single one:
-
-```swift
-try dbQueue.read { db in
-    // Region: "player(id,name,score)"
-    let playerRegion = try SQLRequest<Player>("SELECT * FROM player").databaseRegion(db)
-    
-    // Region: "team(id,name,color)[1]"
-    let teamRegion = try Team.filter(key: 1).databaseRegion(db)
-    
-    // Region: "player(id,name,score), team(id,name,color)[1]"
-    let region = playerRegion.union(teamRegion)
-}
-```
-
-To understand how regions and DatabaseRegionConvertible can improve your application code, let's look at this sample code, which doesn't profit from their help:
-
-```swift
-// Track a team and its players
-let teamId = 1
-let teamRequest = Team.filter(key: teamId)
-let playersRequest = Player.filter(teamId: teamId)
-dbQueue.rx
-    .fetch(from: [teamRequest, playersRequest]) { db -> TeamInfo? in
-        guard let team = try teamRequest.fetchOne(db) else {
-            return nil
-        }
-        let players = try playersRequest.fetchAll(db)
-        return TeamInfo(team: team, players: players)
-    }
-    .subscribe(onNext: { teamInfo: TeamInfo? in
-        ...
-    })
-```
-
-Thanks to DatabaseRegionConvertible, we'll wrap the complex request in a single type, and write instead:
-
-```swift
-// Track a team and its players
-let request = TeamInfoRequest(teamId: 1)
-dbQueue.rx
-    .fetch(from: [request]) { try request.fetchOne($0) }
-    .subscribe(onNext: { teamInfo: TeamInfo? in
-        ...
-    })
-```
-
-TeamInfoRequest could be defined as below:
-
-```swift
-struct TeamInfoRequest: DatabaseRegionConvertible {
-    var teamId: int64
-    
-    private var teamRequest: QueryInterfaceRequest<Team> {
-        return Team.filter(key: teamId)
-    }
-    private var playersRequest: QueryInterfaceRequest<Player> {
-        return Player.filter(teamId: teamId)
-    }
-    
-    // The DatabaseRegion that lets RxGRDB track changes
-    func databaseRegion(_ db: Database) throws -> DatabaseRegion {
-        let teamRegion = try teamRequest.databaseRegion(db)
-        let playersRegion = try playersRequest.databaseRegion(db)
-        return teamRegion.union(playersRegion)
-    }
-    
-    // The fetching method that does the rest of the job
-    func fetchOne(_ db: Database) throws -> TeamInfo? {
-        guard let team = try teamRequest.fetchOne(db) else {
-            return nil
-        }
-        let players = try playersRequest.fetchAll(db)
-        return TeamInfo(team: team, players: players)
-    }
-}
-```
-
-As a closing example, database regions let you observe the full database, and get notified of all transactions:
-
-```swift
-dbQueue.rx
-    .changes(in: [DatabaseRegion.fullDatabase])
-    .subscribe(onNext: { db: Database in
-        print("Database has changed.")
-    })
-```
+All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 
 # Diffs
@@ -1047,3 +912,4 @@ dbQueue
 [open an issue]: https://github.com/RxSwiftCommunity/RxGRDB/issues
 [TransactionObserver]: https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol
 [DatabaseRegion]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregion
+[ValueObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation
