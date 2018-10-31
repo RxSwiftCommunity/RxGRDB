@@ -199,4 +199,3 @@ enum MergeStep<LeftElement, RightElement> {
     /// Left and right elements share a common key:
     case common(LeftElement, RightElement)
 }
-

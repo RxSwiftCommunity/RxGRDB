@@ -21,8 +21,47 @@ extension ValueObservation: _ValueObservationProtocol where Reducer: ValueReduce
 }
 
 extension Reactive where Base: _ValueObservationProtocol {
-    /// TODO
-    public func start(
+    /// Returns an Observable that emits the same values as a ValueObservation.
+    ///
+    ///     let observation = ValueObservation.trackingAll(Player.all())
+    ///     observation.rx
+    ///         .fetch(in: dbQueue)
+    ///         .subscribe(onNext: { players: [Player] in
+    ///             print("Players have changed")
+    ///         })
+    ///
+    /// By default, all values are emitted on the main dispatch queue. If you
+    /// give a *scheduler*, values are emitted on that scheduler.
+    ///
+    /// If you set *startImmediately* to true (the default value), the first
+    /// element is emitted right upon subscription. It is *synchronously*
+    /// emitted if and only if the observable is subscribed on the main queue,
+    /// and is given a nil *scheduler* argument:
+    ///
+    ///     // on the main queue
+    ///     observation.rx
+    ///         .fetch(in: dbQueue)
+    ///         .subscribe(onNext: { players: [Player] in
+    ///             // on the main queue
+    ///             print("Values have changed")
+    ///         })
+    ///     // <- here "Values have changed" has been printed
+    ///
+    ///     // on any queue
+    ///     observation.rx
+    ///         .fetch(in: dbQueue)
+    ///         .subscribe(onNext: { players: [Player] in
+    ///             // on the main queue
+    ///             print("Values have changed")
+    ///         })
+    ///     // <- here "Values have changed" may not be printed yet
+    ///
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted right upon subscription.
+    /// - parameter scheduler: The eventual scheduler on which elements
+    ///   are emitted.
+    public func fetch(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)

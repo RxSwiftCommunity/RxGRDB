@@ -48,7 +48,7 @@ extension Reactive where Base: FetchRequest {
     ///         })
     ///     // <- here "Number of players has changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -59,10 +59,10 @@ extension Reactive where Base: FetchRequest {
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Int>
     {
-        return ValueObservation
-            .trackingCount(base)
-            .rx
-            .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+        return ValueObservation.trackingCount(base).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
     }
 }
 
@@ -107,7 +107,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     ///         })
     ///     // <- here "Players have changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -120,15 +120,16 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
         -> Observable<[Base.RowDecoder]>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingAll(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately:
+                startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingAll(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
     
@@ -170,7 +171,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     ///         })
     ///     // <- here "Player 1 has changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -183,15 +184,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
         -> Observable<Base.RowDecoder?>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingOne(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingOne(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingOne(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingOne(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
 }
@@ -237,7 +238,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     ///         })
     ///     // <- here "Players have changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -250,15 +251,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
         -> Observable<[Row]>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingAll(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingAll(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
     
@@ -300,7 +301,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     ///         })
     ///     // <- here "Player 1 has changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -313,15 +314,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
         -> Observable<Row?>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingOne(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingOne(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingOne(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingOne(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
 }
@@ -367,7 +368,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///         })
     ///     // <- here "Player names have changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -380,15 +381,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
         -> Observable<[Base.RowDecoder]>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingAll(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingAll(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
     
@@ -430,7 +431,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///         })
     ///     // <- here "Best player has changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -443,15 +444,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
         -> Observable<Base.RowDecoder?>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingOne(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingOne(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingOne(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingOne(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
 }
@@ -497,7 +498,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     ///         })
     ///     // <- here "Player names have changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -510,15 +511,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
         -> Observable<[Base.RowDecoder._Wrapped?]>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingAll(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingAll(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
 }
@@ -564,7 +565,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///         })
     ///     // <- here "Player names have changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -577,15 +578,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
         -> Observable<[Base.RowDecoder]>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingAll(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingAll(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingAll(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
     
@@ -627,7 +628,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///         })
     ///     // <- here "Best player has changed" may not be printed yet
     ///
-    /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
@@ -640,15 +641,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
         -> Observable<Base.RowDecoder?>
     {
         if distinctUntilChanged {
-            return ValueObservation
-                .trackingOne(withUniquing: base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingOne(withUniquing: base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         } else {
-            return ValueObservation
-                .trackingOne(base)
-                .rx
-                .start(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+            return ValueObservation.trackingOne(base).rx.fetch(
+                in: reader,
+                startImmediately: startImmediately,
+                scheduler: scheduler)
         }
     }
 }
