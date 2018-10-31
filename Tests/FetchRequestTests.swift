@@ -3,9 +3,9 @@ import GRDB
 import RxSwift
 @testable import RxGRDB // @testable to get PrimaryKeyDiff initializer
 
-class TypedRequestTests : XCTestCase { }
+class FetchRequestTests : XCTestCase { }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func setUpDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
             try db.create(table: "players") { t in
@@ -40,7 +40,7 @@ extension TypedRequestTests {
 
 // MARK: - RowConvertible
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllRecords() throws {
         try Test(testRxFetchAllRecords)
             .run { try DatabaseQueue(path: $0) }
@@ -75,7 +75,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllRecordsDistinctUntilChanged() throws {
         try Test(testRxFetchAllRecordsDistinctUntilChanged)
             .run { try DatabaseQueue(path: $0) }
@@ -109,7 +109,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllRecordsIdentifiedByIds() throws {
         try Test(testRxFetchAllRecordsIdentifiedByIds)
             .run { try DatabaseQueue(path: $0) }
@@ -143,7 +143,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchOneRecord() throws {
         try Test(testRxFetchOneRecord)
             .run { try DatabaseQueue(path: $0) }
@@ -178,7 +178,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchOneRecordDistinctUntilChanged() throws {
         try Test(testRxFetchOneRecordDistinctUntilChanged)
             .run { try DatabaseQueue(path: $0) }
@@ -211,7 +211,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchOneRecordIdentifiedById() throws {
         try Test(testRxFetchOneRecordIdentifiedById)
             .run { try DatabaseQueue(path: $0) }
@@ -247,7 +247,7 @@ extension TypedRequestTests {
 
 // MARK: - Row
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllRows() throws {
         try Test(testRxFetchAllRows)
             .run { try DatabaseQueue(path: $0) }
@@ -282,7 +282,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllRowsDistinctUntilChanged() throws {
         try Test(testRxFetchAllRowsDistinctUntilChanged)
             .run { try DatabaseQueue(path: $0) }
@@ -316,7 +316,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllRowsIdentifiedByIds() throws {
         try Test(testRxFetchAllRowsIdentifiedByIds)
             .run { try DatabaseQueue(path: $0) }
@@ -350,7 +350,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchOneRow() throws {
         try Test(testRxFetchOneRow)
             .run { try DatabaseQueue(path: $0) }
@@ -385,7 +385,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchOneRowDistinctUntilChanged() throws {
         try Test(testRxFetchOneRowDistinctUntilChanged)
             .run { try DatabaseQueue(path: $0) }
@@ -418,7 +418,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchOneRowIdentifiedById() throws {
         try Test(testRxFetchOneRowIdentifiedById)
             .run { try DatabaseQueue(path: $0) }
@@ -454,7 +454,7 @@ extension TypedRequestTests {
 
 // MARK: - DatabaseValue
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllDatabaseValues() throws {
         try Test(testRxFetchAllDatabaseValues)
             .run { try DatabaseQueue(path: $0) }
@@ -489,7 +489,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllDatabaseValuesDistinctUntilChanged() throws {
         try Test(testRxFetchAllDatabaseValuesDistinctUntilChanged)
             .run { try DatabaseQueue(path: $0) }
@@ -523,7 +523,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchOneDatabaseValue() throws {
         try Test(testRxFetchOneDatabaseValue)
             .run { try DatabaseQueue(path: $0) }
@@ -558,7 +558,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchOneDatabaseValueDistinctUntilChanged() throws {
         try Test(testRxFetchOneDatabaseValueDistinctUntilChanged)
             .run { try DatabaseQueue(path: $0) }
@@ -593,7 +593,7 @@ extension TypedRequestTests {
 
 // MARK: - Optional DatabaseValue
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllOptionalDatabaseValues() throws {
         try Test(testRxFetchAllOptionalDatabaseValues)
             .run { try DatabaseQueue(path: $0) }
@@ -632,7 +632,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged() throws {
         try Test(testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged)
             .run { try DatabaseQueue(path: $0) }
@@ -669,7 +669,7 @@ extension TypedRequestTests {
     }
 }
 
-extension TypedRequestTests {
+extension FetchRequestTests {
     func testPrimaryKeyDiffScanner() throws {
         try Test(testPrimaryKeyDiffScanner)
             .run { try DatabaseQueue(path: $0) }
