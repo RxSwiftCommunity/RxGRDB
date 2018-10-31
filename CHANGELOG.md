@@ -1,6 +1,21 @@
 Release Notes
 =============
 
+## Next Version
+
+- [#46](https://github.com/RxSwiftCommunity/RxGRDB/pull/46): Implement RxGRDB on top GRDB.ValueObservation
+
+
+### Breaking Changes
+
+- The `DatabaseWriter.rx.fetch` method has been removed. Instead, use [`ValueObservation.rx.fetch`](README.md#valueobservationrxfetchinstartimmediatelyscheduler).
+
+
+### New
+
+- One can now create a [values observable](README.md#values-observables) from a [DatabaseReader](https://groue.github.io/GRDB.swift/docs/3.5/Protocols/DatabaseReader.html).
+
+
 ## 0.12.1
 
 Released October 25, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.12.0...v0.12.1)
