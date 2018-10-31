@@ -557,20 +557,6 @@ Player.all().rx
     .subscribe(onNext: { players: [Player] in
         print("Players have changed.")
     })
-
-// A values observable:
-dbQueue
-    .fetch(from: [Player.all()]) { (db: Database) -> ([Player], Int) in
-        let players = try Player
-            .order(scoreColumn.desc)
-            .limit(10)
-            .fetchAll(db)
-        let count = try Player.fetchCount(db)
-        return (players, count)
-    }
-    .subscribe(onNext: { (players, count) in
-        print("Best ten players out of \(count): \(players)")
-    })
 ```
 
 Since changes and values observables don't have the same behavior, we'd like you to understand the differences.
@@ -766,27 +752,11 @@ Player.all().rx
         // On the main queue
         print("Players have changed.")
     })
-
-// On any thread
-dbQueue
-    .fetch(from: [Player.all()]) { (db: Database) -> ([Player], Int) in
-        // In a database protected dispatch queue
-        let players = try Player
-            .order(scoreColumn.desc)
-            .limit(10)
-            .fetchAll(db)
-        let count = try Player.fetchCount(db)
-        return (players, count)
-    }
-    .subscribe(onNext: { (players, count) in
-        // On the main queue
-        print("Best ten players out of \(count): \(players)")
-    })
 ```
 
 ### Consuming fetched values off the main thread
 
-The first example is OK, even if the main thread is still involved as a relay. Subsequent examples don't use the main thread at all:
+The first example is OK, even if the main thread is still involved as a relay. The second example doesn't use the main thread at all:
 
 ```swift
 let scheduler = SerialDispatchQueueScheduler(qos: .default)
@@ -806,22 +776,6 @@ Player.all().rx
     .subscribe(onNext: { db: Database in
         // Off the main thread, in the global dispatch queue
         print("Players have changed.")
-    })
-
-// On any thread
-dbQueue
-    .fetch(from: [Player.all()], scheduler: scheduler) { (db: Database) -> ([Player], Int) in
-        // In a database protected dispatch queue
-        let players = try Player
-            .order(scoreColumn.desc)
-            .limit(10)
-            .fetchAll(db)
-        let count = try Player.fetchCount(db)
-        return (players, count)
-    }
-    .subscribe(onNext: { (players, count) in
-        // Off the main thread, in the global dispatch queue
-        print("Best ten players out of \(count): \(players)")
     })
 ```
 
