@@ -29,7 +29,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   GRDB.swift:
-    :commit: 6fa72ebea1697ef7a7cba2829f9e5db9b880b7b7
+    :commit: 087a899f132f95ad8a37facc99073b937e56347f
     :git: https://github.com/groue/GRDB.swift.git
 
 SPEC CHECKSUMS:

@@ -51,7 +51,6 @@ extension FetchRequestTests {
         let request = Player.order(Column("name"))
         let expectedNames = [
             ["Arthur", "Barbara"],
-            ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
             ["Craig", "David", "Elena"],
@@ -60,40 +59,6 @@ extension FetchRequestTests {
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
-            .subscribe { event in
-                // events are expected on the main thread by default
-                assertMainQueue()
-                recorder.on(event)
-            }
-            .disposed(by: disposeBag)
-        try modifyDatabase(in: writer)
-        wait(for: recorder, timeout: 1)
-        
-        for (event, names) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!.map { $0.name }, names)
-        }
-    }
-}
-
-extension FetchRequestTests {
-    func testRxFetchAllRecordsDistinctUntilChanged() throws {
-        try Test(testRxFetchAllRecordsDistinctUntilChanged)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchAllRecordsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Player.order(Column("name"))
-        let expectedNames = [
-            ["Arthur", "Barbara"],
-            ["Arthur", "Barbie"],
-            [],
-            ["Craig", "David", "Elena"],
-            ]
-        
-        try setUpDatabase(in: writer)
-        let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -154,8 +119,6 @@ extension FetchRequestTests {
         let request = Player.order(Column("name"))
         let expectedNames = [
             "Arthur",
-            "Arthur",
-            "Arthur",
             nil,
             "Craig",
             ]
@@ -163,39 +126,6 @@ extension FetchRequestTests {
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
-            .subscribe { event in
-                // events are expected on the main thread by default
-                assertMainQueue()
-                recorder.on(event)
-            }
-            .disposed(by: disposeBag)
-        try modifyDatabase(in: writer)
-        wait(for: recorder, timeout: 1)
-        
-        for (event, name) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!?.name, name)
-        }
-    }
-}
-
-extension FetchRequestTests {
-    func testRxFetchOneRecordDistinctUntilChanged() throws {
-        try Test(testRxFetchOneRecordDistinctUntilChanged)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchOneRecordDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = Player.order(Column("name"))
-        let expectedNames = [
-            "Arthur",
-            nil,
-            "Craig",
-            ]
-        
-        try setUpDatabase(in: writer)
-        let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
-        request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -258,7 +188,6 @@ extension FetchRequestTests {
         let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
-            ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
             ["Craig", "David", "Elena"],
@@ -267,40 +196,6 @@ extension FetchRequestTests {
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
-            .subscribe { event in
-                // events are expected on the main thread by default
-                assertMainQueue()
-                recorder.on(event)
-            }
-            .disposed(by: disposeBag)
-        try modifyDatabase(in: writer)
-        wait(for: recorder, timeout: 1)
-        
-        for (event, names) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!.map { $0["name"] as String }, names)
-        }
-    }
-}
-
-extension FetchRequestTests {
-    func testRxFetchAllRowsDistinctUntilChanged() throws {
-        try Test(testRxFetchAllRowsDistinctUntilChanged)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchAllRowsDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
-        let expectedNames = [
-            ["Arthur", "Barbara"],
-            ["Arthur", "Barbie"],
-            [],
-            ["Craig", "David", "Elena"],
-            ]
-        
-        try setUpDatabase(in: writer)
-        let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -361,8 +256,6 @@ extension FetchRequestTests {
         let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
         let expectedNames = [
             "Arthur",
-            "Arthur",
-            "Arthur",
             nil,
             "Craig",
             ]
@@ -370,39 +263,6 @@ extension FetchRequestTests {
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
-            .subscribe { event in
-                // events are expected on the main thread by default
-                assertMainQueue()
-                recorder.on(event)
-            }
-            .disposed(by: disposeBag)
-        try modifyDatabase(in: writer)
-        wait(for: recorder, timeout: 1)
-        
-        for (event, name) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!?["name"] as String?, name)
-        }
-    }
-}
-
-extension FetchRequestTests {
-    func testRxFetchOneRowDistinctUntilChanged() throws {
-        try Test(testRxFetchOneRowDistinctUntilChanged)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchOneRowDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
-        let expectedNames = [
-            "Arthur",
-            nil,
-            "Craig",
-            ]
-        
-        try setUpDatabase(in: writer)
-        let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
-        request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -465,7 +325,6 @@ extension FetchRequestTests {
         let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
-            ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
             [],
             ["Craig", "David", "Elena"],
@@ -474,40 +333,6 @@ extension FetchRequestTests {
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
-            .subscribe { event in
-                // events are expected on the main thread by default
-                assertMainQueue()
-                recorder.on(event)
-            }
-            .disposed(by: disposeBag)
-        try modifyDatabase(in: writer)
-        wait(for: recorder, timeout: 1)
-        
-        for (event, names) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!, names)
-        }
-    }
-}
-
-extension FetchRequestTests {
-    func testRxFetchAllDatabaseValuesDistinctUntilChanged() throws {
-        try Test(testRxFetchAllDatabaseValuesDistinctUntilChanged)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchAllDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
-        let expectedNames = [
-            ["Arthur", "Barbara"],
-            ["Arthur", "Barbie"],
-            [],
-            ["Craig", "David", "Elena"],
-            ]
-        
-        try setUpDatabase(in: writer)
-        let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -534,8 +359,6 @@ extension FetchRequestTests {
         let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
         let expectedNames = [
             "Arthur",
-            "Arthur",
-            "Arthur",
             nil,
             "Craig",
             ]
@@ -543,39 +366,6 @@ extension FetchRequestTests {
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
         request.rx.fetchOne(in: writer)
-            .subscribe { event in
-                // events are expected on the main thread by default
-                assertMainQueue()
-                recorder.on(event)
-            }
-            .disposed(by: disposeBag)
-        try modifyDatabase(in: writer)
-        wait(for: recorder, timeout: 1)
-        
-        for (event, name) in zip(recorder.recordedEvents, expectedNames) {
-            XCTAssertEqual(event.element!, name)
-        }
-    }
-}
-
-extension FetchRequestTests {
-    func testRxFetchOneDatabaseValueDistinctUntilChanged() throws {
-        try Test(testRxFetchOneDatabaseValueDistinctUntilChanged)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchOneDatabaseValueDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
-        let expectedNames = [
-            "Arthur",
-            nil,
-            "Craig",
-            ]
-        
-        try setUpDatabase(in: writer)
-        let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
-        request.rx.fetchOne(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -604,8 +394,6 @@ extension FetchRequestTests {
         let request = SQLRequest<String?>("SELECT email FROM players ORDER BY name")
         let expectedNames = [
             ["arthur@example.com", nil],
-            ["arthur@example.com", nil],
-            ["arthur@example.com", nil],
             [],
             [nil, "david@example.com", "elena@example.com"],
             ]
@@ -613,43 +401,6 @@ extension FetchRequestTests {
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
         request.rx.fetchAll(in: writer)
-            .subscribe { event in
-                // events are expected on the main thread by default
-                assertMainQueue()
-                recorder.on(event)
-            }
-            .disposed(by: disposeBag)
-        try modifyDatabase(in: writer)
-        wait(for: recorder, timeout: 1)
-        
-        for (event, names) in zip(recorder.recordedEvents, expectedNames) {
-            let fetchedNames = event.element!
-            XCTAssertEqual(fetchedNames.count, names.count)
-            for (fetchedName, name) in zip(fetchedNames, names) {
-                XCTAssertEqual(fetchedName, name)
-            }
-        }
-    }
-}
-
-extension FetchRequestTests {
-    func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged() throws {
-        try Test(testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchAllOptionalDatabaseValuesDistinctUntilChanged(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String?>("SELECT email FROM players ORDER BY name")
-        let expectedNames = [
-            ["arthur@example.com", nil],
-            [],
-            [nil, "david@example.com", "elena@example.com"],
-            ]
-        
-        try setUpDatabase(in: writer)
-        let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer, distinctUntilChanged: true)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -684,10 +435,6 @@ extension FetchRequestTests {
                     Player(id: 1, name: "Arthur", email: "arthur@example.com"),
                     Player(id: 2, name: "Barbara", email: nil),
                     ],
-                updated: [],
-                deleted: []),
-            PrimaryKeyDiff(
-                inserted: [],
                 updated: [],
                 deleted: []),
             PrimaryKeyDiff(

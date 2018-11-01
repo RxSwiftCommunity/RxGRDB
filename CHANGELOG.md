@@ -9,7 +9,8 @@ Release Notes
 ### Breaking Changes
 
 - The `DatabaseWriter.rx.fetch` method has been removed. Instead, use [`ValueObservation.rx.fetch`](README.md#valueobservationrxfetchinstartimmediatelyscheduler).
-
+- The `distinctUntilChanged` parameter is no longer available when one creates an RxGRDB observable. Filtering of consecutive identical database values is now the default behavior.
+ 
 
 ### New
 

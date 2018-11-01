@@ -109,12 +109,6 @@ To function correctly, RxGRDB requires that a unique [database connection] is ke
 
 **To define which part of the database should be observed, you provide a database request.** Requests can be expressed with GRDB's [query interface], as in `Player.all()`, or with SQL, as in `SELECT * FROM player`. Both would observe the full "player" database table. Observed requests can involve several database tables, and generally be as complex as you need them to be.
 
-**Change notifications may happen even though the request results are the same.** RxGRDB often notifies of *potential changes*, not of *actual changes*. A transaction triggers a change notification if and only if a statement has actually modified the tracked tables and columns by inserting, updating, or deleting a row.
-
-For example, if you track `Player.select(max(scoreColumn))`, then you'll get a notification for all changes performed on the `score` column of the `player` table (updates, insertions and deletions), even if they do not modify the value of the maximum score. However, you will not get any notification for changes performed on other database tables, or updates to other columns of the `player` table.
-
-It is possible to avoid notifications of identical consecutive values. For example you can use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator of RxSwift. You can also let RxGRDB perform efficient deduplication at the database level: see the documentation of each reactive method for more information.
-
 **RxGRDB observables are based on GRDB's [ValueObservation] and [TransactionObserver].** If your application needs change notifications that are not built in RxGRDB, those versatile tools will probably provide a solution.
 
 
@@ -140,8 +134,8 @@ request.rx.changes(in: dbQueue)    // Observable<Database>
 
 - [`rx.changes`](#requestrxchangesinstartimmediately)
 - [`rx.fetchCount`](#requestrxfetchcountinstartimmediatelyscheduler)
-- [`rx.fetchOne`](#typedrequestrxfetchoneinstartimmediatelyschedulerdistinctuntilchanged)
-- [`rx.fetchAll`](#typedrequestrxfetchallinstartimmediatelyschedulerdistinctuntilchanged)
+- [`rx.fetchOne`](#typedrequestrxfetchoneinstartimmediatelyscheduler)
+- [`rx.fetchAll`](#typedrequestrxfetchallinstartimmediatelyscheduler)
 
 
 ---
@@ -193,7 +187,7 @@ try dbQueue.write { db in
 
 #### `Request.rx.fetchCount(in:startImmediately:scheduler:)`
 
-This [database values observable](#values-observables) emits a count after each [impactful](#what-is-database-observation) database transaction:
+This [database values observable](#values-observables) emits the number of results of the request after each database transaction that changes it:
 
 ```swift
 let request = Player.all()
@@ -211,16 +205,12 @@ try dbQueue.write { db in
 
 All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
-**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the [`distinctUntilChanged`](http://reactivex.io/documentation/operators/distinct.html) operator in order to avoid duplicates:
-
-```swift
-request.rx.fetchCount(in: dbQueue).distinctUntilChanged()...
-```
+This observable filters out identical consecutive values.
 
 
 ---
 
-#### `TypedRequest.rx.fetchOne(in:startImmediately:scheduler:distinctUntilChanged:)`
+#### `TypedRequest.rx.fetchOne(in:startImmediately:scheduler:)`
 
 This [database values observable](#values-observables) emits a value after each [impactful](#what-is-database-observation) database transaction:
 
@@ -256,18 +246,12 @@ When tracking a *value*, you get nil in two cases: either the request yielded no
 
 > :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
 
-**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
-
-```swift
-request.rx.fetchOne(in: dbQueue, distinctUntilChanged: true)...
-```
-
-The `distinctUntilChanged` parameter does not involve the fetched type, and simply performs comparisons of raw database values.
+This observable filters out identical consecutive values by comparing raw database values.
 
 
 ---
 
-#### `TypedRequest.rx.fetchAll(in:startImmediately:scheduler:distinctUntilChanged:)`
+#### `TypedRequest.rx.fetchAll(in:startImmediately:scheduler:)`
 
 This [database values observable](#values-observables) emits an array of values after each [impactful](#what-is-database-observation) database transaction:
 
@@ -310,13 +294,7 @@ request.rx.fetchAll(in: dbQueue)
 
 > :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
 
-**This observable may emit identical consecutive values**, because RxGRDB tracks [potential](#what-is-database-observation) changes. Use the `distinctUntilChanged` parameter in order to avoid duplicates:
-
-```swift
-request.rx.fetchAll(in: dbQueue, distinctUntilChanged: true)...
-```
-
-The `distinctUntilChanged` parameter does not involve the fetched type, and simply performs comparisons of raw database values.
+This observable filters out identical consecutive values by comparing raw database values.
 
 
 # Observing Multiple Requests

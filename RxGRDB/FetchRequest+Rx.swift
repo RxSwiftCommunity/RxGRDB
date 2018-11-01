@@ -8,7 +8,6 @@ import RxSwift
 
 // MARK: - Count
 
-// TODO: consider performing distinctUntilChanged comparisons in some background queue
 extension Reactive where Base: FetchRequest {
     /// Returns an Observable that emits after each committed database
     /// transaction that has modified the tables and columns fetched by
@@ -115,22 +114,14 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     public func fetchAll(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder]>
     {
-        if distinctUntilChanged {
-            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately:
-                startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingAll(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
+        return ValueObservation.trackingAll(base).rx.fetch(
+            in: reader,
+            startImmediately:
+            startImmediately,
+            scheduler: scheduler)
     }
     
     /// Returns an Observable that emits after each committed database
@@ -179,21 +170,13 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     public func fetchOne(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder?>
     {
-        if distinctUntilChanged {
-            return ValueObservation.trackingOne(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingOne(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
+        return ValueObservation.trackingOne(base).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
     }
 }
 
@@ -246,21 +229,13 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     public func fetchAll(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Row]>
     {
-        if distinctUntilChanged {
-            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingAll(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
+        return ValueObservation.trackingAll(base).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
     }
     
     /// Returns an Observable that emits after each committed database
@@ -309,21 +284,13 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     public func fetchOne(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Row?>
     {
-        if distinctUntilChanged {
-            return ValueObservation.trackingOne(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingOne(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
+        return ValueObservation.trackingOne(base).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
     }
 }
 
@@ -376,21 +343,13 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     public func fetchAll(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder]>
     {
-        if distinctUntilChanged {
-            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingAll(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
+        return ValueObservation.trackingAll(base).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
     }
     
     /// Returns an Observable that emits after each committed database
@@ -439,21 +398,13 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     public func fetchOne(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder?>
     {
-        if distinctUntilChanged {
-            return ValueObservation.trackingOne(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingOne(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
+        return ValueObservation.trackingOne(base).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
     }
 }
 
@@ -506,150 +457,12 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     public func fetchAll(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
+        scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder._Wrapped?]>
     {
-        if distinctUntilChanged {
-            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingAll(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
-    }
-}
-
-// MARK: - DatabaseValueConvertible & StatementColumnConvertible
-
-extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConvertible & StatementColumnConvertible {
-    /// Returns an Observable that emits after each committed database
-    /// transaction that has modified the tables and columns fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.select(Column("name")).asRequest(of: String.self)
-    ///     request.rx
-    ///         .fetchAll(in: dbQueue)
-    ///         .subscribe(onNext: { names: [String] in
-    ///             print("Player names have changed")
-    ///         })
-    ///
-    /// By default, all values are emitted on the main dispatch queue. If you
-    /// give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// If you set *startImmediately* to true (the default value), the first
-    /// element is emitted right upon subscription. It is *synchronously*
-    /// emitted if and only if the observable is subscribed on the main queue,
-    /// and is given a nil *scheduler* argument:
-    ///
-    ///     // on the main queue
-    ///     request.rx
-    ///         .fetchAll(in: dbQueue)
-    ///         .subscribe(onNext: { names: [String] in
-    ///             // on the main queue
-    ///             print("Player names have changed")
-    ///         })
-    ///     // <- here "Player names have changed" has been printed
-    ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .fetchAll(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { names: [String] in
-    ///             // on the main queue
-    ///             print("Player names have changed")
-    ///         })
-    ///     // <- here "Player names have changed" may not be printed yet
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter startImmediately: When true (the default), the first
-    ///   element is emitted right upon subscription.
-    /// - parameter scheduler: The eventual scheduler on which elements
-    ///   are emitted.
-    public func fetchAll(
-        in reader: DatabaseReader,
-        startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
-        -> Observable<[Base.RowDecoder]>
-    {
-        if distinctUntilChanged {
-            return ValueObservation.trackingAll(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingAll(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
-    }
-    
-    /// Returns an Observable that emits after each committed database
-    /// transaction that has modified the tables and columns fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<String>("SELECT name FROM player ORDER BY score DESC")
-    ///     request.rx
-    ///         .fetchOne(in: dbQueue)
-    ///         .subscribe(onNext: { bestPlayerName: String? in
-    ///             print("Best player has changed")
-    ///         })
-    ///
-    /// By default, all values are emitted on the main dispatch queue. If you
-    /// give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// If you set *startImmediately* to true (the default value), the first
-    /// element is emitted right upon subscription. It is *synchronously*
-    /// emitted if and only if the observable is subscribed on the main queue,
-    /// and is given a nil *scheduler* argument:
-    ///
-    ///     // on the main queue
-    ///     request.rx
-    ///         .fetchOne(in: dbQueue)
-    ///         .subscribe(onNext: { bestPlayerName: String? in
-    ///             // on the main queue
-    ///             print("Best player has changed")
-    ///         })
-    ///     // <- here "Best player has changed" has been printed
-    ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .fetchOne(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { bestPlayerName: String? in
-    ///             // on the main queue
-    ///             print("Best player has changed")
-    ///         })
-    ///     // <- here "Best player has changed" may not be printed yet
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter startImmediately: When true (the default), the first
-    ///   element is emitted right upon subscription.
-    /// - parameter scheduler: The eventual scheduler on which elements
-    ///   are emitted.
-    public func fetchOne(
-        in reader: DatabaseReader,
-        startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil,
-        distinctUntilChanged: Bool = false)
-        -> Observable<Base.RowDecoder?>
-    {
-        if distinctUntilChanged {
-            return ValueObservation.trackingOne(withUniquing: base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        } else {
-            return ValueObservation.trackingOne(base).rx.fetch(
-                in: reader,
-                startImmediately: startImmediately,
-                scheduler: scheduler)
-        }
+        return ValueObservation.trackingAll(base).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
     }
 }
