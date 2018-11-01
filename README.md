@@ -368,7 +368,9 @@ try dbQueue.write { db in
 
 #### `ValueObservation.rx.fetch(in:startImmediately:scheduler:)`
 
-This [database values observable](#values-observables) emits the same values as a [ValueObservation]:
+This [database values observable](#values-observables) emits the same values as a [ValueObservation].
+
+For example:
 
 ```swift
 // When the players' table is changed, fetch the ten best ones,
@@ -385,23 +387,6 @@ observation.rx
     .fetch(in: dbQueue)
     .subscribe(onNext: { (players, count) in
         print("Best ten players out of \(count): \(players)")
-    })
-
-// Track a team and its players
-let teamId = 1
-let teamRequest = Team.filter(key: teamId)
-let playersRequest = Player.filter(teamId: teamId)
-let observation = ValueObservation.tracking(teamRequest, playersRequest, fetch: { db -> TeamInfo? in
-    guard let team = try teamRequest.fetchOne(db) else {
-        return nil
-    }
-    let players = try playersRequest.fetchAll(db)
-    return TeamInfo(team: team, players: players)
-})
-observation.rx
-    .fetch(in: dbQueue)
-    .subscribe(onNext: { teamInfo: TeamInfo? in
-        print("Team and its player have changed")
     })
 ```
 
