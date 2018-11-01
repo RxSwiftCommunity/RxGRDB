@@ -107,7 +107,7 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 
 To function correctly, RxGRDB requires that a unique [database connection] is kept open during the whole duration of the observation.
 
-**To define which part of the database should be observed, you provide a database request.** Requests can be expressed with GRDB's [query interface], as in `Player.all()`, or with SQL, as in `SELECT * FROM player`. Both would observe the full "player" database table. Observed requests can involve several database tables, and generally be as complex as you need them to be.
+**To define which part of the database should be observed, you provide database requests.** Requests can be expressed with GRDB's [query interface], as in `Player.all()`, or with SQL, as in `SELECT * FROM player`. Both would observe the full "player" database table. Observed requests can involve several database tables, and generally be as complex as you need them to be.
 
 **RxGRDB observables are based on GRDB's [ValueObservation] and [TransactionObserver].** If your application needs change notifications that are not built in RxGRDB, those versatile tools will probably provide a solution.
 
