@@ -309,11 +309,11 @@ request.rx.fetchOne(in: dbQueue)   // Observable<Player?>
 request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 ```
 
-:warning: **DO NOT compose those observables with [RxSwift operators](https://github.com/ReactiveX/RxSwift)**: they can not fulfill [data consistency](https://en.wikipedia.org/wiki/Consistency_(database_systems)).
+:warning: **DO NOT compose those observables together with [RxSwift operators](https://github.com/ReactiveX/RxSwift)**: you would lose all guarantees of [data consistency](https://en.wikipedia.org/wiki/Consistency_(database_systems)).
 
 Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
 
-And when you need to fetch database values, with the guarantee of consistent results, use [ValueObservation.rx.fetch](#valueobservationrxfetchinstartimmediatelyscheduler).
+And when you need to fetch database values from several requests, use [ValueObservation.rx.fetch](#valueobservationrxfetchinstartimmediatelyscheduler).
 
 
 ---
