@@ -1,7 +1,9 @@
 Release Notes
 =============
 
-## Next Version
+## 0.13.0
+
+Released November 2, 2018 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.12.1...v0.13.0)
 
 - [#46](https://github.com/RxSwiftCommunity/RxGRDB/pull/46): Implement RxGRDB on top GRDB.ValueObservation
 
@@ -10,7 +12,7 @@ Release Notes
 
 - The `DatabaseWriter.rx.fetch` method has been removed. Instead, use [`ValueObservation.rx.fetch`](README.md#valueobservationrxfetchinstartimmediatelyscheduler).
 - The `distinctUntilChanged` parameter is no longer available when one creates an RxGRDB observable. Filtering of consecutive identical database values is now the default behavior.
- 
+
 
 ### New
 
