@@ -3,7 +3,6 @@
 #else
     import GRDB
 #endif
-import RxSwift
 
 /// TODO
 public struct PrimaryKeyDiffScanner<Record: FetchableRecord & MutablePersistableRecord> {
@@ -200,4 +199,3 @@ enum MergeStep<LeftElement, RightElement> {
     /// Left and right elements share a common key:
     case common(LeftElement, RightElement)
 }
-

@@ -3,9 +3,9 @@ import GRDB
 import RxSwift
 import RxGRDB
 
-class FetchTokenTests : XCTestCase { }
+class ValueObservationTests : XCTestCase { }
 
-extension FetchTokenTests {
+extension ValueObservationTests {
     
     func testFetch() throws {
         try Test(testFetch)
@@ -31,14 +31,15 @@ extension FetchTokenTests {
         ]
         let recorder = EventRecorder<([String], Int)>(expectedEventCount: expectedValues.count)
         let request = SQLRequest<Row>("SELECT * FROM table1")
+        let observation = ValueObservation.tracking(request, fetch: { db -> ([String], Int) in
+            let strings = try String.fetchAll(db, "SELECT a FROM table1")
+            let int = try Int.fetchOne(db, "SELECT COUNT(*) FROM table2")!
+            return (strings, int)
+        })
         
         // 1 (startImmediately parameter is true by default)
-        AnyDatabaseWriter(writer).rx
-            .fetch(from: [request]) { db -> ([String], Int) in
-                let strings = try String.fetchAll(db, "SELECT a FROM table1")
-                let int = try Int.fetchOne(db, "SELECT COUNT(*) FROM table2")!
-                return (strings, int)
-            }
+        observation.rx
+            .fetch(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -70,7 +71,7 @@ extension FetchTokenTests {
     }
 }
 
-extension FetchTokenTests {
+extension ValueObservationTests {
     
     // This is a regression test that fails in v0.8.0
     func testSubscriptionOffMainThread() throws {
@@ -89,16 +90,17 @@ extension FetchTokenTests {
         let expectedValues: [Int] = [0, 1, 2]
         let recorder = EventRecorder<Int>(expectedEventCount: expectedValues.count)
         let request = SQLRequest<Int>("SELECT COUNT(*) FROM t")
-        
+
         let initialFetchExpectation = expectation(description: "initial fetch")
         initialFetchExpectation.assertForOverFulfill = false
+        let observation = ValueObservation.tracking(request, fetch: { db -> Int in
+            initialFetchExpectation.fulfill()
+            return try request.fetchOne(db)!
+        })
 
         DispatchQueue.global().async {
-            AnyDatabaseWriter(writer).rx
-                .fetch(from: [request]) { db -> Int in
-                    initialFetchExpectation.fulfill()
-                    return try request.fetchOne(db)!
-                }
+            observation.rx
+                .fetch(in: writer)
                 .subscribe { event in
                     // events are expected on the main thread by default
                     assertMainQueue()
@@ -121,7 +123,7 @@ extension FetchTokenTests {
     }
 }
 
-extension FetchTokenTests {
+extension ValueObservationTests {
     
     // This is a regression test that fails in v0.9.0
     func testSubscriptionFromMainThread() throws {
