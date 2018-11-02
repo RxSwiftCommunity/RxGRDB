@@ -142,7 +142,7 @@ request.rx.changes(in: dbQueue)    // Observable<Database>
 
 #### `Request.rx.changes(in:startImmediately:)`
 
-This [database changes observable](#changes-observables) emits a database connection after each [impactful](#what-is-database-observation) database transaction:
+This [database changes observable](#changes-observables) emits a database connection right after a database transaction has modified the tracked tables and columns by inserting, updating, or deleting a database row:
 
 ```swift
 let request = Player.all()
@@ -212,7 +212,7 @@ This observable filters out identical consecutive values.
 
 #### `TypedRequest.rx.fetchOne(in:startImmediately:scheduler:)`
 
-This [database values observable](#values-observables) emits a value after each [impactful](#what-is-database-observation) database transaction:
+This [database values observable](#values-observables) emits a value after each database transaction which has modified the result of the request:
 
 ```swift
 let playerId = 42
@@ -253,7 +253,7 @@ This observable filters out identical consecutive values by comparing raw databa
 
 #### `TypedRequest.rx.fetchAll(in:startImmediately:scheduler:)`
 
-This [database values observable](#values-observables) emits an array of values after each [impactful](#what-is-database-observation) database transaction:
+This [database values observable](#values-observables) emits an array of values  after each database transaction which has modified the result of the request:
 
 ```swift
 let request = Player.order(Column("name"))
@@ -320,7 +320,7 @@ And when you need to fetch database values from several requests, use [ValueObse
 
 #### `DatabaseWriter.rx.changes(in:startImmediately:)`
 
-This [database changes observable](#changes-observables) emits a database connection after each database transaction that has an [impact](#what-is-database-observation) on any of the tracked requests:
+This [database changes observable](#changes-observables) emits a database connection right after a database transaction has modified the tracked tables and columns by inserting, updating, or deleting a database row:
 
 ```swift
 let playersRequest = Player.all()
@@ -427,7 +427,7 @@ struct PrimaryKeyDiff<Record> {
 }
 ```
 
-Everything starts from a GRDB [record type](https://github.com/groue/GRDB.swift/blob/master/README.md#records), and a request ordered by primary key, whose results are used to compute diffs after each [impactful](#what-is-database-observation) database transaction:
+Everything starts from a GRDB [record type](https://github.com/groue/GRDB.swift/blob/master/README.md#records), and a request ordered by primary key, whose results are used to compute diffs after each database transaction which has modified the results of the request:
 
 ```swift
 let request = Place.orderByPrimaryKey()
@@ -527,7 +527,7 @@ Since changes and values observables don't have the same behavior, we'd like you
 
 ## Changes Observables
 
-**Changes Observable are all about being synchronously notified of any [impactful](#what-is-database-observation) transaction.** They can be created and subscribed from any thread. They all emit database connections in a "protected dispatch queue", serialized with all database updates:
+**Changes Observable are all about being synchronously notified of any database transaction that has modified the tracked tables and columns by inserting, updating, or deleting a database row.** Those observables can be created and subscribed from any thread. They all emit database connections in a "protected dispatch queue", serialized with all database updates:
 
 ```swift
 // On any thread
@@ -649,7 +649,9 @@ Depending on whether you use a [database queue], or a [database pool], the value
 
 ### Values Observables in a Database Queue
 
-In a [database queue], values observables fetch fresh values immediately after an [impactful](#what-is-database-observation) transaction has completed.
+In a [database queue], values observables fetch fresh values immediately after a database transaction has modified the tracked tables and columns
+
+ transaction has completed.
 
 **They block all threads that are accessing the database, or attempting to access in the database, until fresh values are fetched:**
 
@@ -674,9 +676,9 @@ Yet some complex queries take a long time, and you may experience undesired bloc
 
 ### Values Observables in a Database Pool
 
-In a [database pool], values observables *eventually* fetch fresh values after an [impactful](#what-is-database-observation) transaction has completed.
+In a [database pool], values observables *eventually* fetch fresh values after a database transaction has modified the tracked tables and columns.
 
-**They block all threads that are writing in the database, or attempting to write in the database, until [snapshot isolation](https://sqlite.org/isolation.html) has been established:**
+**They block all threads that are writing in the database, or attempting to write in the database, until [snapshot isolation](https://sqlite.org/isolation.html) has been established,** and fresh values can be safely fetched:
 
 ```swift
 Player.all().rx
@@ -694,7 +696,7 @@ try dbPool.write { db in
 
 Acquiring snapshot isolation is very fast. The only limiting resource is the maximum number of concurrent reads (see [database pool configuration]).
 
-After snapshot isolation has been established, the values observable fetches fresh values. Meanwhile, other threads can freely read and write in the database.
+Only after snapshot isolation has been established, the values observable fetches fresh values. During this fetch, other threads can freely read and write in the database.
 
 
 ## Common Use Cases of Values Observables
