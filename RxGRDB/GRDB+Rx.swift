@@ -5,13 +5,17 @@
 #endif
 import RxSwift
 
-// TypedRequest
-extension AdaptedFetchRequest : ReactiveCompatible, DatabaseRegionConvertible { }
-extension AnyFetchRequest : ReactiveCompatible, DatabaseRegionConvertible { }
-extension QueryInterfaceRequest : ReactiveCompatible, DatabaseRegionConvertible { }
-extension SQLRequest : ReactiveCompatible, DatabaseRegionConvertible { }
-
-// DatabaseWriter
+// DatabaseReader & DatabaseWriter
 extension DatabasePool : ReactiveCompatible { }
 extension DatabaseQueue : ReactiveCompatible { }
+extension AnyDatabaseReader : ReactiveCompatible { }
 extension AnyDatabaseWriter : ReactiveCompatible { }
+
+// FetchRequest
+extension AdaptedFetchRequest : ReactiveCompatible { }
+extension AnyFetchRequest : ReactiveCompatible { }
+extension QueryInterfaceRequest : ReactiveCompatible { }
+extension SQLRequest : ReactiveCompatible { }
+
+// ValueObservation
+extension ValueObservation : ReactiveCompatible { }

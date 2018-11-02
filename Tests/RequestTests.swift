@@ -159,7 +159,7 @@ extension RequestTests {
             try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
         }
         
-        let expectedCounts = [2, 2, 0, 3]
+        let expectedCounts = [2, 0, 3]
         let recorder = EventRecorder<Int>(expectedEventCount: expectedCounts.count)
         
         struct Person : TableRecord { static let databaseTableName = "persons" }
