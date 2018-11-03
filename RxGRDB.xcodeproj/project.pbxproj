@@ -17,8 +17,6 @@
 		561E25E82188398E0019F3F0 /* ValueObservation+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561E25E62188398E0019F3F0 /* ValueObservation+Rx.swift */; };
 		561E25EA218982D20019F3F0 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561E25E9218982D20019F3F0 /* DatabaseWriter+Rx.swift */; };
 		561E25EB218982D20019F3F0 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561E25E9218982D20019F3F0 /* DatabaseWriter+Rx.swift */; };
-		561E25ED218984680019F3F0 /* DatabaseReader+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561E25EC218984680019F3F0 /* DatabaseReader+Rx.swift */; };
-		561E25EE218984680019F3F0 /* DatabaseReader+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561E25EC218984680019F3F0 /* DatabaseReader+Rx.swift */; };
 		562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 560F92C31E94DF280077EADF /* RxGRDB.framework */; };
 		562756041E962C5B0035B653 /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
 		562756061E962C5B0035B653 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
@@ -73,7 +71,6 @@
 		5617825C1F6566EA00CEAA55 /* PrimaryKeyDiffScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryKeyDiffScanner.swift; sourceTree = "<group>"; };
 		561E25E62188398E0019F3F0 /* ValueObservation+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ValueObservation+Rx.swift"; sourceTree = "<group>"; };
 		561E25E9218982D20019F3F0 /* DatabaseWriter+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseWriter+Rx.swift"; sourceTree = "<group>"; };
-		561E25EC218984680019F3F0 /* DatabaseReader+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseReader+Rx.swift"; sourceTree = "<group>"; };
 		562755D71E962BFD0035B653 /* RxGRDBmacOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBmacOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		565029151E8FDF5600615A2C /* RxGRDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RxGRDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		565029181E8FDF5600615A2C /* RxGRDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RxGRDB.h; sourceTree = "<group>"; };
@@ -177,7 +174,6 @@
 			isa = PBXGroup;
 			children = (
 				5653EC22209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift */,
-				561E25EC218984680019F3F0 /* DatabaseReader+Rx.swift */,
 				561E25E9218982D20019F3F0 /* DatabaseWriter+Rx.swift */,
 				561782561F655DAC00CEAA55 /* DiffSupport.swift */,
 				565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */,
@@ -550,7 +546,6 @@
 				5653EC24209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift in Sources */,
 				56DBA5431F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
 				560F92CF1E94DF830077EADF /* FetchRequest+Rx.swift in Sources */,
-				561E25EE218984680019F3F0 /* DatabaseReader+Rx.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -578,7 +573,6 @@
 				5653EC23209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift in Sources */,
 				56DBA5421F0BF12B00C90A18 /* GRDB+Rx.swift in Sources */,
 				565029B31E8FE12C00615A2C /* FetchRequest+Rx.swift in Sources */,
-				561E25ED218984680019F3F0 /* DatabaseReader+Rx.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
