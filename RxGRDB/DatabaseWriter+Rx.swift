@@ -54,10 +54,16 @@ extension Reactive where Base: DatabaseWriter {
         startImmediately: Bool = true)
         -> Observable<Database>
     {
+        func observedRegion(_ db: Database) throws -> DatabaseRegion {
+            return try regions.reduce(into: DatabaseRegion()) {
+                try $0.formUnion($1.databaseRegion(db))
+            }
+        }
+        
         return ChangesObservable(
             writer: base,
             startImmediately: startImmediately,
-            observedRegion: { db in try regions.map { try $0.databaseRegion(db) }.union() })
+            observedRegion: observedRegion)
             .asObservable()
     }
 }

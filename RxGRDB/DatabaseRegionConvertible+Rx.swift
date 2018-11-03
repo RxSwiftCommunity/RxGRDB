@@ -60,14 +60,3 @@ extension Reactive where Base: DatabaseRegionConvertible {
             startImmediately: startImmediately)
     }
 }
-
-/// TODO: remove
-extension Array where Element == DatabaseRegion {
-    func union() -> DatabaseRegion {
-        if let initial = first {
-            return suffix(from: 1).reduce(into: initial) { $0.formUnion($1) }
-        } else {
-            return DatabaseRegion()
-        }
-    }
-}
