@@ -114,9 +114,9 @@ To function correctly, RxGRDB requires that a unique [database connection] is ke
 
 # Observing Individual Requests
 
-**When your application observes a request, it gets notified each time a change in the results of the request has been committed in the database.**
+**When your application observes a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests), it gets notified each time a change in the results of the request has been committed in the database.**
 
-If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.fetchCount](#requestrxfetchcountinstartimmediatelyscheduler), [rx.fetchOne](#typedrequestrxfetchoneinstartimmediatelyscheduler), and [rx.fetchAll](#typedrequestrxfetchallinstartimmediatelyscheduler) methods, depending on whether you want to track the number of results, the first one, or all of them:
+If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.fetchCount](#requestrxfetchcountinstartimmediatelyscheduler), [rx.fetchOne](#fetchrequestrxfetchoneinstartimmediatelyscheduler), and [rx.fetchAll](#fetchrequestrxfetchallinstartimmediatelyscheduler) methods, depending on whether you want to track the number of results, the first one, or all of them:
 
 ```swift
 let request = Player.all()
@@ -134,8 +134,8 @@ request.rx.changes(in: dbQueue)    // Observable<Database>
 
 - [`rx.changes`](#requestrxchangesinstartimmediately)
 - [`rx.fetchCount`](#requestrxfetchcountinstartimmediatelyscheduler)
-- [`rx.fetchOne`](#typedrequestrxfetchoneinstartimmediatelyscheduler)
-- [`rx.fetchAll`](#typedrequestrxfetchallinstartimmediatelyscheduler)
+- [`rx.fetchOne`](#fetchrequestrxfetchoneinstartimmediatelyscheduler)
+- [`rx.fetchAll`](#fetchrequestrxfetchallinstartimmediatelyscheduler)
 
 
 ---
@@ -187,7 +187,7 @@ try dbQueue.write { db in
 
 #### `Request.rx.fetchCount(in:startImmediately:scheduler:)`
 
-This [database values observable](#values-observables) emits the number of results of the request after each database transaction that changes it:
+This [database values observable](#values-observables) emits the number of results of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests) after each database transaction that changes it:
 
 ```swift
 let request = Player.all()
@@ -210,9 +210,9 @@ This observable filters out identical consecutive values.
 
 ---
 
-#### `TypedRequest.rx.fetchOne(in:startImmediately:scheduler:)`
+#### `FetchRequest.rx.fetchOne(in:startImmediately:scheduler:)`
 
-This [database values observable](#values-observables) emits a value after each database transaction which has modified the result of the request:
+This [database values observable](#values-observables) emits a value after each database transaction which has modified the result of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests):
 
 ```swift
 let playerId = 42
@@ -251,9 +251,9 @@ This observable filters out identical consecutive values by comparing raw databa
 
 ---
 
-#### `TypedRequest.rx.fetchAll(in:startImmediately:scheduler:)`
+#### `FetchRequest.rx.fetchAll(in:startImmediately:scheduler:)`
 
-This [database values observable](#values-observables) emits an array of values  after each database transaction which has modified the result of the request:
+This [database values observable](#values-observables) emits an array of values  after each database transaction which has modified the result of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests):
 
 ```swift
 let request = Player.order(Column("name"))
