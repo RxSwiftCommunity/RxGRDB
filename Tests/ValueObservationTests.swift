@@ -30,10 +30,10 @@ extension ValueObservationTests {
             ([], 2)
         ]
         let recorder = EventRecorder<([String], Int)>(expectedEventCount: expectedValues.count)
-        let request = SQLRequest<Row>("SELECT * FROM table1")
+        let request = SQLRequest<Row>(sql: "SELECT * FROM table1")
         let observation = ValueObservation.tracking(request, fetch: { db -> ([String], Int) in
-            let strings = try String.fetchAll(db, "SELECT a FROM table1")
-            let int = try Int.fetchOne(db, "SELECT COUNT(*) FROM table2")!
+            let strings = try String.fetchAll(db, sql: "SELECT a FROM table1")
+            let int = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM table2")!
             return (strings, int)
         })
         
@@ -50,17 +50,17 @@ extension ValueObservationTests {
         try writer.writeWithoutTransaction { db in
             // 2: modify observed requests
             try db.inTransaction {
-                try db.execute("INSERT INTO table1 (a) VALUES ('foo')")
-                try db.execute("INSERT INTO table1 (a) VALUES ('bar')")
-                try db.execute("INSERT INTO table2 DEFAULT VALUES")
+                try db.execute(sql: "INSERT INTO table1 (a) VALUES ('foo')")
+                try db.execute(sql: "INSERT INTO table1 (a) VALUES ('bar')")
+                try db.execute(sql: "INSERT INTO table2 DEFAULT VALUES")
                 return .commit
             }
             
             // Still 2: table2 is not observed
-            try db.execute("INSERT INTO table2 DEFAULT VALUES")
+            try db.execute(sql: "INSERT INTO table2 DEFAULT VALUES")
             
             // 3: modify observed request
-            try db.execute("DELETE FROM table1")
+            try db.execute(sql: "DELETE FROM table1")
         }
         wait(for: recorder, timeout: 1)
         
@@ -89,7 +89,7 @@ extension ValueObservationTests {
         
         let expectedValues: [Int] = [0, 1, 2]
         let recorder = EventRecorder<Int>(expectedEventCount: expectedValues.count)
-        let request = SQLRequest<Int>("SELECT COUNT(*) FROM t")
+        let request = SQLRequest<Int>(sql: "SELECT COUNT(*) FROM t")
 
         let initialFetchExpectation = expectation(description: "initial fetch")
         initialFetchExpectation.assertForOverFulfill = false
@@ -112,8 +112,8 @@ extension ValueObservationTests {
         // wait until we have fetched initial value before we perform database changes
         wait(for: [initialFetchExpectation], timeout: 1)
         try writer.writeWithoutTransaction { db in
-            try db.execute("INSERT INTO t DEFAULT VALUES")
-            try db.execute("INSERT INTO t DEFAULT VALUES")
+            try db.execute(sql: "INSERT INTO t DEFAULT VALUES")
+            try db.execute(sql: "INSERT INTO t DEFAULT VALUES")
         }
         
         wait(for: recorder, timeout: 1)
@@ -144,7 +144,7 @@ extension ValueObservationTests {
             didSet { disposable?.disposed(by: disposeBag) }
         }
         
-        let request = SQLRequest<Int>("SELECT COUNT(*) FROM t")
+        let request = SQLRequest<Int>(sql: "SELECT COUNT(*) FROM t")
         
         let expectation1 = expectation(description: "1st subscription")
         expectation1.expectedFulfillmentCount = 2
@@ -159,7 +159,7 @@ extension ValueObservationTests {
         XCTAssertEqual(count1, 0) // synchronous emission of the 1st event
 
         try writer.write { db in
-            try db.execute("INSERT INTO t DEFAULT VALUES")
+            try db.execute(sql: "INSERT INTO t DEFAULT VALUES")
         }
         
         var count2: Int? = nil

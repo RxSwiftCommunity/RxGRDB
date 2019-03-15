@@ -76,7 +76,7 @@ extension Reactive where Base: _ValueObservationProtocol {
             
         } else if case .mainQueue = observation.scheduling , startImmediately == false {
             // Honor the startImmediately parameter
-            observation.scheduling = .onQueue(DispatchQueue.main, startImmediately: false)
+            observation.scheduling = .async(onQueue: DispatchQueue.main, startImmediately: false)
             return observation.makeObservable(in: reader)
             
         } else {

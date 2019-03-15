@@ -188,7 +188,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<Row>("SELECT * FROM player")
+    ///     let request = SQLRequest<Row>(sql: "SELECT * FROM player")
     ///     request.rx
     ///         .fetchAll(in: dbQueue)
     ///         .subscribe(onNext: { rows: [Row] in
@@ -243,7 +243,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<Row>("SELECT * FROM player WHERE id = 1")
+    ///     let request = SQLRequest<Row>(sql: "SELECT * FROM player WHERE id = 1")
     ///     request.rx
     ///         .fetchOne(in: dbQueue)
     ///         .subscribe(onNext: { row: Row? in
@@ -357,7 +357,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<String>("SELECT name FROM player ORDER BY score DESC")
+    ///     let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY score DESC")
     ///     request.rx
     ///         .fetchOne(in: dbQueue)
     ///         .subscribe(onNext: { bestPlayerName: String? in

@@ -24,7 +24,7 @@ extension Reactive where Base: DatabaseWriter {
     ///         }
     ///     }
     ///
-    ///     let request = SQLRequest("SELECT * FROM persons")
+    ///     let request = SQLRequest(sql: "SELECT * FROM persons")
     ///     dbQueue.changes(in: [request])
     ///         .subscribe(onNext: { db in
     ///             let count = try! request.fetchCount(db)
@@ -33,15 +33,15 @@ extension Reactive where Base: DatabaseWriter {
     ///     // Prints "Number of persons: 0"
     ///
     ///     try dbQueue.inDatabase { db in
-    ///         try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
+    ///         try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
     ///         // Prints "Number of persons: 1"
-    ///         try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
+    ///         try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
     ///         // Prints "Number of persons: 2"
     ///     }
     ///
     ///     try dbQueue.inTransaction { db in
-    ///         try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
-    ///         try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
+    ///         try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
+    ///         try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
     ///         return .commit
     ///     }
     ///     // Prints "Number of persons: 4"

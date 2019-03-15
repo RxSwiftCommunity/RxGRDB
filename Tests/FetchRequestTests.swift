@@ -22,8 +22,8 @@ extension FetchRequestTests {
     
     func modifyDatabase(in writer: DatabaseWriter) throws {
         try writer.writeWithoutTransaction { db in
-            try db.execute("UPDATE players SET name = name WHERE id = 1")
-            try db.execute("UPDATE players SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
+            try db.execute(sql: "UPDATE players SET name = name WHERE id = 1")
+            try db.execute(sql: "UPDATE players SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
             _ = try Player.deleteAll(db)
             try db.inTransaction {
                 var player = Player(id: nil, name: "Craig", email: nil)
@@ -185,7 +185,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
+        let request = SQLRequest<Row>(sql: "SELECT * FROM players ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
@@ -253,7 +253,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
+        let request = SQLRequest<Row>(sql: "SELECT * FROM players ORDER BY name")
         let expectedNames = [
             "Arthur",
             nil,
@@ -322,7 +322,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
+        let request = SQLRequest<String>(sql: "SELECT name FROM players ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
@@ -356,7 +356,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
+        let request = SQLRequest<String>(sql: "SELECT name FROM players ORDER BY name")
         let expectedNames = [
             "Arthur",
             nil,
@@ -391,7 +391,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String?>("SELECT email FROM players ORDER BY name")
+        let request = SQLRequest<String?>(sql: "SELECT email FROM players ORDER BY name")
         let expectedNames = [
             ["arthur@example.com", nil],
             [],

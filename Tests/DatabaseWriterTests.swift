@@ -30,8 +30,8 @@ extension DatabaseWriterTests {
         }
         
         let requests: [SQLRequest<Row>] = [
-            SQLRequest("SELECT a FROM table1"),
-            SQLRequest("SELECT table1.a, table2.b FROM table1, table2")]
+            SQLRequest(sql: "SELECT a FROM table1"),
+            SQLRequest(sql: "SELECT table1.a, table2.b FROM table1, table2")]
         
         let recorder = EventRecorder<Void>(expectedEventCount: 5)
         
@@ -45,27 +45,27 @@ extension DatabaseWriterTests {
         try writer.writeWithoutTransaction { db in
             // 2 (modify both requests)
             try db.inTransaction {
-                try db.execute("INSERT INTO table1 (id, a, b) VALUES (NULL, 0, 0)")
-                try db.execute("INSERT INTO table2 (id, a, b) VALUES (NULL, 0, 0)")
+                try db.execute(sql: "INSERT INTO table1 (id, a, b) VALUES (NULL, 0, 0)")
+                try db.execute(sql: "INSERT INTO table2 (id, a, b) VALUES (NULL, 0, 0)")
                 return .commit
             }
             
             // still 2 (modifying ignored columns)
-            try db.execute("UPDATE table1 SET b = 1")
-            try db.execute("UPDATE table2 SET a = 1")
+            try db.execute(sql: "UPDATE table1 SET b = 1")
+            try db.execute(sql: "UPDATE table2 SET a = 1")
             
             // 3 (modify both requests)
             try db.inTransaction {
-                try db.execute("DELETE FROM table1")
-                try db.execute("DELETE FROM table2")
+                try db.execute(sql: "DELETE FROM table1")
+                try db.execute(sql: "DELETE FROM table2")
                 return .commit
             }
             
             // 4 (modify both request)
-            try db.execute("INSERT INTO table1 (id, a, b) VALUES (NULL, 0, 0)")
+            try db.execute(sql: "INSERT INTO table1 (id, a, b) VALUES (NULL, 0, 0)")
             
             // 5 (modify one request)
-            try db.execute("INSERT INTO table2 (id, a, b) VALUES (NULL, 0, 0)")
+            try db.execute(sql: "INSERT INTO table2 (id, a, b) VALUES (NULL, 0, 0)")
         }
 
         wait(for: recorder, timeout: 1)
@@ -103,17 +103,17 @@ extension DatabaseWriterTests {
         try writer.writeWithoutTransaction { db in
             // 2
             try db.inTransaction {
-                try db.execute("INSERT INTO table1 (a) VALUES ('foo')")
-                try db.execute("INSERT INTO table1 (a) VALUES ('bar')")
-                try db.execute("INSERT INTO table2 DEFAULT VALUES")
+                try db.execute(sql: "INSERT INTO table1 (a) VALUES ('foo')")
+                try db.execute(sql: "INSERT INTO table1 (a) VALUES ('bar')")
+                try db.execute(sql: "INSERT INTO table2 DEFAULT VALUES")
                 return .commit
             }
             
             // 3
-            try db.execute("INSERT INTO table2 DEFAULT VALUES")
+            try db.execute(sql: "INSERT INTO table2 DEFAULT VALUES")
             
             // 4
-            try db.execute("DELETE FROM table1")
+            try db.execute(sql: "DELETE FROM table1")
         }
         wait(for: recorder, timeout: 1)
     }

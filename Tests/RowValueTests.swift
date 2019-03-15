@@ -19,7 +19,7 @@ extension RowValueTests {
             let innerSQL = (["SELECT ? AS value"] + dbValues.suffix(from: 1).map { _ in "UNION ALL SELECT ?" }).joined(separator: " ")
             let sql = "SELECT value FROM (\(innerSQL)) ORDER BY value"
             do {
-                let sqlSortedValues = try DatabaseValue.fetchAll(db, sql, arguments: StatementArguments(values))
+                let sqlSortedValues = try DatabaseValue.fetchAll(db, sql: sql, arguments: StatementArguments(values))
                 let swiftSortedValues = dbValues.sorted(by: <)
                 XCTAssertEqual(sqlSortedValues.count, swiftSortedValues.count)
                 for (sqlValue, swiftValue) in zip(sqlSortedValues, swiftSortedValues) {
@@ -28,7 +28,7 @@ extension RowValueTests {
             }
             do {
                 let reversedValues: [DatabaseValue] = dbValues.reversed()
-                let sqlSortedValues = try DatabaseValue.fetchAll(db, sql, arguments: StatementArguments(reversedValues))
+                let sqlSortedValues = try DatabaseValue.fetchAll(db, sql: sql, arguments: StatementArguments(reversedValues))
                 let swiftSortedValues = reversedValues.sorted(by: <)
                 XCTAssertEqual(sqlSortedValues.count, swiftSortedValues.count)
                 for (sqlValue, swiftValue) in zip(sqlSortedValues, swiftSortedValues) {

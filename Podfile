@@ -3,11 +3,11 @@ workspace 'RxGRDB.xcworkspace'
 
 def common
     pod 'RxSwift', '~> 4.0'
-    pod 'GRDB.swift', '~> 3.5'
+    pod 'GRDB.swift', :git => 'https://github.com/groue/GRDB.swift.git', :branch => 'GRDB-4.0'
 end
 
 target 'RxGRDBiOS' do
-  platform :ios, '8.0'
+  platform :ios, '9.0'
   common
 end
 
@@ -17,7 +17,7 @@ target 'RxGRDBmacOS' do
 end
 
 target 'RxGRDBiOSTests' do
-  platform :ios, '8.0'
+  platform :ios, '9.0'
   common
 end
 
@@ -28,7 +28,7 @@ end
 
 target 'RxGRDBDemo' do
   project 'Documentation/RxGRDBDemo/RxGRDBDemo.xcodeproj'
-  platform :ios, '8.0'
+  platform :ios, '9.0'
   pod 'Differ', '~> 1.0'
   pod 'RxGRDB', :path => '.'
 end

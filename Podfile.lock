@@ -1,40 +1,47 @@
 PODS:
   - Differ (1.3.0)
-  - GRDB.swift (3.5.0)
-  - RxAtomic (4.4.0)
-  - RxGRDB (0.12.1):
-    - RxGRDB/default (= 0.12.1)
+  - GRDB.swift (3.7.0)
+  - RxAtomic (4.4.2)
+  - RxGRDB (0.13.0):
+    - RxGRDB/default (= 0.13.0)
     - RxSwift (~> 4.0)
-  - RxGRDB/default (0.12.1):
+  - RxGRDB/default (0.13.0):
     - GRDB.swift (~> 3.5)
     - RxSwift (~> 4.0)
-  - RxSwift (4.4.0):
-    - RxAtomic (~> 4.4)
+  - RxSwift (4.4.2):
+    - RxAtomic (>= 4.4.2, ~> 4.4)
 
 DEPENDENCIES:
   - Differ (~> 1.0)
-  - GRDB.swift (~> 3.5)
+  - GRDB.swift (from `https://github.com/groue/GRDB.swift.git`, branch `GRDB-4.0`)
   - RxGRDB (from `.`)
   - RxSwift (~> 4.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Differ
-    - GRDB.swift
     - RxAtomic
     - RxSwift
 
 EXTERNAL SOURCES:
+  GRDB.swift:
+    :branch: GRDB-4.0
+    :git: https://github.com/groue/GRDB.swift.git
   RxGRDB:
     :path: "."
 
+CHECKOUT OPTIONS:
+  GRDB.swift:
+    :commit: f42a1844013c6cb51276741da7ea5e46effcd140
+    :git: https://github.com/groue/GRDB.swift.git
+
 SPEC CHECKSUMS:
   Differ: 9fcee7602542d7c6484ce05a0faec1c11258ed63
-  GRDB.swift: 225cf9c1354753e92e20c2a1fa2912b924c9da6e
-  RxAtomic: eacf60db868c96bfd63320e28619fe29c179656f
-  RxGRDB: 7c27e9cdc81185696b8ab7f29a2b6a8dc5c1b23d
-  RxSwift: 5976ecd04fc2fefd648827c23de5e11157faa973
+  GRDB.swift: 995f3289c25acc7970497a66ac4ee45a30c7b12c
+  RxAtomic: d00e97c10db88c6f08540e0bf2752fc5a2404167
+  RxGRDB: 2e5301d274550d0844d586a4dfa5ef0c0bd10cf0
+  RxSwift: 74c29b693c8e42b0f64400e8b06564575742d649
 
-PODFILE CHECKSUM: 1590d9a0f5d19408cda2cbca1ece0402fec7a260
+PODFILE CHECKSUM: ab703e3809c7113eb0329b2a011355160f1b66d1
 
-COCOAPODS: 1.6.0.beta.2
+COCOAPODS: 1.6.0
