@@ -3,12 +3,12 @@ import GRDB
 import RxSwift
 import RxGRDB
 
-class DatabaseWriterTests : XCTestCase { }
+class DatabaseRegionObservationTests : XCTestCase { }
 
 
 // MARK: - Changes
 
-extension DatabaseWriterTests {
+extension DatabaseRegionObservationTests {
     func testRxChanges() throws {
         try Test(testRxChanges)
             .run { try DatabaseQueue(path: $0) }
@@ -36,8 +36,8 @@ extension DatabaseWriterTests {
         let recorder = EventRecorder<Void>(expectedEventCount: 5)
         
         // 1 (startImmediately parameter is true by default)
-        AnyDatabaseWriter(writer).rx // ReactiveCompatible is unavailable: use AnyDatabaseWriter to get .rx
-            .changes(in: requests)
+        DatabaseRegionObservation(tracking: requests).rx
+            .changes(in: writer)
             .map { _ in }
             .subscribe(recorder)
             .disposed(by: disposeBag)
@@ -72,7 +72,7 @@ extension DatabaseWriterTests {
     }
 }
 
-extension DatabaseWriterTests {
+extension DatabaseRegionObservationTests {
     
     func testChangesInFullDatabase() throws {
         try Test(testChangesInFullDatabase)
@@ -94,8 +94,8 @@ extension DatabaseWriterTests {
         let recorder = EventRecorder<Void>(expectedEventCount: 4)
         
         // 1
-        AnyDatabaseWriter(writer).rx // ReactiveCompatible is unavailable: use AnyDatabaseWriter to get .rx
-            .changes(in: [DatabaseRegion.fullDatabase])
+        DatabaseRegionObservation(tracking: DatabaseRegion.fullDatabase).rx
+            .changes(in: writer)
             .map { _ in }
             .subscribe(recorder)
             .disposed(by: disposeBag)

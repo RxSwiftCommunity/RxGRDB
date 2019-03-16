@@ -109,7 +109,7 @@ To function correctly, RxGRDB requires that a unique [database connection] is ke
 
 **To define which part of the database should be observed, you provide database requests.** Requests can be expressed with GRDB's [query interface], as in `Player.all()`, or with SQL, as in `SELECT * FROM player`. Both would observe the full "player" database table. Observed requests can involve several database tables, and generally be as complex as you need them to be.
 
-**RxGRDB observables are based on GRDB's [ValueObservation] and [TransactionObserver].** If your application needs change notifications that are not built in RxGRDB, those versatile tools will probably provide a solution.
+**RxGRDB observables are based on GRDB's [ValueObservation] and [DatabaseRegionObservation].** If your application needs change notifications that are not built in RxGRDB, check the general [Database Changes Observation] chapter.
 
 
 # Observing Individual Requests
@@ -311,21 +311,22 @@ request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 
 :warning: **DO NOT compose those observables together with [RxSwift operators](https://github.com/ReactiveX/RxSwift)**: you would lose all guarantees of [data consistency](https://en.wikipedia.org/wiki/Consistency_(database_systems)).
 
-Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
+Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseRegionObservation.rx.changes](#databaseregionobservationrxchangesinstartimmediately).
 
 And when you need to fetch database values from several requests, use [ValueObservation.rx.fetch](#valueobservationrxfetchinstartimmediatelyscheduler).
 
 
 ---
 
-#### `DatabaseWriter.rx.changes(in:startImmediately:)`
+#### `DatabaseRegionObservation.rx.changes(in:startImmediately:)`
 
-This [database changes observable](#changes-observables) emits a database connection right after a database transaction has modified the tracked tables and columns by inserting, updating, or deleting a database row:
+This [database changes observable](#changes-observables) emits a database connection right after a database transaction has modified the tracked tables and columns by inserting, updating, or deleting a database row, just like [DatabaseRegionObservation].
 
 ```swift
-let playersRequest = Player.all()
-let teamsRequest = Team.all()
-dbQueue.rx.changes(in: [playersRequest, teamsRequest])
+let players = Player.all()
+let teams = Team.all()
+let observation = DatabaseRegionObservation(tracking: players, teams)
+observation.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Players or teams have changed.")
     })
@@ -350,7 +351,8 @@ All elements are emitted in a protected database dispatch queue, serialized with
 ```swift
 let players = SQLRequest<Row>(sql: "SELECT * FROM player")
 let teams = SQLRequest<Row>(sql: "SELECT * FROM team")
-dbQueue.rx.changes(in: [players, teams])
+let observation = DatabaseRegionObservation(tracking: players, teams)
+observation.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Players or teams have changed.")
     })
@@ -749,6 +751,6 @@ Player.all().rx
 [query interface]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [open an issue]: https://github.com/RxSwiftCommunity/RxGRDB/issues
-[TransactionObserver]: https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol
-[DatabaseRegion]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregion
+[DatabaseRegionObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregionobservation
 [ValueObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation
+[Database Changes Observation]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-changes-observation

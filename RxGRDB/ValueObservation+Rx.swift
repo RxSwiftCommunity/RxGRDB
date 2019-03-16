@@ -5,6 +5,8 @@
 #endif
 import RxSwift
 
+extension ValueObservation : ReactiveCompatible { }
+
 /// :nodoc:
 public protocol _ValueObservationProtocol: ReactiveCompatible {
     associatedtype _Reducer: ValueReducer

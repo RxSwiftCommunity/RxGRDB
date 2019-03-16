@@ -302,7 +302,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.select(Column("name")).asRequest(of: String.self)
+    ///     let request = Player.select(Column("name"), as: String.self)
     ///     request.rx
     ///         .fetchAll(in: dbQueue)
     ///         .subscribe(onNext: { names: [String] in
@@ -416,7 +416,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.select(Column("name")).asRequest(of: Optional<String>.self)
+    ///     let request = Player.select(Column("name"), as: Optional<String>.self)
     ///     request.rx
     ///         .fetchAll(in: dbQueue)
     ///         .subscribe(onNext: { names: [String?] in
