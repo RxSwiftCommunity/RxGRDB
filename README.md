@@ -346,26 +346,6 @@ try dbQueue.write { db in
 
 All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted synchronously, right upon subscription. See [GRDB Concurrency Guide] for more information.
 
-**You can also track SQL requests:**
-
-```swift
-let players = SQLRequest<Row>(sql: "SELECT * FROM player")
-let teams = SQLRequest<Row>(sql: "SELECT * FROM team")
-let observation = DatabaseRegionObservation(tracking: players, teams)
-observation.rx.changes(in: dbQueue)
-    .subscribe(onNext: { db: Database in
-        print("Players or teams have changed.")
-    })
-
-try dbQueue.write { db in
-    try db.execute(sql: "DELETE FROM player")
-}
-// Prints "Players or teams have changed."
-```
-
-> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
-
-
 ---
 
 #### `ValueObservation.rx.fetch(in:startImmediately:scheduler:)`
