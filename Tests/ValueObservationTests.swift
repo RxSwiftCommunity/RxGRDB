@@ -174,3 +174,49 @@ extension ValueObservationTests {
         waitForExpectations(timeout: 1, handler: nil)
     }
 }
+
+extension ValueObservationTests {
+    
+    // This is a documentation test for https://github.com/RxSwiftCommunity/RxGRDB/issues/52
+    func testDontBlockMainThread() throws {
+        try Test(testDontBlockMainThread)
+            .run { try DatabaseQueue(path: $0) }
+            .run { try DatabasePool(path: $0) }
+    }
+    
+    func testDontBlockMainThread(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        var requestExecutionCount = 0
+        writer.add(function: DatabaseFunction("register", argumentCount: 0, pure: false, function: { _ in
+            requestExecutionCount += 1
+            return nil
+        }))
+        
+        try writer.write { db in
+            try db.create(table: "t") { t in
+                t.column("id", .integer).primaryKey()
+            }
+        }
+        
+        var disposable: Disposable? {
+            willSet { disposable?.dispose() }
+            didSet { disposable?.disposed(by: disposeBag) }
+        }
+        
+        let request = SQLRequest<Int>(sql: "SELECT COUNT(*), register() FROM t")
+        
+        let expectation = self.expectation(description: "subscription")
+        expectation.expectedFulfillmentCount = 1
+        request.rx
+            .fetchOne(in: writer)
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .userInitiated))
+            .subscribe(onNext: { _ in
+                XCTAssertTrue(Thread.isMainThread)
+                expectation.fulfill()
+            })
+            .disposed(by: disposeBag)
+        XCTAssertEqual(requestExecutionCount, 0) // main thread has NOT been blocked by initial fetch
+        
+        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(requestExecutionCount, 1) // initial fetch has been performed
+    }
+}
