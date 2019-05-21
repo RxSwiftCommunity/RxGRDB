@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.10'
   s.watchos.deployment_target = '2.0'
   
-  s.dependency "RxSwift", "~> 4.0"
+  s.dependency "RxSwift", "~> 5.0"
   s.default_subspec = 'default'
   
   s.subspec 'default' do |ss|
