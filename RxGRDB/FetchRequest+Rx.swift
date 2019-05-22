@@ -117,7 +117,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder]>
     {
-        // TODO: test
         return ValueObservation.trackingAll(base).rx.fetch(
             in: reader,
             startImmediately:
@@ -174,7 +173,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder?>
     {
-        // TODO: test
         return ValueObservation.trackingOne(base).rx.fetch(
             in: reader,
             startImmediately: startImmediately,
