@@ -8,7 +8,7 @@ class FetchRequestTests : XCTestCase { }
 extension FetchRequestTests {
     func setUpDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
-            try db.create(table: "players") { t in
+            try db.create(table: "player") { t in
                 t.column("id", .integer).primaryKey()
                 t.column("name", .text)
                 t.column("email", .text)
@@ -22,8 +22,8 @@ extension FetchRequestTests {
     
     func modifyDatabase(in writer: DatabaseWriter) throws {
         try writer.writeWithoutTransaction { db in
-            try db.execute(sql: "UPDATE players SET name = name WHERE id = 1")
-            try db.execute(sql: "UPDATE players SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
+            try db.execute(sql: "UPDATE player SET name = name WHERE id = 1")
+            try db.execute(sql: "UPDATE player SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
             _ = try Player.deleteAll(db)
             try db.inTransaction {
                 var player = Player(id: nil, name: "Craig", email: nil)
@@ -185,7 +185,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<Row>(sql: "SELECT * FROM players ORDER BY name")
+        let request = SQLRequest<Row>(sql: "SELECT * FROM player ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
@@ -253,7 +253,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<Row>(sql: "SELECT * FROM players ORDER BY name")
+        let request = SQLRequest<Row>(sql: "SELECT * FROM player ORDER BY name")
         let expectedNames = [
             "Arthur",
             nil,
@@ -322,7 +322,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String>(sql: "SELECT name FROM players ORDER BY name")
+        let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
@@ -356,7 +356,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String>(sql: "SELECT name FROM players ORDER BY name")
+        let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY name")
         let expectedNames = [
             "Arthur",
             nil,
@@ -391,7 +391,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String?>(sql: "SELECT email FROM players ORDER BY name")
+        let request = SQLRequest<String?>(sql: "SELECT email FROM player ORDER BY name")
         let expectedNames = [
             ["arthur@example.com", nil],
             [],
@@ -488,41 +488,12 @@ extension FetchRequestTests {
 
 // MARK: - Support
 
-private struct Player : FetchableRecord, MutablePersistableRecord {
+private struct Player : FetchableRecord, MutablePersistableRecord, Codable, Equatable {
     var id: Int64?
     var name: String
     var email: String?
     
-    init(id: Int64?, name: String, email: String?) {
-        self.id = id
-        self.name = name
-        self.email = email
-    }
-    
-    init(row: Row) {
-        id = row["id"]
-        name = row["name"]
-        email = row["email"]
-    }
-    
-    static var databaseTableName = "players"
-    
-    func encode(to container: inout PersistenceContainer) {
-        container["id"] = id
-        container["name"] = name
-        container["email"] = email
-    }
-    
     mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
-    }
-}
-
-extension Player : Equatable {
-    static func == (lhs: Player, rhs: Player) -> Bool {
-        if lhs.id != rhs.id { return false }
-        if lhs.name != rhs.name { return false }
-        if lhs.email != rhs.email { return false }
-        return true
     }
 }
