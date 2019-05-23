@@ -1,8 +1,4 @@
-#if USING_SQLCIPHER
-    import GRDBCipher
-#else
-    import GRDB
-#endif
+import GRDB
 import RxSwift
 
 extension DatabaseRegionObservation : ReactiveCompatible { }

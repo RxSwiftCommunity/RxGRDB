@@ -1,8 +1,4 @@
-#if USING_SQLCIPHER
-    import GRDBCipher
-#else
-    import GRDB
-#endif
+import GRDB
 
 /// TODO
 public struct PrimaryKeyDiffScanner<Record: FetchableRecord & MutablePersistableRecord> {

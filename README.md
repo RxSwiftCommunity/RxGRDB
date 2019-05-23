@@ -87,7 +87,7 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 
     ```ruby
     use_frameworks!
-    pod 'RxGRDB/GRDBCipher'
+    pod 'RxGRDB/SQLCipher'
     ```
 
 3. In your application files, import the modules you need:
@@ -95,7 +95,7 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
     ```swift
     import RxSwift
     import RxGRDB
-    import GRDBCipher
+    import GRDB
     ```
 
 

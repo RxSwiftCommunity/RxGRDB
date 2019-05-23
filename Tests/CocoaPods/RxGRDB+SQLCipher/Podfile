@@ -1,0 +1,5 @@
+target "DemoApp" do
+  use_frameworks!
+  platform :ios, '9.0'
+  pod 'RxGRDB/SQLCipher', path: '../../..'
+end
