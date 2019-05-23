@@ -3,7 +3,7 @@ workspace 'RxGRDB.xcworkspace'
 
 def common
     pod 'RxSwift', '~> 5.0'
-    pod 'GRDB.swift', :git => 'https://github.com/groue/GRDB.swift.git', :branch => 'GRDB-4.0'
+    pod 'GRDB.swift', '~> 4.0'
 end
 
 target 'RxGRDBiOS' do

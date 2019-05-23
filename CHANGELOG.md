@@ -5,7 +5,7 @@ Release Notes
 
 ### New
 
-- Support for GRDB 4.0 and Swift 5
+- Support for Swift 5, GRDB 4.0, and RxSwift 5.0.
 - Reactive extension on DatabaseRegionObservation:
     
     ```swift
@@ -21,9 +21,11 @@ Release Notes
 ### Breaking Changes
 
 - Swift 4.0 and Swift 4.1 are no longer supported.
+- GRDB 3 and RxSwift 4 are no longer supported.
 - iOS 8 is no longer supported. Minimum deployment target is now iOS 9.0.
 - Deprecated APIs are no longer available.
 - `DatabaseWriter.rx.changes` is removed, replaced with `DatabaseRegionObservation.rx.changes`.
+- SQLCipher support is now available under the CocoaPods `RxGRDB/SQLCipher` name.
 
 
 ## 0.13.0
