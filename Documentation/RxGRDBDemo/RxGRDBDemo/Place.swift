@@ -36,8 +36,10 @@ extension Place: FetchableRecord { }
 extension Place: MutablePersistableRecord {
     static let databaseTableName = "place"
     
-    enum Columns: String, ColumnExpression {
-        case id, latitude, longitude
+    enum Columns {
+        static let id = Column(CodingKeys.id)
+        static let latitude = Column(CodingKeys.latitude)
+        static let longitude = Column(CodingKeys.longitude)
     }
     
     mutating func didInsert(with rowID: Int64, for column: String?) {

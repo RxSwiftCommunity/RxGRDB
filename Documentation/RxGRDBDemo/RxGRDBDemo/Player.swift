@@ -16,8 +16,10 @@ extension Player: FetchableRecord { }
 extension Player: MutablePersistableRecord {
     static let databaseTableName = "player"
     
-    enum Columns: String, ColumnExpression {
-        case id, name, score
+    enum Columns {
+        static let id = Column(CodingKeys.id)
+        static let name = Column(CodingKeys.name)
+        static let score = Column(CodingKeys.score)
     }
     
     mutating func didInsert(with rowID: Int64, for column: String?) {
