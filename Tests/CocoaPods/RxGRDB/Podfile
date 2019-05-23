@@ -1,4 +1,5 @@
 target "DemoApp" do
   use_frameworks!
-  pod 'RxGRDB'
+  platform :ios, '9.0'
+  pod 'RxGRDB', path: '../../..'
 end
