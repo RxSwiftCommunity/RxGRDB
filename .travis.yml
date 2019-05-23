@@ -35,7 +35,7 @@ jobs:
       script: make test_framework_RxGRDBmacOS_maxSwift
 
     # Test RxGRDBmacOS (Xcode 10.2)
-    - stage: Test RxGRDB
+    - stage: Test RxGRDB Xcode 10.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10.2
       env:
@@ -43,7 +43,7 @@ jobs:
       script: make test_framework_RxGRDBmacOS_minSwift
 
     # Test RxGRDBiOS (iOS <MAXIMUM VERSION>))
-    - stage: Test RxGRDB
+    - stage: Test RxGRDB Xcode 10.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10.2
       env:
@@ -51,7 +51,7 @@ jobs:
       script: make test_framework_RxGRDBiOS_maxTarget_maxSwift
 
     # Test RxGRDBiOS (iOS <MAXIMUM VERSION>))
-    - stage: Test RxGRDB
+    - stage: Test RxGRDB Xcode 10.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10.2
       env:
@@ -59,7 +59,7 @@ jobs:
       script: make test_framework_RxGRDBiOS_maxTarget_minSwift
 
     # Test RxGRDBiOS (iOS <MINIMUM VERSION>))
-    - stage: Test RxGRDB
+    - stage: Test RxGRDB Xcode 10.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10.2
       env:
@@ -78,7 +78,7 @@ jobs:
       script: make test_framework_RxGRDBmacOS_maxSwift
 
     # Test RxGRDBiOS (iOS <MAXIMUM VERSION>))
-    - stage: Test RxGRDB
+    - stage: Test RxGRDB Xcode 10
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10
       env:
@@ -86,7 +86,7 @@ jobs:
       script: make test_framework_RxGRDBiOS_maxTarget_maxSwift
 
     # Test RxGRDBiOS (iOS <MINIMUM VERSION>))
-    - stage: Test RxGRDB
+    - stage: Test RxGRDB Xcode 10
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10
       env:
