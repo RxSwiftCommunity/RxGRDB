@@ -383,7 +383,7 @@ Since RxGRDB is able to track database changes, it is a natural desire to comput
 
 RxGRDB ships with one diff algorithm which computes the inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for collections whose order does not matter, such as annotations in a map view. See [`PrimaryKeyDiffScanner`](#primarykeydiffscanner).
 
-For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses Differ in order to animate the content of a table view.
+For other diff algorithms, we advise you to have a look to [RxDataSources](https://github.com/RxSwiftCommunity/RxDataSources), [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses RxDataSources in order to animate the content of a table view.
 
 
 ## PrimaryKeyDiffScanner

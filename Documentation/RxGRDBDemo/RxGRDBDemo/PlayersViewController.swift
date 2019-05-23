@@ -1,10 +1,12 @@
 import UIKit
-import RxSwift
-import RxGRDB
 import GRDB
-import Differ
+import RxDataSources
+import RxGRDB
+import RxCocoa
+import RxSwift
 
-class PlayersViewController: UITableViewController {
+class PlayersViewController: UIViewController {
+    @IBOutlet private weak var tableView: UITableView!
     private let disposeBag = DisposeBag()
     
     // An enum that describes a players ordering
@@ -28,11 +30,7 @@ class PlayersViewController: UITableViewController {
     }
     
     // The user can change the players ordering
-    private var ordering: Variable<Ordering> = Variable(.byScore)
-    
-    // The players that feed the table view.
-    // They depend on the current ordering.
-    private var players: [Player] = []
+    private var ordering = BehaviorRelay<Ordering>(value: .byScore)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,19 +46,21 @@ extension PlayersViewController {
     
     private func setupNavigationItem() {
         // Navigation item depends on the ordering
-        ordering.asObservable()
-            .observeOn(MainScheduler.instance)
+        ordering
             .subscribe(onNext: { [weak self] ordering in
-                guard let strongSelf = self else { return }
+                guard let self = self else { return }
                 
                 let action: Selector
                 switch ordering {
-                case .byScore: action = #selector(strongSelf.sortByName)
-                case .byName: action = #selector(strongSelf.sortByScore)
+                case .byScore: action = #selector(self.sortByName)
+                case .byName: action = #selector(self.sortByScore)
                 }
                 
-                strongSelf.navigationItem.rightBarButtonItem = UIBarButtonItem(title: ordering.localizedName, style: .plain, target: self, action: action)
-                
+                self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                    title: ordering.localizedName,
+                    style: .plain,
+                    target: self,
+                    action: action)
             })
             .disposed(by: disposeBag)
     }
@@ -76,11 +76,11 @@ extension PlayersViewController {
     }
     
     @IBAction func sortByName() {
-        ordering.value = .byName
+        ordering.accept(.byName)
     }
     
     @IBAction func sortByScore() {
-        ordering.value = .byScore
+        ordering.accept(.byScore)
     }
     
     @IBAction func deletePlayers() {
@@ -133,61 +133,40 @@ extension PlayersViewController {
     // MARK: - Table View
     
     private func setupTableView() {
-        let diffScanner = ExtendedDiffScanner(rows: [], extendedDiff: nil)
+        let dataSource = RxTableViewSectionedAnimatedDataSource<Section>(
+            animationConfiguration: AnimationConfiguration(
+                insertAnimation: .fade,
+                reloadAnimation: .fade,
+                deleteAnimation: .fade),
+            configureCell: { (dataSource, tableView, indexPath, _) -> UITableViewCell in
+                let section = dataSource.sectionModels[indexPath.section]
+                let player = section.items[indexPath.row]
+                let cell = tableView.dequeueReusableCell(withIdentifier: "Player", for: indexPath)
+                cell.textLabel?.text = player.name
+                cell.detailTextLabel?.text = "\(player.score)"
+                return cell
+        })
         
-        // Track player ordering
-        ordering.asObservable()
-            
-            // Each ordering has a database request: observe its changes
-            .flatMapLatest { ordering -> Observable<[Row]> in
-                // Turn player requests into row requests so that we can compute
-                // diffs based on Row's implementation of Equatable protocol.
-                let rowRequest = ordering.request.asRequest(of: Row.self)
-                
-                // Emits a new row array each time the database changes
-                return rowRequest.rx.fetchAll(in: dbPool)
-            }
-            
-            // Compute diff between fetched rows
-            .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
-            
-            // Apply diff to the table view
-            .subscribe(onNext: { [weak self] scanner in
-                guard let strongSelf = self else { return }
-                strongSelf.players = scanner.rows.map { Player(row: $0) }
-                strongSelf.tableView.apply(
-                    scanner.extendedDiff!,
-                    deletionAnimation: .fade,
-                    insertionAnimation: .fade)
-            })
+        ordering
+            .distinctUntilChanged()
+            .flatMapLatest { $0.request.rx.fetchAll(in: dbPool) }
+            .map { [Section(items: $0)] }
+            .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
     }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return players.count
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Player", for: indexPath)
-        configure(cell, at: indexPath)
-        return cell
-    }
-    
-    private func configure(_ cell: UITableViewCell, at indexPath: IndexPath) {
-        let player = players[indexPath.row]
-        cell.textLabel?.text = player.name
-        cell.detailTextLabel?.text = "\(player.score)"
+}
+
+private struct Section {
+    var items: [Player]
+}
+
+extension Section: AnimatableSectionModelType {
+    var identity: Int { return 1 }
+    init(original: Section, items: [Player]) {
+        self.items = items
     }
 }
 
-struct ExtendedDiffScanner {
-    var rows: [Row]
-    var extendedDiff: ExtendedDiff?
-    
-    func diffed(from newRows: [Row]) -> ExtendedDiffScanner {
-        return ExtendedDiffScanner(
-            rows: newRows,
-            extendedDiff: rows.extendedDiff(newRows))
-    }
+extension Player: IdentifiableType {
+    var identity: Int64 { return id! }
 }
-

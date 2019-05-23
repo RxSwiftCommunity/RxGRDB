@@ -1,7 +1,7 @@
 import GRDB
 
 // A player
-struct Player: Codable {
+struct Player: Codable, Equatable {
     var id: Int64?
     var name: String
     var score: Int
