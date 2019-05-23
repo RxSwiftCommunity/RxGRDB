@@ -24,97 +24,88 @@ jobs:
   include:
 
     ###########################################
-    ## Test RxGRDB
+    ## Test RxGRDB Xcode 10.2
 
-    # Test RxGRDBmacOS (Xcode 10)
-    - stage: Test RxGRDB
+    # Test RxGRDBmacOS (Xcode 10.2)
+    - stage: Test RxGRDB Xcode 10.2
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode10
+      osx_image: xcode10.2
       env:
-        - TID=RxGRDBOSX (Xcode 10, Swift 4.2, macOS)
+        - TID=RxGRDBOSX (Swift 5, macOS)
       script: make test_framework_RxGRDBmacOS_maxSwift
 
-    # Test RxGRDBmacOS (Xcode 10)
+    # Test RxGRDBmacOS (Xcode 10.2)
     - stage: Test RxGRDB
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode10
+      osx_image: xcode10.2
       env:
-        - TID=RxGRDBOSX (Xcode 10, Swift 4.0, macOS)
+        - TID=RxGRDBOSX (Swift 4.2, macOS)
       script: make test_framework_RxGRDBmacOS_minSwift
 
-    # Test RxGRDBmacOS (Xcode 9.4)
+    # Test RxGRDBiOS (iOS <MAXIMUM VERSION>))
     - stage: Test RxGRDB
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode9.4
+      osx_image: xcode10.2
       env:
-        - TID=RxGRDBOSX (Xcode 9.4, macOS)
-      script: make test_framework_RxGRDBmacOS_maxSwift
-
-    # Test RxGRDBmacOS (Xcode 9.3)
-    - stage: Test RxGRDB
-      gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode9.3
-      env:
-        - TID=RxGRDBOSX (Xcode 9.3, macOS)
-      script: make test_framework_RxGRDBmacOS
-
-    # Test RxGRDBiOS (Xcode 10, iOS <MAXIMUM VERSION>))
-    - stage: Test RxGRDB
-      gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode10
-      env:
-        - TID=RxGRDBiOS (Xcode 10, Swift 4.2, iOS <MAX>)
+        - TID=RxGRDBiOS (Swift 5, iOS <MAX>)
       script: make test_framework_RxGRDBiOS_maxTarget_maxSwift
 
-    # Test RxGRDBiOS (Xcode 10, iOS <MAXIMUM VERSION>))
+    # Test RxGRDBiOS (iOS <MAXIMUM VERSION>))
     - stage: Test RxGRDB
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode10
+      osx_image: xcode10.2
       env:
-        - TID=RxGRDBiOS (Xcode 10, Swift 4.0, iOS <MAX>)
+        - TID=RxGRDBiOS (Swift 4.2, iOS <MAX>)
       script: make test_framework_RxGRDBiOS_maxTarget_minSwift
 
-    # Test RxGRDBiOS (Xcode 10, iOS <MINIMUM VERSION>))
+    # Test RxGRDBiOS (iOS <MINIMUM VERSION>))
+    - stage: Test RxGRDB
+      gemfile: .ci/gemfiles/Gemfile.travis
+      osx_image: xcode10.2
+      env:
+        - TID=RxGRDBiOS (Swift 5, iOS <MIN>)
+      script: make test_framework_RxGRDBiOS_minTarget
+
+    ###########################################
+    ## Test RxGRDB Xcode 10
+
+    # Test RxGRDBmacOS (Xcode 10)
+    - stage: Test RxGRDB Xcode 10
+      gemfile: .ci/gemfiles/Gemfile.travis
+      osx_image: xcode10
+      env:
+        - TID=RxGRDBOSX (Swift 4.2, macOS)
+      script: make test_framework_RxGRDBmacOS_maxSwift
+
+    # Test RxGRDBiOS (iOS <MAXIMUM VERSION>))
     - stage: Test RxGRDB
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10
       env:
-        - TID=RxGRDBiOS (Xcode 10, iOS <MIN>)
-      script: make test_framework_RxGRDBiOS_minTarget
-
-    # Test RxGRDBiOS (Xcode 9.4, iOS <MAXIMUM VERSION>))
-    - stage: Test RxGRDB
-      gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode9.4
-      env:
-        - TID=RxGRDBiOS (Xcode 9.4, iOS <MAX>)
+        - TID=RxGRDBiOS (Swift 4.2, iOS <MAX>)
       script: make test_framework_RxGRDBiOS_maxTarget_maxSwift
 
-    # Test RxGRDBiOS (Xcode 9.3, iOS <MINIMUM VERSION>))
+    # Test RxGRDBiOS (iOS <MINIMUM VERSION>))
     - stage: Test RxGRDB
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode9.3
+      osx_image: xcode10
       env:
-        - TID=RxGRDBiOS (Xcode 9.3, iOS <MIN>)
+        - TID=RxGRDBiOS (Swift 4.2, iOS <MIN>)
       script: make test_framework_RxGRDBiOS_minTarget
 
     ###########################################
     ## Test Installation Methods
 
-    # Cocoapods Lint
+    # CocoaPods Lint
     - stage: Test Installation
-      osx_image: xcode10
-      install:
-        - gem install cocoapods --pre # >= 1.6.0.beta.1 for cocoapods lint
+      osx_image: xcode10.2
       env:
-        - TID=Cocoapods
+        - TID=CocoaPods (Xcode 10.2)
       script: make test_CocoaPodsLint
 
-    # Cocoapods Lint
+    # CocoaPods Lint
     - stage: Test Installation
-      osx_image: xcode9.3
-      install:
-        - gem install cocoapods --pre # >= 1.6.0.beta.1 for cocoapods lint
+      osx_image: xcode10
       env:
-        - TID=Cocoapods
+        - TID=CocoaPods (Xcode 10)
       script: make test_CocoaPodsLint
