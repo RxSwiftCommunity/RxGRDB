@@ -62,7 +62,7 @@ Documentation
 
 You can install RxGRDB with [CocoaPods](http://cocoapods.org/):
 
-1. Install cocoapods version 1.1 or higher
+1. Install cocoapods version 1.7.0 or higher
 
 2. Specify in your Podfile:
 
