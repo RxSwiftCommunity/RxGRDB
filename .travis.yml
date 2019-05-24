@@ -55,6 +55,7 @@ jobs:
 
     # CocoaPods Lint
     - stage: Test Installation
+      gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode10.2
       env:
         - TID=CocoaPods (Xcode 10.2)
