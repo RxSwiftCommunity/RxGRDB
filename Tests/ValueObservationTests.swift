@@ -139,11 +139,6 @@ extension ValueObservationTests {
             }
         }
         
-        var disposable: Disposable? {
-            willSet { disposable?.dispose() }
-            didSet { disposable?.disposed(by: disposeBag) }
-        }
-        
         let request = SQLRequest<Int>(sql: "SELECT COUNT(*) FROM t")
         
         let expectation1 = expectation(description: "1st subscription")
@@ -185,25 +180,9 @@ extension ValueObservationTests {
     }
     
     func testDontBlockMainThread(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+        let request = SQLRequest<Int>(sql: "SELECT 1")
+        
         var requestExecutionCount = 0
-        writer.add(function: DatabaseFunction("register", argumentCount: 0, pure: false, function: { _ in
-            requestExecutionCount += 1
-            return nil
-        }))
-        
-        try writer.write { db in
-            try db.create(table: "t") { t in
-                t.column("id", .integer).primaryKey()
-            }
-        }
-        
-        var disposable: Disposable? {
-            willSet { disposable?.dispose() }
-            didSet { disposable?.disposed(by: disposeBag) }
-        }
-        
-        let request = SQLRequest<Int>(sql: "SELECT COUNT(*), register() FROM t")
-        
         let expectation = self.expectation(description: "subscription")
         expectation.expectedFulfillmentCount = 1
         request.rx
@@ -211,6 +190,7 @@ extension ValueObservationTests {
             .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             .subscribe(onNext: { _ in
                 XCTAssertTrue(Thread.isMainThread)
+                requestExecutionCount += 1
                 expectation.fulfill()
             })
             .disposed(by: disposeBag)
