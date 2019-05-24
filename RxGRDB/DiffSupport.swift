@@ -1,8 +1,4 @@
-#if USING_SQLCIPHER
-    import GRDBCipher
-#else
-    import GRDB
-#endif
+import GRDB
 
 /// A "row value" https://www.sqlite.org/rowvalue.html
 ///
@@ -72,7 +68,7 @@ extension FetchRequest where RowDecoder: TableRecord {
         let columns = try db.primaryKey(RowDecoder.databaseTableName).columns
         
         // Turn column names into statement indexes
-        let (statement, rowAdapter) = try prepare(db)
+        let (statement, rowAdapter) = try prepare(db, forSingleResult: false)
         let rowLayout: RowLayout = try rowAdapter?.layoutedAdapter(from: statement).mapping ?? statement
         let indexes = columns.map { column -> Int in
             guard let index = rowLayout.layoutIndex(ofColumn: column) else {

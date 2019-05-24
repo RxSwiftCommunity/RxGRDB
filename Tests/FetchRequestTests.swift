@@ -3,12 +3,39 @@ import GRDB
 import RxSwift
 @testable import RxGRDB // @testable to get PrimaryKeyDiff initializer
 
+// The tested request
+private struct CustomFetchRequest<T>: FetchRequest, ReactiveCompatible {
+    typealias RowDecoder = T
+    
+    private let _prepare: (Database, _ singleResult: Bool) throws -> (SelectStatement, RowAdapter?)
+    private let _fetchCount: (Database) throws -> Int
+    private let _databaseRegion: (Database) throws -> DatabaseRegion
+    
+    init<Request: FetchRequest>(_ request: Request) where Request.RowDecoder == T {
+        _prepare = request.prepare
+        _fetchCount = request.fetchCount
+        _databaseRegion = request.databaseRegion
+    }
+    
+    func prepare(_ db: Database, forSingleResult singleResult: Bool) throws -> (SelectStatement, RowAdapter?) {
+        return try _prepare(db, singleResult)
+    }
+    
+    func fetchCount(_ db: Database) throws -> Int {
+        return try _fetchCount(db)
+    }
+    
+    func databaseRegion(_ db: Database) throws -> DatabaseRegion {
+        return try _databaseRegion(db)
+    }
+}
+
 class FetchRequestTests : XCTestCase { }
 
 extension FetchRequestTests {
     func setUpDatabase(in writer: DatabaseWriter) throws {
         try writer.write { db in
-            try db.create(table: "players") { t in
+            try db.create(table: "player") { t in
                 t.column("id", .integer).primaryKey()
                 t.column("name", .text)
                 t.column("email", .text)
@@ -22,8 +49,8 @@ extension FetchRequestTests {
     
     func modifyDatabase(in writer: DatabaseWriter) throws {
         try writer.writeWithoutTransaction { db in
-            try db.execute("UPDATE players SET name = name WHERE id = 1")
-            try db.execute("UPDATE players SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
+            try db.execute(sql: "UPDATE player SET name = name WHERE id = 1")
+            try db.execute(sql: "UPDATE player SET name = ? WHERE name = ?", arguments: ["Barbie", "Barbara"])
             _ = try Player.deleteAll(db)
             try db.inTransaction {
                 var player = Player(id: nil, name: "Craig", email: nil)
@@ -58,7 +85,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -92,7 +119,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -125,7 +152,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
-        request.rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.fetchOne(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -159,7 +186,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
-        request.rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.fetchOne(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -185,7 +212,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
+        let request = SQLRequest<Row>(sql: "SELECT * FROM player ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
@@ -195,7 +222,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -229,7 +256,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -253,7 +280,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<Row>("SELECT * FROM players ORDER BY name")
+        let request = SQLRequest<Row>(sql: "SELECT * FROM player ORDER BY name")
         let expectedNames = [
             "Arthur",
             nil,
@@ -262,7 +289,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
-        request.rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.fetchOne(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -296,7 +323,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
-        request.rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.fetchOne(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -322,7 +349,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
+        let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
             ["Arthur", "Barbie"],
@@ -332,7 +359,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -356,7 +383,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String>("SELECT name FROM players ORDER BY name")
+        let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY name")
         let expectedNames = [
             "Arthur",
             nil,
@@ -365,7 +392,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
-        request.rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.fetchOne(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -391,7 +418,7 @@ extension FetchRequestTests {
     }
     
     func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        let request = SQLRequest<String?>("SELECT email FROM players ORDER BY name")
+        let request = SQLRequest<String?>(sql: "SELECT email FROM player ORDER BY name")
         let expectedNames = [
             ["arthur@example.com", nil],
             [],
@@ -400,7 +427,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
-        request.rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.fetchAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -466,8 +493,7 @@ extension FetchRequestTests {
                 request: request,
                 initialRecords: [])
         }
-        request
-            .asRequest(of: Row.self)
+        CustomFetchRequest(request.asRequest(of: Row.self))
             .rx
             .fetchAll(in: writer)
             .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
@@ -488,41 +514,12 @@ extension FetchRequestTests {
 
 // MARK: - Support
 
-private struct Player : FetchableRecord, MutablePersistableRecord {
+private struct Player : FetchableRecord, MutablePersistableRecord, Codable, Equatable {
     var id: Int64?
     var name: String
     var email: String?
     
-    init(id: Int64?, name: String, email: String?) {
-        self.id = id
-        self.name = name
-        self.email = email
-    }
-    
-    init(row: Row) {
-        id = row["id"]
-        name = row["name"]
-        email = row["email"]
-    }
-    
-    static var databaseTableName = "players"
-    
-    func encode(to container: inout PersistenceContainer) {
-        container["id"] = id
-        container["name"] = name
-        container["email"] = email
-    }
-    
     mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
-    }
-}
-
-extension Player : Equatable {
-    static func == (lhs: Player, rhs: Player) -> Bool {
-        if lhs.id != rhs.id { return false }
-        if lhs.name != rhs.name { return false }
-        if lhs.email != rhs.email { return false }
-        return true
     }
 }

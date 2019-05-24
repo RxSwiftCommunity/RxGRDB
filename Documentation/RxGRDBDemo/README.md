@@ -1,7 +1,7 @@
 RxGRDBDemo
 ==========
 
-This demo application uses [RxSwift], [RxGRDB], and [Differ](https://github.com/tonyarnold/Differ) to synchronize its view with the content of the database.
+This demo application uses [RxSwift], [RxGRDB], and [RxDataSources](https://github.com/RxSwiftCommunity/RxDataSources) to synchronize its view with the content of the database.
 
 To play with it:
 
@@ -20,6 +20,6 @@ In both screens, the bomb icon spawns 50 dispatch items that concurrently perfor
 | :-----: | :-----: |
 | ![Screen shot 1](Documentation/Screen1.png) | ![Screen shot 2](Documentation/Screen2.png) |
 
-[Differ]: https://github.com/tonyarnold/Differ
+[RxDataSources]: https://github.com/RxSwiftCommunity/RxDataSources
 [RxGRDB]: http://github.com/RxSwiftCommunity/RxGRDB
 [RxSwift]: https://github.com/ReactiveX/RxSwift

@@ -1,11 +1,11 @@
-RxGRDB [![Swift](https://img.shields.io/badge/swift-4.1-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE) [![Build Status](https://travis-ci.org/RxSwiftCommunity/RxGRDB.svg?branch=master)](https://travis-ci.org/RxSwiftCommunity/RxGRDB)
+RxGRDB [![Swift 5](https://img.shields.io/badge/swift-5-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE) [![Build Status](https://travis-ci.org/RxSwiftCommunity/RxGRDB.svg?branch=master)](https://travis-ci.org/RxSwiftCommunity/RxGRDB)
 ======
 
 ### A set of reactive extensions for SQLite and [GRDB.swift](http://github.com/groue/GRDB.swift)
 
 **Latest release**: November 2, 2018 &bull; version 0.13.0 &bull; [Release Notes](CHANGELOG.md)
 
-**Requirements**: iOS 8.0+ / OSX 10.9+ / watchOS 2.0+ &bull; Swift 4.1+ / Xcode 9.3+
+**Requirements**: iOS 9.0+ / OSX 10.9+ / watchOS 2.0+ &bull; Swift 5+ / Xcode 10.2+
 
 | Swift version | RxGRDB version                                                    |
 | ------------- | ----------------------------------------------------------------- |
@@ -62,7 +62,7 @@ Documentation
 
 You can install RxGRDB with [CocoaPods](http://cocoapods.org/):
 
-1. Install cocoapods version 1.1 or higher
+1. Install cocoapods version 1.7.0 or higher
 
 2. Specify in your Podfile:
 
@@ -87,7 +87,7 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 
     ```ruby
     use_frameworks!
-    pod 'RxGRDB/GRDBCipher'
+    pod 'RxGRDB/SQLCipher'
     ```
 
 3. In your application files, import the modules you need:
@@ -95,7 +95,7 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
     ```swift
     import RxSwift
     import RxGRDB
-    import GRDBCipher
+    import GRDB
     ```
 
 
@@ -109,7 +109,7 @@ To function correctly, RxGRDB requires that a unique [database connection] is ke
 
 **To define which part of the database should be observed, you provide database requests.** Requests can be expressed with GRDB's [query interface], as in `Player.all()`, or with SQL, as in `SELECT * FROM player`. Both would observe the full "player" database table. Observed requests can involve several database tables, and generally be as complex as you need them to be.
 
-**RxGRDB observables are based on GRDB's [ValueObservation] and [TransactionObserver].** If your application needs change notifications that are not built in RxGRDB, those versatile tools will probably provide a solution.
+**RxGRDB observables are based on GRDB's [ValueObservation] and [DatabaseRegionObservation].** If your application needs change notifications that are not built in RxGRDB, check the general [Database Changes Observation] chapter.
 
 
 # Observing Individual Requests
@@ -168,14 +168,14 @@ All elements are emitted in a protected database dispatch queue, serialized with
 **You can also track SQL requests:**
 
 ```swift
-let request = SQLRequest<Row>("SELECT * FROM player")
+let request = SQLRequest<Row>(sql: "SELECT * FROM player")
 request.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Players have changed.")
     })
 
 try dbQueue.write { db in
-    try db.execute("DELETE FROM player")
+    try db.execute(sql: "DELETE FROM player")
 }
 // Prints "Players have changed."
 ```
@@ -235,7 +235,7 @@ All elements are emitted on the main queue, unless you provide a specific `sched
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest<Int>("SELECT MAX(score) FROM round")
+let request = SQLRequest<Int>(sql: "SELECT MAX(score) FROM round")
 request.rx.fetchOne(in: dbQueue)
     .subscribe(onNext: { maxScore: Int? in
         print(maxScore)
@@ -275,7 +275,7 @@ All elements are emitted on the main queue, unless you provide a specific `sched
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest<URL>("SELECT url FROM link")
+let request = SQLRequest<URL>(sql: "SELECT url FROM link")
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { urls: [URL] in
         print(urls)
@@ -285,7 +285,7 @@ request.rx.fetchAll(in: dbQueue)
 When tracking *values*, make sure to ask for optionals when database may contain NULL:
 
 ```swift
-let request = SQLRequest<String?>("SELECT email FROM player")
+let request = SQLRequest<String?>(sql: "SELECT email FROM player")
 request.rx.fetchAll(in: dbQueue)
     .subscribe(onNext: { emails: [String?] in
         print(emails)
@@ -311,21 +311,22 @@ request.rx.fetchAll(in: dbQueue)   // Observable<[Player]>
 
 :warning: **DO NOT compose those observables together with [RxSwift operators](https://github.com/ReactiveX/RxSwift)**: you would lose all guarantees of [data consistency](https://en.wikipedia.org/wiki/Consistency_(database_systems)).
 
-Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseWriter.rx.changes](#databasewriterrxchangesinstartimmediately).
+Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseRegionObservation.rx.changes](#databaseregionobservationrxchangesinstartimmediately).
 
 And when you need to fetch database values from several requests, use [ValueObservation.rx.fetch](#valueobservationrxfetchinstartimmediatelyscheduler).
 
 
 ---
 
-#### `DatabaseWriter.rx.changes(in:startImmediately:)`
+#### `DatabaseRegionObservation.rx.changes(in:startImmediately:)`
 
-This [database changes observable](#changes-observables) emits a database connection right after a database transaction has modified the tracked tables and columns by inserting, updating, or deleting a database row:
+This [database changes observable](#changes-observables) emits a database connection right after a database transaction has modified the tracked tables and columns by inserting, updating, or deleting a database row, just like [DatabaseRegionObservation].
 
 ```swift
-let playersRequest = Player.all()
-let teamsRequest = Team.all()
-dbQueue.rx.changes(in: [playersRequest, teamsRequest])
+let players = Player.all()
+let teams = Team.all()
+let observation = DatabaseRegionObservation(tracking: players, teams)
+observation.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Players or teams have changed.")
     })
@@ -344,25 +345,6 @@ try dbQueue.write { db in
 ```
 
 All elements are emitted in a protected database dispatch queue, serialized with all database updates. If you set `startImmediately` to true (the default value), the first element is emitted synchronously, right upon subscription. See [GRDB Concurrency Guide] for more information.
-
-**You can also track SQL requests:**
-
-```swift
-let players = SQLRequest<Row>("SELECT * FROM player")
-let teams = SQLRequest<Row>("SELECT * FROM team")
-dbQueue.rx.changes(in: [players, teams])
-    .subscribe(onNext: { db: Database in
-        print("Players or teams have changed.")
-    })
-
-try dbQueue.write { db in
-    try db.execute("DELETE FROM player")
-}
-// Prints "Players or teams have changed."
-```
-
-> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
-
 
 ---
 
@@ -401,7 +383,7 @@ Since RxGRDB is able to track database changes, it is a natural desire to comput
 
 RxGRDB ships with one diff algorithm which computes the inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for collections whose order does not matter, such as annotations in a map view. See [`PrimaryKeyDiffScanner`](#primarykeydiffscanner).
 
-For other diff algorithms, we advise you to have a look to [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses Differ in order to animate the content of a table view.
+For other diff algorithms, we advise you to have a look to [RxDataSources](https://github.com/RxSwiftCommunity/RxDataSources), [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses RxDataSources in order to animate the content of a table view.
 
 
 ## PrimaryKeyDiffScanner
@@ -749,6 +731,6 @@ Player.all().rx
 [query interface]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [open an issue]: https://github.com/RxSwiftCommunity/RxGRDB/issues
-[TransactionObserver]: https://github.com/groue/GRDB.swift/blob/master/README.md#transactionobserver-protocol
-[DatabaseRegion]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregion
+[DatabaseRegionObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregionobservation
 [ValueObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation
+[Database Changes Observation]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-changes-observation

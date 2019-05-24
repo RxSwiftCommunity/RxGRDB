@@ -1,9 +1,7 @@
-#if USING_SQLCIPHER
-    import GRDBCipher
-#else
-    import GRDB
-#endif
+import GRDB
 import RxSwift
+
+extension ValueObservation : ReactiveCompatible { }
 
 /// :nodoc:
 public protocol _ValueObservationProtocol: ReactiveCompatible {
@@ -76,7 +74,7 @@ extension Reactive where Base: _ValueObservationProtocol {
             
         } else if case .mainQueue = observation.scheduling , startImmediately == false {
             // Honor the startImmediately parameter
-            observation.scheduling = .onQueue(DispatchQueue.main, startImmediately: false)
+            observation.scheduling = .async(onQueue: .main, startImmediately: false)
             return observation.makeObservable(in: reader)
             
         } else {

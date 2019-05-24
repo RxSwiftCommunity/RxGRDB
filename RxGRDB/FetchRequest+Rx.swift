@@ -1,9 +1,5 @@
 import Foundation
-#if USING_SQLCIPHER
-    import GRDBCipher
-#else
-    import GRDB
-#endif
+import GRDB
 import RxSwift
 
 // MARK: - Count
@@ -180,6 +176,124 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     }
 }
 
+/// :nodoc:
+public protocol _QueryInterfaceRequestProtocol: FetchRequest { }
+extension QueryInterfaceRequest: _QueryInterfaceRequestProtocol { }
+extension Reactive where Base: _QueryInterfaceRequestProtocol, Base.RowDecoder: FetchableRecord {
+    /// Returns an Observable that emits after each committed database
+    /// transaction that has modified the tables and columns fetched by
+    /// the request.
+    ///
+    ///     let dbQueue = DatabaseQueue()
+    ///     let request = Player.all()
+    ///     request.rx
+    ///         .fetchAll(in: dbQueue)
+    ///         .subscribe(onNext: { players: [Player] in
+    ///             print("Players have changed")
+    ///         })
+    ///
+    /// By default, all records are emitted on the main dispatch queue. If you
+    /// give a *scheduler*, records are emitted on that scheduler.
+    ///
+    /// If you set *startImmediately* to true (the default value), the first
+    /// element is emitted right upon subscription. It is *synchronously*
+    /// emitted if and only if the observable is subscribed on the main queue,
+    /// and is given a nil *scheduler* argument:
+    ///
+    ///     // on the main queue
+    ///     request.rx
+    ///         .fetchAll(in: dbQueue)
+    ///         .subscribe(onNext: { players: [Player] in
+    ///             // on the main queue
+    ///             print("Players have changed")
+    ///         })
+    ///     // <- here "Players have changed" has been printed
+    ///
+    ///     // on any queue
+    ///     request.rx
+    ///         .fetchAll(in: dbQueue, scheduler: MainScheduler.instance)
+    ///         .subscribe(onNext: { players: [Player] in
+    ///             // on the main queue
+    ///             print("Players have changed")
+    ///         })
+    ///     // <- here "Players have changed" may not be printed yet
+    ///
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted right upon subscription.
+    /// - parameter scheduler: The eventual scheduler on which elements
+    ///   are emitted.
+    public func fetchAll(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<[Base.RowDecoder]>
+    {
+        let request = base as! QueryInterfaceRequest<Base.RowDecoder>
+        return ValueObservation.trackingAll(request).rx.fetch(
+            in: reader,
+            startImmediately:
+            startImmediately,
+            scheduler: scheduler)
+    }
+    
+    /// Returns an Observable that emits after each committed database
+    /// transaction that has modified the tables and columns fetched by
+    /// the request.
+    ///
+    ///     let dbQueue = DatabaseQueue()
+    ///     let request = Player.filter(key: 1)
+    ///     request.rx
+    ///         .fetchOne(in: dbQueue)
+    ///         .subscribe(onNext: { player: Player? in
+    ///             print("Player 1 has changed")
+    ///         })
+    ///
+    /// By default, all records are emitted on the main dispatch queue. If you
+    /// give a *scheduler*, records are emitted on that scheduler.
+    ///
+    /// If you set *startImmediately* to true (the default value), the first
+    /// element is emitted right upon subscription. It is *synchronously*
+    /// emitted if and only if the observable is subscribed on the main queue,
+    /// and is given a nil *scheduler* argument:
+    ///
+    ///     // on the main queue
+    ///     request.rx
+    ///         .fetchOne(in: dbQueue)
+    ///         .subscribe(onNext: { player: Player? in
+    ///             // on the main queue
+    ///             print("Player 1 has changed")
+    ///         })
+    ///     // <- here "Player 1 has changed" has been printed
+    ///
+    ///     // on any queue
+    ///     request.rx
+    ///         .fetchOne(in: dbQueue, scheduler: MainScheduler.instance)
+    ///         .subscribe(onNext: { player: Player? in
+    ///             // on the main queue
+    ///             print("Player 1 has changed")
+    ///         })
+    ///     // <- here "Player 1 has changed" may not be printed yet
+    ///
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted right upon subscription.
+    /// - parameter scheduler: The eventual scheduler on which elements
+    ///   are emitted.
+    public func fetchOne(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Base.RowDecoder?>
+    {
+        let request = base as! QueryInterfaceRequest<Base.RowDecoder>
+        return ValueObservation.trackingOne(request).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
+    }
+}
+
 // MARK: - Row
 
 extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
@@ -188,7 +302,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<Row>("SELECT * FROM player")
+    ///     let request = SQLRequest<Row>(sql: "SELECT * FROM player")
     ///     request.rx
     ///         .fetchAll(in: dbQueue)
     ///         .subscribe(onNext: { rows: [Row] in
@@ -243,7 +357,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<Row>("SELECT * FROM player WHERE id = 1")
+    ///     let request = SQLRequest<Row>(sql: "SELECT * FROM player WHERE id = 1")
     ///     request.rx
     ///         .fetchOne(in: dbQueue)
     ///         .subscribe(onNext: { row: Row? in
@@ -294,6 +408,121 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     }
 }
 
+extension Reactive where Base: _QueryInterfaceRequestProtocol, Base.RowDecoder == Row {
+    /// Returns an Observable that emits after each committed database
+    /// transaction that has modified the tables and columns fetched by
+    /// the request.
+    ///
+    ///     let dbQueue = DatabaseQueue()
+    ///     let request = SQLRequest<Row>(sql: "SELECT * FROM player")
+    ///     request.rx
+    ///         .fetchAll(in: dbQueue)
+    ///         .subscribe(onNext: { rows: [Row] in
+    ///             print("Players have changed")
+    ///         })
+    ///
+    /// By default, all rows are emitted on the main dispatch queue. If you
+    /// give a *scheduler*, rows are emitted on that scheduler.
+    ///
+    /// If you set *startImmediately* to true (the default value), the first
+    /// element is emitted right upon subscription. It is *synchronously*
+    /// emitted if and only if the observable is subscribed on the main queue,
+    /// and is given a nil *scheduler* argument:
+    ///
+    ///     // on the main queue
+    ///     request.rx
+    ///         .fetchAll(in: dbQueue)
+    ///         .subscribe(onNext: { rows: [Row] in
+    ///             // on the main queue
+    ///             print("Players have changed")
+    ///         })
+    ///     // <- here "Players have changed" has been printed
+    ///
+    ///     // on any queue
+    ///     request.rx
+    ///         .fetchAll(in: dbQueue, scheduler: MainScheduler.instance)
+    ///         .subscribe(onNext: { rows: [Row] in
+    ///             // on the main queue
+    ///             print("Players have changed")
+    ///         })
+    ///     // <- here "Players have changed" may not be printed yet
+    ///
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted right upon subscription.
+    /// - parameter scheduler: The eventual scheduler on which elements
+    ///   are emitted.
+    public func fetchAll(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<[Row]>
+    {
+        // TODO: test
+        let request = base as! QueryInterfaceRequest<Row>
+        return ValueObservation.trackingAll(request).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
+    }
+    
+    /// Returns an Observable that emits after each committed database
+    /// transaction that has modified the tables and columns fetched by
+    /// the request.
+    ///
+    ///     let dbQueue = DatabaseQueue()
+    ///     let request = SQLRequest<Row>(sql: "SELECT * FROM player WHERE id = 1")
+    ///     request.rx
+    ///         .fetchOne(in: dbQueue)
+    ///         .subscribe(onNext: { row: Row? in
+    ///             print("Player 1 has changed")
+    ///         })
+    ///
+    /// By default, all rows are emitted on the main dispatch queue. If you
+    /// give a *scheduler*, rows are emitted on that scheduler.
+    ///
+    /// If you set *startImmediately* to true (the default value), the first
+    /// element is emitted right upon subscription. It is *synchronously*
+    /// emitted if and only if the observable is subscribed on the main queue,
+    /// and is given a nil *scheduler* argument:
+    ///
+    ///     // on the main queue
+    ///     request.rx
+    ///         .fetchOne(in: dbQueue)
+    ///         .subscribe(onNext: { row: Row? in
+    ///             // on the main queue
+    ///             print("Player 1 has changed")
+    ///         })
+    ///     // <- here "Player 1 has changed" has been printed
+    ///
+    ///     // on any queue
+    ///     request.rx
+    ///         .fetchOne(in: dbQueue, scheduler: MainScheduler.instance)
+    ///         .subscribe(onNext: { row: Row? in
+    ///             // on the main queue
+    ///             print("Player 1 has changed")
+    ///         })
+    ///     // <- here "Player 1 has changed" may not be printed yet
+    ///
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
+    /// - parameter startImmediately: When true (the default), the first
+    ///   element is emitted right upon subscription.
+    /// - parameter scheduler: The eventual scheduler on which elements
+    ///   are emitted.
+    public func fetchOne(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Row?>
+    {
+        let request = base as! QueryInterfaceRequest<Row>
+        return ValueObservation.trackingOne(request).rx.fetch(
+            in: reader,
+            startImmediately: startImmediately,
+            scheduler: scheduler)
+    }
+}
+
 // MARK: - DatabaseValueConvertible
 
 extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConvertible {
@@ -302,7 +531,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.select(Column("name")).asRequest(of: String.self)
+    ///     let request = Player.select(Column("name"), as: String.self)
     ///     request.rx
     ///         .fetchAll(in: dbQueue)
     ///         .subscribe(onNext: { names: [String] in
@@ -357,7 +586,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<String>("SELECT name FROM player ORDER BY score DESC")
+    ///     let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY score DESC")
     ///     request.rx
     ///         .fetchOne(in: dbQueue)
     ///         .subscribe(onNext: { bestPlayerName: String? in
@@ -416,7 +645,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     /// the request.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.select(Column("name")).asRequest(of: Optional<String>.self)
+    ///     let request = Player.select(Column("name"), as: Optional<String>.self)
     ///     request.rx
     ///         .fetchAll(in: dbQueue)
     ///         .subscribe(onNext: { names: [String?] in

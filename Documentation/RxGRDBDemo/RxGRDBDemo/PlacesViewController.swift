@@ -130,7 +130,7 @@ extension PlacesViewController: MKMapViewDelegate {
         // to build the zooming map rect.
         let rects = mapView.annotations.map { annotation in
             MKMapRect(
-                origin: MKMapPointForCoordinate(annotation.coordinate),
+                origin: MKMapPoint(annotation.coordinate),
                 size: MKMapSize(width: 0, height: 0))
         }
         
@@ -142,7 +142,7 @@ extension PlacesViewController: MKMapViewDelegate {
         // Union rects
         let zoomRect = rects
             .suffix(from: 1)
-            .reduce(firstRect) { MKMapRectUnion($0, $1) }
+            .reduce(firstRect) { $0.union($1) }
         
         // Zoom
         mapView.setVisibleMapRect(

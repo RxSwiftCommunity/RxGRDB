@@ -9,7 +9,9 @@ struct AppDatabase {
     static func openDatabase(atPath path: String) throws -> DatabaseQueue {
         // Connect to the database
         // See https://github.com/groue/GRDB.swift/blob/master/README.md#database-connections
-        let dbQueue = try DatabaseQueue(path: path)
+        var configuration = Configuration()
+        configuration.passphrase = "secret"
+        let dbQueue = try DatabaseQueue(path: path, configuration: configuration)
         
         // Define the database schema
         try migrator.migrate(dbQueue)

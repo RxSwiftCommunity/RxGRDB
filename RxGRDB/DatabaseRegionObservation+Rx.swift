@@ -1,15 +1,11 @@
 import GRDB
 import RxSwift
 
-extension AdaptedFetchRequest: ReactiveCompatible { }
-extension AnyFetchRequest: ReactiveCompatible { }
-extension QueryInterfaceRequest: ReactiveCompatible { }
-extension SQLRequest: ReactiveCompatible { }
+extension DatabaseRegionObservation : ReactiveCompatible { }
 
-extension Reactive where Base: DatabaseRegionConvertible {
-    /// Returns an Observable that emits a database connection after each
-    /// committed database transaction that has modified the tables and columns
-    /// fetched by the request.
+extension Reactive where Base == DatabaseRegionObservation {
+    /// Returns an Observable that emits the same elements as
+    /// a DatabaseRegionObservation.
     ///
     /// All elements are emitted in a protected database dispatch queue,
     /// serialized with all database updates. If you set *startImmediately* to
@@ -31,7 +27,8 @@ extension Reactive where Base: DatabaseRegionConvertible {
     ///     }
     ///
     ///     let request = Player.all()
-    ///     request.rx
+    ///     let observation = DatabaseRegionObservation(tracking: request)
+    ///     observation.rx
     ///         .changes(in: dbQueue)
     ///         .subscribe(onNext: { db in
     ///             let count = try! Player.fetchCount(db)
@@ -60,8 +57,24 @@ extension Reactive where Base: DatabaseRegionConvertible {
         startImmediately: Bool = true)
         -> Observable<Database>
     {
-        return DatabaseRegionObservation(tracking: base)
-            .rx
-            .changes(in: writer, startImmediately: startImmediately)
+        return Observable.create { observer -> Disposable in
+            do {
+                let transactionObserver: TransactionObserver
+                if startImmediately {
+                    transactionObserver = try writer.unsafeReentrantWrite { db in
+                        defer { observer.onNext(db) }
+                        return try self.base.start(in: writer, onChange: observer.onNext)
+                    }
+                } else {
+                    transactionObserver = try self.base.start(in: writer, onChange: observer.onNext)
+                }
+                return Disposables.create {
+                    writer.remove(transactionObserver: transactionObserver)
+                }
+            } catch {
+                observer.onError(error)
+                return Disposables.create()
+            }
+        }
     }
 }

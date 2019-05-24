@@ -36,8 +36,10 @@ extension Place: FetchableRecord { }
 extension Place: MutablePersistableRecord {
     static let databaseTableName = "place"
     
-    enum Columns: String, ColumnExpression {
-        case id, latitude, longitude
+    enum Columns {
+        static let id = Column(CodingKeys.id)
+        static let latitude = Column(CodingKeys.latitude)
+        static let longitude = Column(CodingKeys.longitude)
     }
     
     mutating func didInsert(with rowID: Int64, for column: String?) {
@@ -63,7 +65,7 @@ extension CLLocationCoordinate2D {
         let angle = randomDouble() * 2 * .pi
         let latitudinalMeters = d * cos(angle)
         let longitudinalMeters = d * sin(angle)
-        let region = MKCoordinateRegionMakeWithDistance(center, latitudinalMeters, longitudinalMeters)
+        let region = MKCoordinateRegion(center: center, latitudinalMeters: latitudinalMeters, longitudinalMeters: longitudinalMeters)
         return CLLocationCoordinate2D(
             latitude: center.latitude + copysign(region.span.latitudeDelta, latitudinalMeters),
             longitude: center.longitude + copysign(region.span.longitudeDelta, longitudinalMeters))

@@ -30,9 +30,9 @@ extension RequestTests {
         }
         
         let requests: [SQLRequest<Row>] = [
-            SQLRequest("SELECT * FROM table1"),
-            SQLRequest("SELECT id, a FROM table1"),
-            SQLRequest("SELECT table1.id, table1.a, table2.a FROM table1 JOIN table2 ON table1.id = table2.id")]
+            SQLRequest(sql: "SELECT * FROM table1"),
+            SQLRequest(sql: "SELECT id, a FROM table1"),
+            SQLRequest(sql: "SELECT table1.id, table1.a, table2.a FROM table1 JOIN table2 ON table1.id = table2.id")]
         
         var changes = requests.map { _ in false }
         for (index, request) in requests.enumerated() {
@@ -53,7 +53,7 @@ extension RequestTests {
             // Transaction triggers an event for concerned requests
             reset()
             try db.inTransaction {
-                try db.execute("INSERT INTO table1 (id, a, b) VALUES (NULL, 0, 0)")
+                try db.execute(sql: "INSERT INTO table1 (id, a, b) VALUES (NULL, 0, 0)")
                 XCTAssertEqual(changes, [false, false, false])
                 return .commit
             }
@@ -61,27 +61,27 @@ extension RequestTests {
             
             // Transaction triggers an event for concerned requests
             reset()
-            try db.execute("INSERT INTO table2 (id, a, b) VALUES (NULL, 0, 0)")
+            try db.execute(sql: "INSERT INTO table2 (id, a, b) VALUES (NULL, 0, 0)")
             XCTAssertEqual(changes, [false, false, true])
             
             // Transaction triggers an event for concerned requests
             reset()
-            try db.execute("UPDATE table1 SET a = 1")
+            try db.execute(sql: "UPDATE table1 SET a = 1")
             XCTAssertEqual(changes, [true, true, true])
             
             // Transaction triggers an event for concerned requests
             reset()
-            try db.execute("UPDATE table1 SET b = 1")
+            try db.execute(sql: "UPDATE table1 SET b = 1")
             XCTAssertEqual(changes, [true, false, false])
             
             // Transaction triggers an event for concerned requests
             reset()
-            try db.execute("UPDATE table2 SET a = 1")
+            try db.execute(sql: "UPDATE table2 SET a = 1")
             XCTAssertEqual(changes, [false, false, true])
             
             // Transaction triggers an event for concerned requests
             reset()
-            try db.execute("UPDATE table2 SET b = 1")
+            try db.execute(sql: "UPDATE table2 SET b = 1")
             XCTAssertEqual(changes, [false, false, false])
         }
     }
@@ -102,7 +102,7 @@ extension RequestTests {
 //            }
 //        }
 //
-//        let request = SQLRequest("SELECT * FROM table1")
+//        let request = SQLRequest(sql: "SELECT * FROM table1")
 //        var changesCount = 0
 //        var needsThrow = false
 //        request.rx
@@ -122,18 +122,18 @@ extension RequestTests {
 //        XCTAssertEqual(changesCount, 1)
 //
 //        try writer.writeWithoutTransaction { db in
-//            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+//            try db.execute(sql: "INSERT INTO table1 (id) VALUES (NULL)")
 //            XCTAssertEqual(changesCount, 2)
 //
 //            needsThrow = true
-//            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+//            try db.execute(sql: "INSERT INTO table1 (id) VALUES (NULL)")
 //            XCTAssertEqual(changesCount, 3)
 //
 //            needsThrow = false
-//            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+//            try db.execute(sql: "INSERT INTO table1 (id) VALUES (NULL)")
 //            XCTAssertEqual(changesCount, 4)
 //
-//            try db.execute("INSERT INTO table1 (id) VALUES (NULL)")
+//            try db.execute(sql: "INSERT INTO table1 (id) VALUES (NULL)")
 //            XCTAssertEqual(changesCount, 5)
 //        }
 //    }
@@ -155,8 +155,8 @@ extension RequestTests {
                 t.column("id", .integer).primaryKey()
                 t.column("name", .text)
             }
-            try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
-            try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
+            try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
+            try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
         }
         
         let expectedCounts = [2, 0, 3]
@@ -172,12 +172,12 @@ extension RequestTests {
             }
             .disposed(by: disposeBag)
         try writer.writeWithoutTransaction { db in
-            try db.execute("UPDATE persons SET name = name")
-            try db.execute("DELETE FROM persons")
+            try db.execute(sql: "UPDATE persons SET name = name")
+            try db.execute(sql: "DELETE FROM persons")
             try db.inTransaction {
-                try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
-                try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
-                try db.execute("INSERT INTO persons (name) VALUES (?)", arguments: ["Eve"])
+                try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
+                try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
+                try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Eve"])
                 return .commit
             }
         }
@@ -230,7 +230,7 @@ extension RequestTests {
         XCTAssertEqual(eventsCount, 1)
         
         needsThrow = true
-        try writer.write { try $0.execute("INSERT INTO table1 (id) VALUES (NULL)") }
+        try writer.write { try $0.execute(sql: "INSERT INTO table1 (id) VALUES (NULL)") }
         waitForExpectations(timeout: 1, handler: nil)
         XCTAssertEqual(eventsCount, 2)
     }

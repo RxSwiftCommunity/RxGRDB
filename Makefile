@@ -35,23 +35,12 @@ XCPRETTY_PATH := $(shell command -v xcpretty 2> /dev/null)
 TEST_ACTIONS = clean build build-for-testing test-without-building
 
 # When adding support for an Xcode version, look for available devices with `instruments -s devices`
-ifeq ($(XCODEVERSION),10.0)
-  MIN_SWIFT_VERSION = 4.0
-  MAX_SWIFT_VERSION = 4.2
-  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=12.0"
-  MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
-else ifeq ($(XCODEVERSION),9.4)
-  # MIN_SWIFT_VERSION undefined: only check MAX_SWIFT_VERSION
-  MAX_SWIFT_VERSION = 4.0
-  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.4"
-  MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
-else ifeq ($(XCODEVERSION),9.3)
-  # MIN_SWIFT_VERSION undefined: only check MAX_SWIFT_VERSION
-  MAX_SWIFT_VERSION = 4.0
-  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 8,OS=11.3"
+ifeq ($(XCODEVERSION),10.2)
+  MAX_SWIFT_VERSION = 5
+  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone XS,OS=12.2"
   MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
 else
-  # Swift 4.1 required: Xcode < 9.3 is not supported
+  # Swift 5 required: Xcode < 10.2 is not supported
 endif
 
 # If xcpretty is available, use it for xcodebuild output
