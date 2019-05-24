@@ -3,13 +3,14 @@ RxGRDB [![Swift 5](https://img.shields.io/badge/swift-5-orange.svg?style=flat)](
 
 ### A set of reactive extensions for SQLite and [GRDB.swift](http://github.com/groue/GRDB.swift)
 
-**Latest release**: November 2, 2018 &bull; version 0.13.0 &bull; [Release Notes](CHANGELOG.md)
+**Latest release**: May 24, 2019 &bull; version 0.14.0 &bull; [Release Notes](CHANGELOG.md)
 
 **Requirements**: iOS 9.0+ / OSX 10.9+ / watchOS 2.0+ &bull; Swift 5+ / Xcode 10.2+
 
 | Swift version | RxGRDB version                                                    |
 | ------------- | ----------------------------------------------------------------- |
-| **Swift 4.2** | **v0.13.0**                                                       |
+| **Swift 5**   | **v0.14.0**                                                       |
+| Swift 4.2     | [v0.13.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.13.0) |
 | Swift 4.1     | [v0.11.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.11.0) |
 | Swift 4       | [v0.10.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.10.0) |
 | Swift 3.2     | [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0)   |
