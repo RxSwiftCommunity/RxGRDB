@@ -85,7 +85,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.observeAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -119,7 +119,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Player]>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.observeAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()

@@ -164,7 +164,7 @@ extension RequestTests {
         
         struct Person : TableRecord { static let databaseTableName = "persons" }
         let request = Person.all()
-        request.rx.fetchCount(in: writer)
+        request.rx.observeCount(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -213,7 +213,7 @@ extension RequestTests {
         var eventsCount = 0
         var needsThrow = false
         request.rx
-            .fetchCount(in: writer)
+            .observeCount(in: writer)
             .map { db in
                 if needsThrow {
                     needsThrow = false

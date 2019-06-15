@@ -9,8 +9,10 @@ public protocol _ValueObservationProtocol: ReactiveCompatible {
     var scheduling: ValueScheduling { get set }
     func start(
         in reader: DatabaseReader,
-        onError: ((Error) -> Void)?,
-        onChange: @escaping (_Reducer.Value) -> Void) throws -> TransactionObserver
+        onError: @escaping (Error) -> Void,
+        onChange: @escaping (_Reducer.Value) -> Void) -> TransactionObserver
+    // Dependency on an experimental GRDB API
+    func fetch(_ db: Database) throws -> _Reducer.Value?
 }
 
 /// :nodoc:
@@ -23,9 +25,9 @@ extension Reactive where Base: _ValueObservationProtocol {
     ///
     ///     let observation = ValueObservation.trackingAll(Player.all())
     ///     observation.rx
-    ///         .fetch(in: dbQueue)
-    ///         .subscribe(onNext: { players: [Player] in
-    ///             print("Players have changed")
+    ///         .observe(in: dbQueue)
+    ///         .subscribe(onNext: { (players: [Player]) in
+    ///             print("Fresh players: \(players)")
     ///         })
     ///
     /// By default, all values are emitted on the main dispatch queue. If you
@@ -38,28 +40,28 @@ extension Reactive where Base: _ValueObservationProtocol {
     ///
     ///     // on the main queue
     ///     observation.rx
-    ///         .fetch(in: dbQueue)
-    ///         .subscribe(onNext: { players: [Player] in
+    ///         .observe(in: dbQueue)
+    ///         .subscribe(onNext: { (players: [Player]) in
     ///             // on the main queue
-    ///             print("Values have changed")
+    ///             print("Fresh players: \(players)")
     ///         })
-    ///     // <- here "Values have changed" has been printed
+    ///     // <- here "Fresh players" has been printed
     ///
     ///     // on any queue
     ///     observation.rx
-    ///         .fetch(in: dbQueue)
-    ///         .subscribe(onNext: { players: [Player] in
+    ///         .observe(in: dbQueue)
+    ///         .subscribe(onNext: { (players: [Player]) in
     ///             // on the main queue
-    ///             print("Values have changed")
+    ///             print("Fresh players: \(players)")
     ///         })
-    ///     // <- here "Values have changed" may not be printed yet
+    ///     // <- here "Fresh players" may not be printed yet
     ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
-    public func fetch(
+    public func observe(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
@@ -68,9 +70,16 @@ extension Reactive where Base: _ValueObservationProtocol {
         var observation = base
         
         if let scheduler = scheduler {
-            // Honor the scheduler parameter
+            // Honor the scheduler parameter.
+            // Deal with unsafe GRDB scheduling: we can only
+            // guarantee correct ordering of values if observation
+            // starts on the same queue as the queue values are
+            // dispatched on.
             observation.scheduling = .unsafe(startImmediately: startImmediately)
-            return observation.makeObservable(in: reader).observeOn(scheduler)
+            return observation
+                .makeObservable(in: reader)
+                .subscribeOn(scheduler)
+                .observeOn(scheduler)
             
         } else if case .mainQueue = observation.scheduling , startImmediately == false {
             // Honor the startImmediately parameter
@@ -83,22 +92,54 @@ extension Reactive where Base: _ValueObservationProtocol {
         }
     }
 }
+    
+extension Reactive where Base: _ValueObservationProtocol, Base._Reducer: ImmediateValueReducer {
+    /// Returns a Single that eventually emits the first value emitted by
+    /// the ValueObservation.
+    ///
+    ///     let dbQueue = DatabaseQueue()
+    ///     let observation = ValueObservation.trackingAll(Player.all())
+    ///     observation.rx
+    ///         .fetch(in: dbQueue)
+    ///         .subscribe(onSuccess: { (players: [Player]) in
+    ///             print("players: \(players)")
+    ///         })
+    ///
+    /// By default, fetched values are emitted on the main dispatch queue. If
+    /// you give a *scheduler*, values are emitted on that scheduler.
+    ///
+    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
+    /// - parameter scheduler: The eventual scheduler on which elements
+    ///   are emitted. Defaults to MainScheduler.asyncInstance.
+    public func fetch(
+        in reader: DatabaseReader,
+        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
+        -> Single<Base._Reducer.Value>
+    {
+        let observation = base
+        return AnyDatabaseReader(reader).rx.fetch(scheduler: scheduler) { db in
+            guard let value = try observation.fetch(db) else {
+                fatalError("ImmediateSchedulerType contract broken: observation did not emit its first element")
+            }
+            return value
+        }
+    }
+}
 
 extension _ValueObservationProtocol {
     fileprivate func makeObservable(in reader: DatabaseReader) -> Observable<_Reducer.Value> {
         return Observable.create { observer -> Disposable in
-            do {
-                let transactionObserver = try self.start(
-                    in: reader,
-                    onError: observer.onError,
-                    onChange: observer.onNext)
-                
-                return Disposables.create {
-                    reader.remove(transactionObserver: transactionObserver)
-                }
-            } catch {
-                observer.onError(error)
-                return Disposables.create()
+            var transactionObserver: TransactionObserver? = nil
+            // Avoid the "Variable 'transactionObserver' was written to, but never read" warning
+            _ = transactionObserver
+            
+            transactionObserver = self.start(
+                in: reader,
+                onError: observer.onError,
+                onChange: observer.onNext)
+            
+            return Disposables.create {
+                transactionObserver = nil
             }
         }
     }
