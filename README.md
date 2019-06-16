@@ -197,7 +197,7 @@ RxGRDB observables are based on GRDB's [ValueObservation] and [DatabaseRegionObs
 
 **When your application observes a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests), it gets notified each time a change in the results of the request has been committed in the database.**
 
-If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.observeCount](#fetchrequestrxobservecountinstartimmediatelyscheduler), [rx.observeFirst](#fetchrequestrxobserveoneinstartimmediatelyscheduler), and [rx.observeAll](#fetchrequestrxobserveallinstartimmediatelyscheduler) methods, depending on whether you want to track the number of results, the first one, or all of them:
+If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.observeCount](#fetchrequestrxobservecountinstartimmediatelyscheduler), [rx.observeFirst](#fetchrequestrxobservefirstinstartimmediatelyscheduler), and [rx.observeAll](#fetchrequestrxobserveallinstartimmediatelyscheduler) methods, depending on whether you want to track the number of results, the first one, or all of them:
 
 ```swift
 let request = Player.all()
@@ -215,7 +215,7 @@ request.rx.changes(in: dbQueue)      // Observable<Database>
 
 - [`rx.changes`](#requestrxchangesinstartimmediately)
 - [`rx.observeCount`](#fetchrequestrxobservecountinstartimmediatelyscheduler)
-- [`rx.observeFirst`](#fetchrequestrxobserveoneinstartimmediatelyscheduler)
+- [`rx.observeFirst`](#fetchrequestrxobservefirstinstartimmediatelyscheduler)
 - [`rx.observeAll`](#fetchrequestrxobserveallinstartimmediatelyscheduler)
 
 
@@ -266,7 +266,7 @@ try dbQueue.write { db in
 
 ---
 
-#### `Request.rx.observeCount(in:startImmediately:scheduler:)`
+#### `FetchRequest.rx.observeCount(in:startImmediately:scheduler:)`
 
 This [database values observable](#values-observables) emits the number of results of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests) after each database transaction that changes it:
 
