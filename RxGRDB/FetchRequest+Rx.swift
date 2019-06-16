@@ -50,6 +50,16 @@ extension Reactive where Base: FetchRequest {
             startImmediately: startImmediately,
             scheduler: scheduler)
     }
+    
+    @available(*, deprecated, renamed: "observeCount(in:startImmediately:scheduler:)")
+    public func fetchCount(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Int>
+    {
+        return observeCount(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+    }
 }
 
 // MARK: - FetchableRecord
@@ -101,6 +111,16 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
             scheduler: scheduler)
     }
     
+    @available(*, deprecated, renamed: "observeAll(in:startImmediately:scheduler:)")
+    public func fetchAll(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<[Base.RowDecoder]>
+    {
+        return observeAll(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+    }
+
     /// Returns an Observable that emits after each committed database
     /// transaction that has modified the tables and columns fetched by
     /// the request.
@@ -145,6 +165,16 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
             in: reader,
             startImmediately: startImmediately,
             scheduler: scheduler)
+    }
+    
+    @available(*, deprecated, renamed: "observeFirst(in:startImmediately:scheduler:)")
+    public func fetchOne(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Base.RowDecoder?>
+    {
+        return observeFirst(in: reader, startImmediately: startImmediately, scheduler: scheduler)
     }
 }
 
@@ -197,6 +227,16 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
             scheduler: scheduler)
     }
     
+    @available(*, deprecated, renamed: "observeAll(in:startImmediately:scheduler:)")
+    public func fetchAll(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<[Row]>
+    {
+        return observeAll(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+    }
+    
     /// Returns an Observable that emits after each committed database
     /// transaction that has modified the tables and columns fetched by
     /// the request.
@@ -241,6 +281,16 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
             in: reader,
             startImmediately: startImmediately,
             scheduler: scheduler)
+    }
+    
+    @available(*, deprecated, renamed: "observeFirst(in:startImmediately:scheduler:)")
+    public func fetchOne(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Row?>
+    {
+        return observeFirst(in: reader, startImmediately: startImmediately, scheduler: scheduler)
     }
 }
 
@@ -293,6 +343,16 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
             scheduler: scheduler)
     }
     
+    @available(*, deprecated, renamed: "observeAll(in:startImmediately:scheduler:)")
+    public func fetchAll(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<[Base.RowDecoder]>
+    {
+        return observeAll(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+    }
+
     /// Returns an Observable that emits after each committed database
     /// transaction that has modified the tables and columns fetched by
     /// the request.
@@ -337,6 +397,16 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
             in: reader,
             startImmediately: startImmediately,
             scheduler: scheduler)
+    }
+    
+    @available(*, deprecated, renamed: "observeFirst(in:startImmediately:scheduler:)")
+    public func fetchOne(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Base.RowDecoder?>
+    {
+        return observeFirst(in: reader, startImmediately: startImmediately, scheduler: scheduler)
     }
 }
 
@@ -389,6 +459,16 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
             scheduler: scheduler)
     }
     
+    @available(*, deprecated, renamed: "observeAll(in:startImmediately:scheduler:)")
+    public func fetchAll(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<[Base.RowDecoder._Wrapped?]>
+    {
+        return observeAll(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+    }
+
     /// Returns an Observable that emits after each committed database
     /// transaction that has modified the tables and columns fetched by
     /// the request.
@@ -433,5 +513,15 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
             in: reader,
             startImmediately: startImmediately,
             scheduler: scheduler)
+    }
+    
+    @available(*, deprecated, renamed: "observeFirst(in:startImmediately:scheduler:)")
+    public func fetchOne(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Base.RowDecoder._Wrapped?>
+    {
+        return observeFirst(in: reader, startImmediately: startImmediately, scheduler: scheduler)
     }
 }
