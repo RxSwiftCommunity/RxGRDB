@@ -249,7 +249,7 @@ All elements are emitted in a protected database dispatch queue, serialized with
 **You can also track SQL requests:**
 
 ```swift
-let request = SQLRequest<Row>(sql: "SELECT * FROM player")
+let request: SQLRequest<Row> = "SELECT * FROM player"
 request.rx.changes(in: dbQueue)
     .subscribe(onNext: { db: Database in
         print("Players have changed.")
@@ -261,7 +261,7 @@ try dbQueue.write { db in
 // Prints "Players have changed."
 ```
 
-> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
+> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and [SQL Interpolation] about SQLRequest in particular.
 
 
 ---
@@ -316,7 +316,7 @@ All elements are emitted on the main queue, unless you provide a specific `sched
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest<Int>(sql: "SELECT MAX(score) FROM round")
+let request: SQLRequest<Int> = "SELECT MAX(score) FROM round"
 request.rx.observeFirst(in: dbQueue)
     .subscribe(onNext: { maxScore: Int? in
         print(maxScore)
@@ -325,7 +325,7 @@ request.rx.observeFirst(in: dbQueue)
 
 When tracking a *value*, you get nil in two cases: either the request yielded no database row, or one row with a NULL value.
 
-> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
+> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and [SQL Interpolation] about SQLRequest in particular.
 
 This observable filters out identical consecutive values by comparing raw database values.
 
@@ -356,7 +356,7 @@ All elements are emitted on the main queue, unless you provide a specific `sched
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
 ```swift
-let request = SQLRequest<URL>(sql: "SELECT url FROM link")
+let request: SQLRequest<URL> = "SELECT url FROM link"
 request.rx.observeAll(in: dbQueue)
     .subscribe(onNext: { urls: [URL] in
         print(urls)
@@ -366,14 +366,14 @@ request.rx.observeAll(in: dbQueue)
 When tracking *values*, make sure to ask for optionals when database may contain NULL:
 
 ```swift
-let request = SQLRequest<String?>(sql: "SELECT email FROM player")
+let request: SQLRequest<String?> = "SELECT email FROM player"
 request.rx.observeAll(in: dbQueue)
     .subscribe(onNext: { emails: [String?] in
         print(emails)
     })
 ```
 
-> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and SQLRequest in particular.
+> :point_up: **Note**: see [GRDB requests] for more information about requests in general, and [SQL Interpolation] about SQLRequest in particular.
 
 This observable filters out identical consecutive values by comparing raw database values.
 
@@ -820,6 +820,7 @@ Player.all().rx
 [Scheduling Guarantees]: #scheduling-guarantees
 [Scheduling]: #scheduling
 [Single]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md#single
+[SQL Interpolation]: https://github.com/groue/GRDB.swift/blob/master/Documentation/SQLInterpolation.md
 [ValueObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation
 [Values Observables]: #values-observables
 [contact]: http://twitter.com/groue
