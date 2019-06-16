@@ -10,17 +10,17 @@ extension Reactive where Base: DatabaseReader {
     /// Returns a Single that asynchronously emits the fetched value.
     ///
     ///     let dbQueue = DatabaseQueue()
-    ///     let players: Single<[Player]> = dbQueue.rx.fetch { db in
+    ///     let players: Single<[Player]> = dbQueue.rx.read { db in
     ///         try Player.fetchAll(db)
     ///     }
     ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
+    /// By default, returned values are emitted on the main dispatch queue. If
     /// you give a *scheduler*, values are emitted on that scheduler.
     ///
-    /// - parameter value: A closer which fetches database values.
+    /// - parameter value: A closure which accesses the database.
     /// - parameter scheduler: The scheduler on which the single completes.
     ///   Defaults to MainScheduler.asyncInstance.
-    public func fetch<T>(
+    public func read<T>(
         scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance,
         value: @escaping (Database) throws -> T)
         -> Single<T>

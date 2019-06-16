@@ -73,7 +73,7 @@ let newPlayerCount = dbQueue.rx.write { db -> Int in
 
 ```swift
 // Single<[Player]>
-let player = dbQueue.rx.fetch { db in
+let player = dbQueue.rx.read { db in
     try Player.fetchAll(db)
 }
 ```
@@ -138,18 +138,18 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 
 RxGRDB provides three mehods that allow you to embed asynchronous database accesses in your reactive flows.
 
-- [`rx.fetch(scheduler:value:)`](#databasereaderrxfetchschedulervalue)
+- [`rx.read(scheduler:value:)`](#databasereaderrxreadschedulervalue)
 - [`rx.writeCompletable(scheduler:updates:)`](#databasewriterrxwritecompletableschedulerupdates)
 - [`rx.write(scheduler:updates:)`](#databasewriterrxwriteschedulerupdates)
 
 
-#### `DatabaseReader.rx.fetch(scheduler:value:)`
+#### `DatabaseReader.rx.read(scheduler:value:)`
 
 This method returns a [Single] that completes after database values have been asynchronously fetched.
 
 ```swift
 // Single<[Player]>
-let player = dbQueue.rx.fetch { db in
+let player = dbQueue.rx.read { db in
     try Player.fetchAll(db)
 }
 ```
