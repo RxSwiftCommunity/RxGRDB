@@ -143,13 +143,13 @@ extension RequestTests {
 // MARK: - Count
 
 extension RequestTests {
-    func testRxFetchCount() throws {
-        try Test(testRxFetchCount)
+    func testRxObserveCount() throws {
+        try Test(testRxObserveCount)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchCount(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveCount(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "persons") { t in
                 t.column("id", .integer).primaryKey()
@@ -190,13 +190,13 @@ extension RequestTests {
 }
 
 extension RequestTests {
-    func testRxFetchCountRetry() throws {
-        try Test(testRxFetchCountRetry)
+    func testRxObserveCountRetry() throws {
+        try Test(testRxObserveCountRetry)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchCountRetry(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveCountRetry(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "table1") { t in
                 t.column("id", .integer).primaryKey()

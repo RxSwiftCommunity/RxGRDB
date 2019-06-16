@@ -68,13 +68,13 @@ extension FetchRequestTests {
 // MARK: - RowConvertible
 
 extension FetchRequestTests {
-    func testRxFetchAllRecords() throws {
-        try Test(testRxFetchAllRecords)
+    func testRxObserveAllRecords() throws {
+        try Test(testRxObserveAllRecords)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllRecords(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveAllRecords(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.order(Column("name"))
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -102,13 +102,13 @@ extension FetchRequestTests {
 }
 
 extension FetchRequestTests {
-    func testRxFetchAllRecordsIdentifiedByIds() throws {
-        try Test(testRxFetchAllRecordsIdentifiedByIds)
+    func testRxObserveAllRecordsIdentifiedByIds() throws {
+        try Test(testRxObserveAllRecordsIdentifiedByIds)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllRecordsIdentifiedByIds(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveAllRecordsIdentifiedByIds(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.filter(keys: [2, 3]).order(Column("name"))
         let expectedNames = [
             ["Barbara"],
@@ -136,13 +136,13 @@ extension FetchRequestTests {
 }
 
 extension FetchRequestTests {
-    func testRxFetchOneRecord() throws {
-        try Test(testRxFetchOneRecord)
+    func testRxObserveOneRecord() throws {
+        try Test(testRxObserveOneRecord)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneRecord(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveOneRecord(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.order(Column("name"))
         let expectedNames = [
             "Arthur",
@@ -169,13 +169,13 @@ extension FetchRequestTests {
 }
 
 extension FetchRequestTests {
-    func testRxFetchOneRecordIdentifiedById() throws {
-        try Test(testRxFetchOneRecordIdentifiedById)
+    func testRxObserveOneRecordIdentifiedById() throws {
+        try Test(testRxObserveOneRecordIdentifiedById)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneRecordIdentifiedById(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveOneRecordIdentifiedById(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.filter(key: 2)
         let expectedNames = [
             "Barbara",
@@ -205,13 +205,13 @@ extension FetchRequestTests {
 // MARK: - Row
 
 extension FetchRequestTests {
-    func testRxFetchAllRows() throws {
-        try Test(testRxFetchAllRows)
+    func testRxObserveAllRows() throws {
+        try Test(testRxObserveAllRows)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest<Row>(sql: "SELECT * FROM player ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -239,13 +239,13 @@ extension FetchRequestTests {
 }
 
 extension FetchRequestTests {
-    func testRxFetchAllRowsIdentifiedByIds() throws {
-        try Test(testRxFetchAllRowsIdentifiedByIds)
+    func testRxObserveAllRowsIdentifiedByIds() throws {
+        try Test(testRxObserveAllRowsIdentifiedByIds)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllRowsIdentifiedByIds(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveAllRowsIdentifiedByIds(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.filter(keys: [2, 3]).order(Column("name")).asRequest(of: Row.self)
         let expectedNames = [
             ["Barbara"],
@@ -273,13 +273,13 @@ extension FetchRequestTests {
 }
 
 extension FetchRequestTests {
-    func testRxFetchOneRow() throws {
-        try Test(testRxFetchOneRow)
+    func testRxObserveOneRow() throws {
+        try Test(testRxObserveOneRow)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveOneRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest<Row>(sql: "SELECT * FROM player ORDER BY name")
         let expectedNames = [
             "Arthur",
@@ -306,13 +306,13 @@ extension FetchRequestTests {
 }
 
 extension FetchRequestTests {
-    func testRxFetchOneRowIdentifiedById() throws {
-        try Test(testRxFetchOneRowIdentifiedById)
+    func testRxObserveOneRowIdentifiedById() throws {
+        try Test(testRxObserveOneRowIdentifiedById)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneRowIdentifiedById(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveOneRowIdentifiedById(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = Player.filter(key: 2).asRequest(of: Row.self)
         let expectedNames = [
             "Barbara",
@@ -342,13 +342,13 @@ extension FetchRequestTests {
 // MARK: - DatabaseValue
 
 extension FetchRequestTests {
-    func testRxFetchAllDatabaseValues() throws {
-        try Test(testRxFetchAllDatabaseValues)
+    func testRxObserveAllDatabaseValues() throws {
+        try Test(testRxObserveAllDatabaseValues)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY name")
         let expectedNames = [
             ["Arthur", "Barbara"],
@@ -376,13 +376,13 @@ extension FetchRequestTests {
 }
 
 extension FetchRequestTests {
-    func testRxFetchOneDatabaseValue() throws {
-        try Test(testRxFetchOneDatabaseValue)
+    func testRxObserveOneDatabaseValue() throws {
+        try Test(testRxObserveOneDatabaseValue)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveOneDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY name")
         let expectedNames = [
             "Arthur",
@@ -411,13 +411,13 @@ extension FetchRequestTests {
 // MARK: - Optional DatabaseValue
 
 extension FetchRequestTests {
-    func testRxFetchAllOptionalDatabaseValues() throws {
-        try Test(testRxFetchAllOptionalDatabaseValues)
+    func testRxObserveAllOptionalDatabaseValues() throws {
+        try Test(testRxObserveAllOptionalDatabaseValues)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
     
-    func testRxFetchAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+    func testRxObserveAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         let request = SQLRequest<String?>(sql: "SELECT email FROM player ORDER BY name")
         let expectedNames = [
             ["arthur@example.com", nil],
