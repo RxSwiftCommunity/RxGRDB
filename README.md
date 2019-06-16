@@ -206,14 +206,14 @@ request.rx.observeFirst(in: dbQueue) // Observable<Player?>
 request.rx.observeAll(in: dbQueue)   // Observable<[Player]>
 ```
 
-Some applications need to be synchronously notified right after any impactful transaction has been committed, and before any further database modification. This feature is provided by the [rx.changes](#requestrxchangesinstartimmediately) method:
+Some applications need to be synchronously notified right after any impactful transaction has been committed, and before any further database modification. This feature is provided by the [rx.changes](#fetchrequestrxchangesinstartimmediately) method:
 
 ```swift
 let request = Player.all()
 request.rx.changes(in: dbQueue)      // Observable<Database>
 ```
 
-- [`rx.changes`](#requestrxchangesinstartimmediately)
+- [`rx.changes`](#fetchrequestrxchangesinstartimmediately)
 - [`rx.observeCount`](#fetchrequestrxobservecountinstartimmediatelyscheduler)
 - [`rx.observeFirst`](#fetchrequestrxobservefirstinstartimmediatelyscheduler)
 - [`rx.observeAll`](#fetchrequestrxobserveallinstartimmediatelyscheduler)
