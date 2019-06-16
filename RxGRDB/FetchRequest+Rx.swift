@@ -50,29 +50,6 @@ extension Reactive where Base: FetchRequest {
             startImmediately: startImmediately,
             scheduler: scheduler)
     }
-    
-    /// Returns a Single that asynchronously emits the number of results in
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.all()
-    ///     let count: Single<Int> = request.rx.fetchCount(in: dbQueue)
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchCount(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<Int>
-    {
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: base.fetchCount)
-    }
 }
 
 // MARK: - FetchableRecord
@@ -168,52 +145,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
             in: reader,
             startImmediately: startImmediately,
             scheduler: scheduler)
-    }
-    
-    /// Returns a Single that asynchronously emits all records fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.all()
-    ///     let players: Single<[Player]> = request.rx.fetchAll(in: dbQueue)
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchAll(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<[Base.RowDecoder]>
-    {
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: base.fetchAll)
-    }
-    
-    /// Returns a Single that asynchronously emits the first record fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.filter(key: 1)
-    ///     let player = Single<Player?> = request.rx.fetchOne(in: dbQueue)
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchOne(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<Base.RowDecoder?>
-    {
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: base.fetchOne)
     }
 }
 
@@ -311,52 +242,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
             startImmediately: startImmediately,
             scheduler: scheduler)
     }
-    
-    /// Returns a Single that asynchronously emits all rows fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<Row>(sql: "SELECT * FROM player")
-    ///     let rows: Single<[Row]> = request.rx.fetchAll(in: dbQueue)
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchAll(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<[Row]>
-    {
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: base.fetchAll)
-    }
-    
-    /// Returns a Single that asynchronously emits the first row fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<Row>(sql: "SELECT * FROM player WHERE id = 1")
-    ///     let row: Single<Row?> = request.rx.fetchOne(in: dbQueue)
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchOne(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<Row?>
-    {
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: base.fetchOne)
-    }
 }
 
 // MARK: - DatabaseValueConvertible
@@ -453,55 +338,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
             startImmediately: startImmediately,
             scheduler: scheduler)
     }
-    
-    /// Returns a Single that asynchronously emits all values fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.select(Column("name"), as: String.self)
-    ///     let names: Single<[String]> = request.rx.fetchAll(in: dbQueue)
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchAll(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<[Base.RowDecoder]>
-    {
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: base.fetchAll)
-    }
-    
-    /// Returns a Single that asynchronously emits the first value fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY score DESC")
-    ///     let bestPlayerName: Single<String?> = request.rx.fetchOne(in: dbQueue)
-    ///
-    /// The value is nil if the query returns no row, or if the fetched
-    /// database value is null.
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchOne(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<Base.RowDecoder?>
-    {
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: base.fetchOne)
-    }
 }
 
 // MARK: - Optional DatabaseValueConvertible
@@ -597,55 +433,5 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
             in: reader,
             startImmediately: startImmediately,
             scheduler: scheduler)
-    }
-    
-    /// Returns a Single that asynchronously emits all values fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = Player.select(Column("name"), as: String.self)
-    ///     let names: Single<[String?]> = request.rx.fetchAll(in: dbQueue)
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchAll(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<[Base.RowDecoder._Wrapped?]>
-    {
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: base.fetchAll)
-    }
-    
-    /// Returns a Single that asynchronously emits the first value fetched by
-    /// the request.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let request = SQLRequest<String?>(sql: "SELECT name FROM player ORDER BY score DESC")
-    ///     let name: Single<String?>= request.rx.fetchOne(in: dbQueue)
-    ///
-    /// The value is nil if the query returns no row, or if the fetched
-    /// database value is null.
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func fetchOne(
-        in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<Base.RowDecoder._Wrapped?>
-    {
-        let request = base
-        return AnyDatabaseReader(reader).rx.fetch(
-            scheduler: scheduler,
-            value: { db in try Base.RowDecoder._Wrapped.fetchOne(db, request) })
     }
 }

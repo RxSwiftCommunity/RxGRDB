@@ -43,8 +43,6 @@
 		56E5D0FC22B60CE800C29948 /* DatabaseReaderFetchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0FA22B60CE800C29948 /* DatabaseReaderFetchTests.swift */; };
 		56E5D0FE22B6174F00C29948 /* DatabaseWriterWriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0FD22B6174F00C29948 /* DatabaseWriterWriteTests.swift */; };
 		56E5D0FF22B6175000C29948 /* DatabaseWriterWriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0FD22B6174F00C29948 /* DatabaseWriterWriteTests.swift */; };
-		56E5D10322B665F300C29948 /* FetchRequestFetchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D10222B665F300C29948 /* FetchRequestFetchTests.swift */; };
-		56E5D10422B665F300C29948 /* FetchRequestFetchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D10222B665F300C29948 /* FetchRequestFetchTests.swift */; };
 		A362BD5B2DEFD11686782D1A /* Pods_RxGRDBmacOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA8B516D1A1DA52925A30C9 /* Pods_RxGRDBmacOS.framework */; };
 		A4B026157539E608ECC97D62 /* Pods_RxGRDBiOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02EC464A1CA3B744FF371822 /* Pods_RxGRDBiOSTests.framework */; };
 		BCEC800F7000170F0EE210B3 /* Pods_RxGRDBiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6949C145CE7FB5807620153C /* Pods_RxGRDBiOS.framework */; };
@@ -100,7 +98,6 @@
 		56E5D0F522B544E900C29948 /* DatabaseWriter+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseWriter+Rx.swift"; sourceTree = "<group>"; };
 		56E5D0FA22B60CE800C29948 /* DatabaseReaderFetchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseReaderFetchTests.swift; sourceTree = "<group>"; };
 		56E5D0FD22B6174F00C29948 /* DatabaseWriterWriteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseWriterWriteTests.swift; sourceTree = "<group>"; };
-		56E5D10222B665F300C29948 /* FetchRequestFetchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchRequestFetchTests.swift; sourceTree = "<group>"; };
 		5A188A66CB167C18650FBE5B /* Pods-RxGRDBiOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBiOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RxGRDBiOSTests/Pods-RxGRDBiOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6949C145CE7FB5807620153C /* Pods_RxGRDBiOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxGRDBiOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BF0D0B1F6507696ECEC3D45 /* Pods-RxGRDBmacOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBmacOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RxGRDBmacOSTests/Pods-RxGRDBmacOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -205,7 +202,6 @@
 				567A2CA7223D1CEC00C44054 /* DatabaseRegionObservationTests.swift */,
 				56E5D0FD22B6174F00C29948 /* DatabaseWriterWriteTests.swift */,
 				565029231E8FDF5600615A2C /* FetchRequestChangesTests.swift */,
-				56E5D10222B665F300C29948 /* FetchRequestFetchTests.swift */,
 				565029C51E91318F00615A2C /* FetchRequestObserveTests.swift */,
 				567043E11F66A7B9000A44BA /* RowValueTests.swift */,
 				565029C31E9130F600615A2C /* Support.swift */,
@@ -576,7 +572,6 @@
 				567A2CA9223D1CED00C44054 /* DatabaseRegionObservationTests.swift in Sources */,
 				56E5D0FC22B60CE800C29948 /* DatabaseReaderFetchTests.swift in Sources */,
 				56E5D0FF22B6175000C29948 /* DatabaseWriterWriteTests.swift in Sources */,
-				56E5D10422B665F300C29948 /* FetchRequestFetchTests.swift in Sources */,
 				562756081E962C5B0035B653 /* FetchRequestObserveTests.swift in Sources */,
 				562756041E962C5B0035B653 /* FetchRequestChangesTests.swift in Sources */,
 				562756061E962C5B0035B653 /* Support.swift in Sources */,
@@ -607,7 +602,6 @@
 				567A2CA8223D1CED00C44054 /* DatabaseRegionObservationTests.swift in Sources */,
 				56E5D0FB22B60CE800C29948 /* DatabaseReaderFetchTests.swift in Sources */,
 				56E5D0FE22B6174F00C29948 /* DatabaseWriterWriteTests.swift in Sources */,
-				56E5D10322B665F300C29948 /* FetchRequestFetchTests.swift in Sources */,
 				565029C41E9130F600615A2C /* Support.swift in Sources */,
 				565029C61E91318F00615A2C /* FetchRequestObserveTests.swift in Sources */,
 				565029241E8FDF5600615A2C /* FetchRequestChangesTests.swift in Sources */,
