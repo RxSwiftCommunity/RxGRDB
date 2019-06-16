@@ -40,8 +40,8 @@ player.subscribe(onNext: { (player: Player?) in
 
 let request: SQLRequest<Int> = "SELECT MAX(score) FROM player"
 let maximumScore = request.rx.observeFirst(in: dbQueue)          // Observable<Int?>
-maximumScore.subscribe(onNext: { (maxScore: Int?) in
-    print("Fresh maximum score: \(maxScore)")
+maximumScore.subscribe(onNext: { (score: Int?) in
+    print("Fresh maximum score: \(score)")
 })
 ```
 
