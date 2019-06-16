@@ -289,7 +289,18 @@ try dbQueue.write { db in
 // Eventually prints "Fresh player count: 1"
 ```
 
-All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on the main queue by default, unless you provide a specific `scheduler`.
+
+If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
+
+```swift
+// On the main queue
+request.rx.observeCount(in: dbQueue)
+    .subscribe(onNext: { (count: Int) in
+        print("Fresh player count: \(count)")
+    })
+// <- here "Fresh player count" has been printed.
+```
 
 This observable filters out identical consecutive values.
 
@@ -316,7 +327,18 @@ try dbQueue.write { db in
 // Eventually prints "Fresh player"
 ```
 
-All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on the main queue by default, unless you provide a specific `scheduler`.
+
+If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
+
+```swift
+// On the main queue
+request.rx.observeFirst(in: dbQueue)
+    .subscribe(onNext: { (player: Player?) in
+        print("Fresh player: \(player)")
+    })
+// <- here "Fresh player" has been printed.
+```
 
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an `Int` value fetched from a custom SQL request:
 
@@ -356,7 +378,18 @@ try dbQueue.write { db in
 // Eventually prints "[Arthur, Barbara]"
 ```
 
-All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on the main queue by default, unless you provide a specific `scheduler`.
+
+If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
+
+```swift
+// On the main queue
+request.rx.observeAll(in: dbQueue)
+    .subscribe(onNext: { (players: [Player]) in
+        print("Fresh players: \(players)")
+    })
+// <- Here "Players have changed" is guaranteed to be printed.
+```
 
 **You can also track SQL requests, and choose the fetched type** (database [row](https://github.com/groue/GRDB.swift/blob/master/README.md#row-queries), plain [value](https://github.com/groue/GRDB.swift/blob/master/README.md#values), custom [record](https://github.com/groue/GRDB.swift/blob/master/README.md#records)). The sample code below tracks an array of `URL` values fetched from a custom SQL request:
 
@@ -399,7 +432,7 @@ request.rx.observeAll(in: dbQueue)   // Observable<[Player]>
 
 Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseRegionObservation.rx.changes](#databaseregionobservationrxchangesinstartimmediately).
 
-And when you need to fetch database values from several requests, use [ValueObservation.rx.fetch](#valueobservationrxfetchinstartimmediatelyscheduler).
+And when you need to fetch database values from several requests, use [ValueObservation.rx.observe](#valueobservationrxobserveinstartimmediatelyscheduler).
 
 
 ---
@@ -434,7 +467,7 @@ All elements are emitted in a protected database dispatch queue, serialized with
 
 ---
 
-#### `ValueObservation.rx.fetch(in:startImmediately:scheduler:)`
+#### `ValueObservation.rx.observe(in:startImmediately:scheduler:)`
 
 This [database values observable](#values-observables) emits the same values as a [ValueObservation].
 
@@ -451,14 +484,24 @@ let observation = ValueObservation.tracking(Player.all(), fetch: { db -> ([Playe
     let count = try Player.fetchCount(db)
     return (players, count)
 })
-observation.rx
-    .fetch(in: dbQueue)
+observation.rx.observe(in: dbQueue)
     .subscribe(onNext: { (players, count) in
         print("Fresh best ten players out of \(count): \(players)")
     })
 ```
 
-All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
+All elements are emitted on the main queue by default, unless you provide a specific `scheduler`.
+
+If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
+
+```swift
+// On the main queue
+observation.rx.observe(in: dbQueue)
+    .subscribe(onNext: { (players, count) in
+        print("Fresh best ten players out of \(count): \(players)")
+    })
+// <- here "Fresh best ten players" has been printed.
+```
 
 
 ## Diffs

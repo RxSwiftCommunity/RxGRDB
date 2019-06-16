@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+## Next Version
+
+- [#55](https://github.com/RxSwiftCommunity/RxGRDB/pull/55): Asynchronous database access
+
+
 ## 0.14.0
 
 Released May 24, 2019 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.13.0...v0.14.0)

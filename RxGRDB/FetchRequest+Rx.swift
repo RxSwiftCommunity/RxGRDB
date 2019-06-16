@@ -17,13 +17,14 @@ extension Reactive where Base: FetchRequest {
     ///             print("Fresh number of players: \(count)")
     ///         })
     ///
-    /// By default, all values are emitted on the main dispatch queue. If you
-    /// give a *scheduler*, values are emitted on that scheduler.
+    /// All elements are emitted on the main queue by default, unless you
+    /// provide a specific `scheduler`.
     ///
-    /// If you set *startImmediately* to true (the default value), the first
-    /// element is emitted right upon subscription. It is *synchronously*
-    /// emitted if and only if the observable is subscribed on the main queue,
-    /// and is given a nil *scheduler* argument:
+    /// If you set `startImmediately` to true (the default value), the first
+    /// element is emitted immediately, from the current database state.
+    /// Furthermore, this first element is emitted *synchronously* if and only
+    /// if the observable is subscribed on the main queue, and is given a nil
+    /// `scheduler` argument:
     ///
     ///     // on the main queue
     ///     request.rx
@@ -309,13 +310,14 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///             print("Fresh names: \(names)")
     ///         })
     ///
-    /// By default, all values are emitted on the main dispatch queue. If you
-    /// give a *scheduler*, values are emitted on that scheduler.
+    /// All elements are emitted on the main queue by default, unless you
+    /// provide a specific `scheduler`.
     ///
-    /// If you set *startImmediately* to true (the default value), the first
-    /// element is emitted right upon subscription. It is *synchronously*
-    /// emitted if and only if the observable is subscribed on the main queue,
-    /// and is given a nil *scheduler* argument:
+    /// If you set `startImmediately` to true (the default value), the first
+    /// element is emitted immediately, from the current database state.
+    /// Furthermore, this first element is emitted *synchronously* if and only
+    /// if the observable is subscribed on the main queue, and is given a nil
+    /// `scheduler` argument:
     ///
     ///     // on the main queue
     ///     request.rx
@@ -365,13 +367,14 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///             print("Fresh name: \(name)")
     ///         })
     ///
-    /// By default, all values are emitted on the main dispatch queue. If you
-    /// give a *scheduler*, values are emitted on that scheduler.
+    /// All elements are emitted on the main queue by default, unless you
+    /// provide a specific `scheduler`.
     ///
-    /// If you set *startImmediately* to true (the default value), the first
-    /// element is emitted right upon subscription. It is *synchronously*
-    /// emitted if and only if the observable is subscribed on the main queue,
-    /// and is given a nil *scheduler* argument:
+    /// If you set `startImmediately` to true (the default value), the first
+    /// element is emitted immediately, from the current database state.
+    /// Furthermore, this first element is emitted *synchronously* if and only
+    /// if the observable is subscribed on the main queue, and is given a nil
+    /// `scheduler` argument:
     ///
     ///     // on the main queue
     ///     request.rx
@@ -425,13 +428,14 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     ///             print("Fresh names: \(names)")
     ///         })
     ///
-    /// By default, all values are emitted on the main dispatch queue. If you
-    /// give a *scheduler*, values are emitted on that scheduler.
+    /// All elements are emitted on the main queue by default, unless you
+    /// provide a specific `scheduler`.
     ///
-    /// If you set *startImmediately* to true (the default value), the first
-    /// element is emitted right upon subscription. It is *synchronously*
-    /// emitted if and only if the observable is subscribed on the main queue,
-    /// and is given a nil *scheduler* argument:
+    /// If you set `startImmediately` to true (the default value), the first
+    /// element is emitted immediately, from the current database state.
+    /// Furthermore, this first element is emitted *synchronously* if and only
+    /// if the observable is subscribed on the main queue, and is given a nil
+    /// `scheduler` argument:
     ///
     ///     // on the main queue
     ///     request.rx
@@ -481,13 +485,14 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     ///             print("Fresh name: \(name)")
     ///         })
     ///
-    /// By default, all values are emitted on the main dispatch queue. If you
-    /// give a *scheduler*, values are emitted on that scheduler.
+    /// All elements are emitted on the main queue by default, unless you
+    /// provide a specific `scheduler`.
     ///
-    /// If you set *startImmediately* to true (the default value), the first
-    /// element is emitted right upon subscription. It is *synchronously*
-    /// emitted if and only if the observable is subscribed on the main queue,
-    /// and is given a nil *scheduler* argument:
+    /// If you set `startImmediately` to true (the default value), the first
+    /// element is emitted immediately, from the current database state.
+    /// Furthermore, this first element is emitted *synchronously* if and only
+    /// if the observable is subscribed on the main queue, and is given a nil
+    /// `scheduler` argument:
     ///
     ///     // on the main queue
     ///     request.rx
