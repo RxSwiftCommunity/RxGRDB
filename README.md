@@ -60,7 +60,7 @@ let write = dbQueue.rx.writeCompletable { db in
 }
 
 // Single<Int>
-let newPlayerCount = dbQueue.rx.write { db in
+let newPlayerCount = dbQueue.rx.write { db -> Int in
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
