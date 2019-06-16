@@ -16,15 +16,15 @@
 		561E25E72188398E0019F3F0 /* ValueObservation+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561E25E62188398E0019F3F0 /* ValueObservation+Rx.swift */; };
 		561E25E82188398E0019F3F0 /* ValueObservation+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561E25E62188398E0019F3F0 /* ValueObservation+Rx.swift */; };
 		562755DC1E962BFD0035B653 /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 560F92C31E94DF280077EADF /* RxGRDB.framework */; };
-		562756041E962C5B0035B653 /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
+		562756041E962C5B0035B653 /* FetchRequestChangesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* FetchRequestChangesTests.swift */; };
 		562756061E962C5B0035B653 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
-		562756081E962C5B0035B653 /* FetchRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* FetchRequestTests.swift */; };
+		562756081E962C5B0035B653 /* FetchRequestObserveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* FetchRequestObserveTests.swift */; };
 		5650291F1E8FDF5600615A2C /* RxGRDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565029151E8FDF5600615A2C /* RxGRDB.framework */; };
-		565029241E8FDF5600615A2C /* RequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* RequestTests.swift */; };
+		565029241E8FDF5600615A2C /* FetchRequestChangesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029231E8FDF5600615A2C /* FetchRequestChangesTests.swift */; };
 		565029261E8FDF5600615A2C /* RxGRDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 565029181E8FDF5600615A2C /* RxGRDB.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		565029B31E8FE12C00615A2C /* FetchRequest+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */; };
 		565029C41E9130F600615A2C /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C31E9130F600615A2C /* Support.swift */; };
-		565029C61E91318F00615A2C /* FetchRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* FetchRequestTests.swift */; };
+		565029C61E91318F00615A2C /* FetchRequestObserveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565029C51E91318F00615A2C /* FetchRequestObserveTests.swift */; };
 		5653EC23209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5653EC22209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift */; };
 		5653EC24209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5653EC22209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift */; };
 		565934481F0F419600707571 /* ValueObservationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565934471F0F419600707571 /* ValueObservationTests.swift */; };
@@ -39,6 +39,12 @@
 		56E5D0F422B53D5600C29948 /* DatabaseReader+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0F222B53D5600C29948 /* DatabaseReader+Rx.swift */; };
 		56E5D0F622B544E900C29948 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0F522B544E900C29948 /* DatabaseWriter+Rx.swift */; };
 		56E5D0F722B544E900C29948 /* DatabaseWriter+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0F522B544E900C29948 /* DatabaseWriter+Rx.swift */; };
+		56E5D0FB22B60CE800C29948 /* DatabaseReaderFetchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0FA22B60CE800C29948 /* DatabaseReaderFetchTests.swift */; };
+		56E5D0FC22B60CE800C29948 /* DatabaseReaderFetchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0FA22B60CE800C29948 /* DatabaseReaderFetchTests.swift */; };
+		56E5D0FE22B6174F00C29948 /* DatabaseWriterWriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0FD22B6174F00C29948 /* DatabaseWriterWriteTests.swift */; };
+		56E5D0FF22B6175000C29948 /* DatabaseWriterWriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D0FD22B6174F00C29948 /* DatabaseWriterWriteTests.swift */; };
+		56E5D10322B665F300C29948 /* FetchRequestFetchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D10222B665F300C29948 /* FetchRequestFetchTests.swift */; };
+		56E5D10422B665F300C29948 /* FetchRequestFetchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E5D10222B665F300C29948 /* FetchRequestFetchTests.swift */; };
 		A362BD5B2DEFD11686782D1A /* Pods_RxGRDBmacOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA8B516D1A1DA52925A30C9 /* Pods_RxGRDBmacOS.framework */; };
 		A4B026157539E608ECC97D62 /* Pods_RxGRDBiOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02EC464A1CA3B744FF371822 /* Pods_RxGRDBiOSTests.framework */; };
 		BCEC800F7000170F0EE210B3 /* Pods_RxGRDBiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6949C145CE7FB5807620153C /* Pods_RxGRDBiOS.framework */; };
@@ -77,11 +83,11 @@
 		565029181E8FDF5600615A2C /* RxGRDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RxGRDB.h; sourceTree = "<group>"; };
 		565029191E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5650291E1E8FDF5600615A2C /* RxGRDBiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		565029231E8FDF5600615A2C /* RequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestTests.swift; sourceTree = "<group>"; };
+		565029231E8FDF5600615A2C /* FetchRequestChangesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRequestChangesTests.swift; sourceTree = "<group>"; };
 		565029251E8FDF5600615A2C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		565029B21E8FE12C00615A2C /* FetchRequest+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FetchRequest+Rx.swift"; sourceTree = "<group>"; };
 		565029C31E9130F600615A2C /* Support.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
-		565029C51E91318F00615A2C /* FetchRequestTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchRequestTests.swift; sourceTree = "<group>"; };
+		565029C51E91318F00615A2C /* FetchRequestObserveTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchRequestObserveTests.swift; sourceTree = "<group>"; };
 		5653EC22209C36FD00F46237 /* DatabaseRegionConvertible+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseRegionConvertible+Rx.swift"; sourceTree = "<group>"; };
 		565934471F0F419600707571 /* ValueObservationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueObservationTests.swift; sourceTree = "<group>"; };
 		567043E11F66A7B9000A44BA /* RowValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowValueTests.swift; sourceTree = "<group>"; };
@@ -92,6 +98,9 @@
 		56DBA5311F0BC0C000C90A18 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		56E5D0F222B53D5600C29948 /* DatabaseReader+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseReader+Rx.swift"; sourceTree = "<group>"; };
 		56E5D0F522B544E900C29948 /* DatabaseWriter+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseWriter+Rx.swift"; sourceTree = "<group>"; };
+		56E5D0FA22B60CE800C29948 /* DatabaseReaderFetchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseReaderFetchTests.swift; sourceTree = "<group>"; };
+		56E5D0FD22B6174F00C29948 /* DatabaseWriterWriteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseWriterWriteTests.swift; sourceTree = "<group>"; };
+		56E5D10222B665F300C29948 /* FetchRequestFetchTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchRequestFetchTests.swift; sourceTree = "<group>"; };
 		5A188A66CB167C18650FBE5B /* Pods-RxGRDBiOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBiOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RxGRDBiOSTests/Pods-RxGRDBiOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6949C145CE7FB5807620153C /* Pods_RxGRDBiOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxGRDBiOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BF0D0B1F6507696ECEC3D45 /* Pods-RxGRDBmacOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBmacOSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RxGRDBmacOSTests/Pods-RxGRDBmacOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -192,13 +201,16 @@
 		565029221E8FDF5600615A2C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				56E5D0FA22B60CE800C29948 /* DatabaseReaderFetchTests.swift */,
 				567A2CA7223D1CEC00C44054 /* DatabaseRegionObservationTests.swift */,
-				565029C51E91318F00615A2C /* FetchRequestTests.swift */,
-				565029231E8FDF5600615A2C /* RequestTests.swift */,
+				56E5D0FD22B6174F00C29948 /* DatabaseWriterWriteTests.swift */,
+				565029231E8FDF5600615A2C /* FetchRequestChangesTests.swift */,
+				56E5D10222B665F300C29948 /* FetchRequestFetchTests.swift */,
+				565029C51E91318F00615A2C /* FetchRequestObserveTests.swift */,
 				567043E11F66A7B9000A44BA /* RowValueTests.swift */,
-				565934431F0EB29E00707571 /* Support */,
 				565029C31E9130F600615A2C /* Support.swift */,
 				565934471F0F419600707571 /* ValueObservationTests.swift */,
+				565934431F0EB29E00707571 /* Support */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -562,8 +574,11 @@
 				567043E31F66A7B9000A44BA /* RowValueTests.swift in Sources */,
 				565934491F0F419600707571 /* ValueObservationTests.swift in Sources */,
 				567A2CA9223D1CED00C44054 /* DatabaseRegionObservationTests.swift in Sources */,
-				562756081E962C5B0035B653 /* FetchRequestTests.swift in Sources */,
-				562756041E962C5B0035B653 /* RequestTests.swift in Sources */,
+				56E5D0FC22B60CE800C29948 /* DatabaseReaderFetchTests.swift in Sources */,
+				56E5D0FF22B6175000C29948 /* DatabaseWriterWriteTests.swift in Sources */,
+				56E5D10422B665F300C29948 /* FetchRequestFetchTests.swift in Sources */,
+				562756081E962C5B0035B653 /* FetchRequestObserveTests.swift in Sources */,
+				562756041E962C5B0035B653 /* FetchRequestChangesTests.swift in Sources */,
 				562756061E962C5B0035B653 /* Support.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -590,9 +605,12 @@
 				567043E21F66A7B9000A44BA /* RowValueTests.swift in Sources */,
 				565934481F0F419600707571 /* ValueObservationTests.swift in Sources */,
 				567A2CA8223D1CED00C44054 /* DatabaseRegionObservationTests.swift in Sources */,
+				56E5D0FB22B60CE800C29948 /* DatabaseReaderFetchTests.swift in Sources */,
+				56E5D0FE22B6174F00C29948 /* DatabaseWriterWriteTests.swift in Sources */,
+				56E5D10322B665F300C29948 /* FetchRequestFetchTests.swift in Sources */,
 				565029C41E9130F600615A2C /* Support.swift in Sources */,
-				565029C61E91318F00615A2C /* FetchRequestTests.swift in Sources */,
-				565029241E8FDF5600615A2C /* RequestTests.swift in Sources */,
+				565029C61E91318F00615A2C /* FetchRequestObserveTests.swift in Sources */,
+				565029241E8FDF5600615A2C /* FetchRequestChangesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

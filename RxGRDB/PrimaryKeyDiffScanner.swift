@@ -109,6 +109,9 @@ public struct PrimaryKeyDiff<Record> {
     }
 }
 
+extension PrimaryKeyDiff: Equatable where Record: Equatable { }
+extension PrimaryKeyDiff: Hashable where Record: Hashable { }
+
 /// Given two sorted sequences (left and right), this function emits "merge steps"
 /// which tell whether elements are only found on the left, on the right, or on
 /// both sides.
