@@ -67,7 +67,7 @@ let newPlayerCount = dbQueue.rx.write { db in                    // Single<Int>
   <summary>Asynchronously read from the database</summary>
 
 ```swift
-let players: Single<[Player]> = dbQueue.rx.fetch { db in
+let player = dbQueue.rx.fetch { db in                            // Single<[Player]>
     try Player.fetchAll(db)
 }
 ```
