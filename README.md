@@ -22,23 +22,58 @@ RxGRDB [![Swift 5](https://img.shields.io/badge/swift-5-orange.svg?style=flat)](
 
 ## Usage
 
-RxGRDB produces observable sequences from database requests. For example:
+<details open>
+  <summary>Observe database changes</summary>
 
 ```swift
-Player.order(score.desc).limit(10)
-    .rx
-    .fetchAll(in: dbQueue)
-    .subscribe(onNext: { players: [Player] in
-        print("Best ten players have changed")
-    })
+let players: Observable<[Player]> = 
+    Player.all().rx.observeAll(in: dbQueue)
+players.subscribe(onNext: { (players: [Player]) in
+    print("Fresh players: \(players)")
+})
 
-Player.filter(key: 1)
-    .rx
-    .fetchOne(in: dbQueue)
-    .subscribe(onNext: { player: Player? in
-        print("Player 1 has changed")
-    })
+let players: Observable<Player?> = 
+    Player.filter(key: 1).rx.observeFirst(in: dbQueue)
+player.subscribe(onNext: { (player: Player?) in
+    print("Fresh player: \(player)")
+})
+
+let request: SQLRequest<Int> = "SELECT MAX(score) FROM player"
+let maximumScore =
+    request.rx.observeFirst(in: dbQueue)
+maximumScore.subscribe(onNext: { (maxScore: Int?) in
+    print("Fresh maximum score: \(maxScore)")
+})
 ```
+
+</details>
+
+<details>
+  <summary>Asynchronously write in the database</summary>
+
+```swift
+let write: Completable = dbQueue.rx.writeCompletable { db in
+    try Player(...).insert(db)
+}
+
+let newPlayerCount: Single<Int> = dbQueue.rx.write { db in
+    try Player(...).insert(db)
+    return try Player.fetchCount(db)
+}
+```
+
+</details>
+
+<details>
+  <summary>Asynchronously read from the database</summary>
+
+```swift
+let players: Single<[Player]> = dbQueue.rx.fetch { db in
+    try Player.fetchAll(db)
+}
+```
+
+</details>
 
 To connect to the database and define the tracked requests, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
 

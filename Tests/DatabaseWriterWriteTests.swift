@@ -34,7 +34,9 @@ extension DatabaseWriterWriteTests {
         let single = writer.rx.write { db in
             try Player(id: 1, name: "Arthur", score: 1000).insert(db)
         }
+        try XCTAssertEqual(writer.read(Player.fetchCount), 0)
         let _: Void = try single.toBlocking(timeout: 1).single()
+        try XCTAssertEqual(writer.read(Player.fetchCount), 1)
     }
 }
 
@@ -78,7 +80,7 @@ extension DatabaseWriterWriteTests {
                 .do(onSuccess: { _ in
                     dispatchPrecondition(condition: .onQueue(.main))
                 })
-            _ = try single.toBlocking(timeout: 1).toArray()
+            _ = try single.toBlocking(timeout: 1).single()
         }
         do {
             let queue = DispatchQueue(label: "test")
@@ -89,7 +91,7 @@ extension DatabaseWriterWriteTests {
                 .do(onSuccess: { _ in
                     dispatchPrecondition(condition: .onQueue(queue))
                 })
-            _ = try single.toBlocking(timeout: 1).toArray()
+            _ = try single.toBlocking(timeout: 1).single()
         }
     }
 }
