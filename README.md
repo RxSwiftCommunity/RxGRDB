@@ -51,11 +51,11 @@ maximumScore.subscribe(onNext: { (maxScore: Int?) in
   <summary>Asynchronously write in the database</summary>
 
 ```swift
-let write: Completable = dbQueue.rx.writeCompletable { db in
+let write = dbQueue.rx.writeCompletable { db in                  // Completable
     try Player(...).insert(db)
 }
 
-let newPlayerCount: Single<Int> = dbQueue.rx.write { db in
+let newPlayerCount = dbQueue.rx.write { db in                    // Single<Int>
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
