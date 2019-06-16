@@ -78,17 +78,13 @@ let player = dbQueue.rx.fetch { db in                            // Single<[Play
 Documentation
 =============
 
-- [Installation](#installation)
-- [What is Database Observation?](#what-is-database-observation)
-- [Observing Individual Requests](#observing-individual-requests)
-- [Observing Multiple Requests](#observing-multiple-requests)
-- [Diffs](#diffs)
-- [Scheduling](#scheduling)
-    - [Scheduling Guarantees](#scheduling-guarantees)
-    - [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
-    - [Changes Observables](#changes-observables)
-    - [Values Observables](#values-observables)
-    - [Common Use Cases of Values Observables](#common-use-cases-of-values-observables)
+- [Installation]
+- [Asynchronous Database Access]
+- [Database Observation]
+    - [Observing Individual Requests]
+    - [Observing Multiple Requests]
+    - [Diffs]
+    - [Scheduling]
 
 
 ## Installation
@@ -131,8 +127,59 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
     import GRDB
     ```
 
+# Asynchronous Database Access
 
-## What is Database Observation?
+**RxGRDB provides three mehods that allow you to embed asynchronous database accesses in your reactive flows.**
+
+- [`rx.fetch(scheduler:value:)`](#databasereaderrxfetchschedulervalue)
+- [`rx.writeCompletable(scheduler:updates:)`](#databasewriterrxwritecompletableschedulerupdates)
+- [`rx.write(scheduler:updates:)`](#databasewriterrxwriteschedulerupdates)
+
+
+#### `DatabaseReader.rx.fetch(scheduler:value:)`
+
+This method returns a [Single] that completes after database values have been asynchronously fetched.
+
+```swift
+// Single<[Player]>
+let player = dbQueue.rx.fetch { db in
+    try Player.fetchAll(db)
+}
+```
+
+The fetched value is emitted on the main queue, unless you provide a specific `scheduler`.
+
+
+#### `DatabaseWriter.rx.writeCompletable(scheduler:updates:)`
+
+This method returns a [Completable] that completes after database updates have been succesfully executed inside a database transaction.
+
+```swift
+// Completable
+let write = dbQueue.rx.writeCompletable { db in
+    try Player(...).insert(db)
+}
+```
+
+The completable completes on the main queue, unless you provide a specific `scheduler`.
+
+
+#### `DatabaseWriter.rx.write(scheduler:updates:)`
+
+This method returns a [Single] that completes after database updates have been succesfully executed inside a database transaction.
+
+```swift
+// Single<Int>
+let newPlayerCount = dbQueue.rx.writeCompletable { db -> Int in
+    try Player(...).insert(db)
+    return try Player.fetchCount(db)
+}
+```
+
+The single completes on the main queue, unless you provide a specific `scheduler`.
+
+
+# Database Observation
 
 **RxGRDB notifies changes that have been committed in the database.** No insertion, update, or deletion in tracked tables is missed. This includes indirect changes triggered by [foreign keys](https://www.sqlite.org/foreignkeys.html#fk_actions) or [SQL triggers](https://www.sqlite.org/lang_createtrigger.html).
 
@@ -145,7 +192,7 @@ To function correctly, RxGRDB requires that a unique [database connection] is ke
 **RxGRDB observables are based on GRDB's [ValueObservation] and [DatabaseRegionObservation].** If your application needs change notifications that are not built in RxGRDB, check the general [Database Changes Observation] chapter.
 
 
-# Observing Individual Requests
+## Observing Individual Requests
 
 **When your application observes a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests), it gets notified each time a change in the results of the request has been committed in the database.**
 
@@ -330,7 +377,7 @@ request.rx.fetchAll(in: dbQueue)
 This observable filters out identical consecutive values by comparing raw database values.
 
 
-# Observing Multiple Requests
+## Observing Multiple Requests
 
 We have seen above how to [observe individual requests](#observing-individual-requests):
 
@@ -408,7 +455,7 @@ observation.rx
 All elements are emitted on the main queue, unless you provide a specific `scheduler`. If you set `startImmediately` to true (the default value), the first element is emitted right upon subscription.
 
 
-# Diffs
+## Diffs
 
 Since RxGRDB is able to track database changes, it is a natural desire to compute diffs between two consecutive request results.
 
@@ -419,7 +466,7 @@ RxGRDB ships with one diff algorithm which computes the inserted, updated, and d
 For other diff algorithms, we advise you to have a look to [RxDataSources](https://github.com/RxSwiftCommunity/RxDataSources), [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses RxDataSources in order to animate the content of a table view.
 
 
-## PrimaryKeyDiffScanner
+### PrimaryKeyDiffScanner
 
 **PrimaryKeyDiffScanner computes diffs between collections whose order does not matter.** It uses an algorithm that has a low, linear, complexity.
 
@@ -493,31 +540,31 @@ request
 Check the [demo application](Documentation/RxGRDBDemo) for an example app that uses `PrimaryKeyDiffScanner` to synchronize the content of a map view with the content of the database.
 
 
-# Scheduling
+## Scheduling
 
 GRDB and RxGRDB go a long way in order to smooth out subtleties of multi-threaded SQLite. You're unlikely to use those libraries in a *very* wrong way.
 
 Some applications are demanding: this chapter attempts at making RxGRDB scheduling as clear as possible. Please have a look at [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency) first.
 
-- [Scheduling Guarantees](#scheduling-guarantees)
-- [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
-- [Changes Observables](#changes-observables)
-- [Values Observables](#values-observables)
-- [Common Use Cases of Values Observables](#common-use-cases-of-values-observables)
+- [Scheduling Guarantees]
+- [Changes Observables vs. Values Observables]
+- [Changes Observables]
+- [Values Observables]
+- [Common Use Cases of Values Observables]
 
 
-## Scheduling Guarantees
+### Scheduling Guarantees
 
 RxGRDB inherits from [GRDB guarantees](https://github.com/groue/GRDB.swift/blob/master/README.md#guarantees-and-rules), and adds two more:
 
 - :bowtie: **RxGRDB Guarantee 1: all observables can be created and subscribed from any thread.**
     
-    Not all can be observed on any thread, though: see [Changes Observables vs. Values Observables](#changes-observables-vs-values-observables)
+    Not all can be observed on any thread, though: see [Changes Observables vs. Values Observables].
 
 - :bowtie: **RxGRDB Guarantee 2: all observables emit their values in the same chronological order as transactions.**
 
 
-## Changes Observables vs. Values Observables
+### Changes Observables vs. Values Observables
 
 **RxGRDB provides two sets of observables: changes observables, and values observables.** Changes observables emit database connections, and values observables emit values (records, rows, ints, etc.):
 
@@ -540,7 +587,7 @@ Player.all().rx
 Since changes and values observables don't have the same behavior, we'd like you to understand the differences.
 
 
-## Changes Observables
+### Changes Observables
 
 **Changes Observable are all about being synchronously notified of any database transaction that has modified the tracked tables and columns by inserting, updating, or deleting a database row.** Those observables can be created and subscribed from any thread. They all emit database connections in a "protected dispatch queue", serialized with all database updates:
 
@@ -593,7 +640,7 @@ When one uses a [database queue], all reads are blocked as well. A [database poo
 
 This application needs to update its UI, on the main thread, from the freshest database values. As the application is setting up its views from those values, background threads can write in the database, and make those values obsolete even before screen pixels have been refreshed.
 
-Is it a problem if the app draws stale database content? RxGRDB's answer is *no*, as long as the application is eventually notified with refreshed values. And this is the job of [values observables](#values-observables).
+Is it a problem if the app draws stale database content? RxGRDB's answer is *no*, as long as the application is eventually notified with refreshed values. And this is the job of [Values Observables].
 
 **There are very few use cases for changes observables.** For example:
 
@@ -608,7 +655,7 @@ Is it a problem if the app draws stale database content? RxGRDB's answer is *no*
 Outside of those use cases, it is much likely *wrong* to use a changes observables. Please [open an issue] and come discuss if you have any question.
 
 
-## Values Observables
+### Values Observables
 
 **Values Observables are all about getting fresh database values**.
 
@@ -662,7 +709,7 @@ Depending on whether you use a [database queue], or a [database pool], the value
 - [Values Observables in a Database Pool](#values-observables-in-a-database-pool)
 
 
-### Values Observables in a Database Queue
+#### Values Observables in a Database Queue
 
 In a [database queue], values observables fetch fresh values immediately after a database transaction has modified the tracked tables and columns
 
@@ -689,7 +736,7 @@ Fortunately, fetching values is usually [quite fast](https://github.com/groue/GR
 Yet some complex queries take a long time, and you may experience undesired blocking. In this case, consider replacing the database queue with a database pool, because that's what database pools are for: *efficient multi-threading*.
 
 
-### Values Observables in a Database Pool
+#### Values Observables in a Database Pool
 
 In a [database pool], values observables *eventually* fetch fresh values after a database transaction has modified the tracked tables and columns.
 
@@ -754,16 +801,29 @@ Player.all().rx
 ```
 
 
+[Changes Observables vs. Values Observables]: #changes-observables-vs-values-observables
+[Changes Observables]: #changes-observables
+[Common Use Cases of Values Observables]: #common-use-cases-of-values-observables
+[Completable]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md#completable
+[Database Changes Observation]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-changes-observation
+[Database Observation]: #database-observation
+[DatabaseRegionObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregionobservation
+[Diffs]: #diffs
+[GRDB Concurrency Guide]: https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency
+[GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
+[Installation]: #installation
+[Isolation In SQLite]: https://sqlite.org/isolation.html
+[Observing Individual Requests]: #observing-individual-requests
+[Observing Multiple Requests]: #observing-multiple-requests
+[Scheduling Guarantees]: #scheduling-guarantees
+[Scheduling]: #scheduling
+[Single]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md#single
+[ValueObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation
+[Values Observables]: #values-observables
 [contact]: http://twitter.com/groue
 [database connection]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-connections
-[database pool]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools
 [database pool configuration]: https://github.com/groue/GRDB.swift/blob/master/README.md#databasepool-configuration
+[database pool]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools
 [database queue]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-queues
-[GRDB Concurrency Guide]: https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency
-[Isolation In SQLite]: https://sqlite.org/isolation.html
-[query interface]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
-[GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [open an issue]: https://github.com/RxSwiftCommunity/RxGRDB/issues
-[DatabaseRegionObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregionobservation
-[ValueObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation
-[Database Changes Observation]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-changes-observation
+[query interface]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
