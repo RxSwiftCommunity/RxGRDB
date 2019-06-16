@@ -39,7 +39,7 @@ extension ValueObservationTests {
         
         // 1 (startImmediately parameter is true by default)
         observation.rx
-            .fetch(in: writer)
+            .observe(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -100,7 +100,7 @@ extension ValueObservationTests {
 
         DispatchQueue.global().async {
             observation.rx
-                .fetch(in: writer)
+                .observe(in: writer)
                 .subscribe { event in
                     // events are expected on the main thread by default
                     assertMainQueue()
@@ -144,7 +144,7 @@ extension ValueObservationTests {
         let expectation1 = expectation(description: "1st subscription")
         expectation1.expectedFulfillmentCount = 2
         var count1: Int? = nil
-        request.rx.fetchOne(in: writer)
+        request.rx.observeFirst(in: writer)
             .subscribe(onNext: {
                 XCTAssertTrue(Thread.isMainThread)
                 expectation1.fulfill()
@@ -158,7 +158,7 @@ extension ValueObservationTests {
         }
         
         var count2: Int? = nil
-        request.rx.fetchOne(in: writer)
+        request.rx.observeFirst(in: writer)
             .subscribe(onNext: {
                 XCTAssertTrue(Thread.isMainThread)
                 count2 = $0
@@ -186,7 +186,7 @@ extension ValueObservationTests {
         let expectation = self.expectation(description: "subscription")
         expectation.expectedFulfillmentCount = 1
         request.rx
-            .fetchOne(in: writer)
+            .observeFirst(in: writer)
             .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .userInitiated))
             .subscribe(onNext: { _ in
                 XCTAssertTrue(Thread.isMainThread)

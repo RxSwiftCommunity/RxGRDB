@@ -11,8 +11,6 @@ public protocol _ValueObservationProtocol: ReactiveCompatible {
         in reader: DatabaseReader,
         onError: @escaping (Error) -> Void,
         onChange: @escaping (_Reducer.Value) -> Void) -> TransactionObserver
-    // Dependency on an experimental GRDB API
-    func fetch(_ db: Database) throws -> _Reducer.Value?
 }
 
 /// :nodoc:
@@ -46,15 +44,6 @@ extension Reactive where Base: _ValueObservationProtocol {
     ///             print("Fresh players: \(players)")
     ///         })
     ///     // <- here "Fresh players" has been printed
-    ///
-    ///     // on any queue
-    ///     observation.rx
-    ///         .observe(in: dbQueue)
-    ///         .subscribe(onNext: { (players: [Player]) in
-    ///             // on the main queue
-    ///             print("Fresh players: \(players)")
-    ///         })
-    ///     // <- here "Fresh players" may not be printed yet
     ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
@@ -91,38 +80,15 @@ extension Reactive where Base: _ValueObservationProtocol {
             return observation.makeObservable(in: reader)
         }
     }
-}
     
-extension Reactive where Base: _ValueObservationProtocol, Base._Reducer: ImmediateValueReducer {
-    /// Returns a Single that eventually emits the first value emitted by
-    /// the ValueObservation.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let observation = ValueObservation.trackingAll(Player.all())
-    ///     observation.rx
-    ///         .fetch(in: dbQueue)
-    ///         .subscribe(onSuccess: { (players: [Player]) in
-    ///             print("players: \(players)")
-    ///         })
-    ///
-    /// By default, fetched values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
-    ///
-    /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter scheduler: The eventual scheduler on which elements
-    ///   are emitted. Defaults to MainScheduler.asyncInstance.
+    @available(*, deprecated, renamed: "observe(in:startImmediately:scheduler:)")
     public func fetch(
         in reader: DatabaseReader,
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
-        -> Single<Base._Reducer.Value>
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Base._Reducer.Value>
     {
-        let observation = base
-        return AnyDatabaseReader(reader).rx.fetch(scheduler: scheduler) { db in
-            guard let value = try observation.fetch(db) else {
-                fatalError("ImmediateSchedulerType contract broken: observation did not emit its first element")
-            }
-            return value
-        }
+        return observe(in: reader, startImmediately: startImmediately, scheduler: scheduler)
     }
 }
 

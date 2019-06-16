@@ -152,7 +152,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.observeFirst(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -186,7 +186,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Player?>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.observeFirst(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -222,7 +222,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.observeAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -256,7 +256,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Row]>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.observeAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -289,7 +289,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.observeFirst(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -323,7 +323,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Row?>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.observeFirst(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -359,7 +359,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[String]>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.observeAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -392,7 +392,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<String?>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchOne(in: writer)
+        CustomFetchRequest(request).rx.observeFirst(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -427,7 +427,7 @@ extension FetchRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[String?]>(expectedEventCount: expectedNames.count)
-        CustomFetchRequest(request).rx.fetchAll(in: writer)
+        CustomFetchRequest(request).rx.observeAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -495,7 +495,7 @@ extension FetchRequestTests {
         }
         CustomFetchRequest(request.asRequest(of: Row.self))
             .rx
-            .fetchAll(in: writer)
+            .observeAll(in: writer)
             .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
             .map { $0.diff }
             .subscribe(recorder)

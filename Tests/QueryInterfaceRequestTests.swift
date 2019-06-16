@@ -91,7 +91,7 @@ extension QueryInterfaceRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[ParentInfo]>(expectedEventCount: expectedRecordArrays.count)
-        request.rx.fetchAll(in: writer)
+        request.rx.observeAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -133,7 +133,7 @@ extension QueryInterfaceRequestTests {
 
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<ParentInfo?>(expectedEventCount: expectedRecords.count)
-        request.rx.fetchOne(in: writer)
+        request.rx.observeFirst(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -166,7 +166,7 @@ extension QueryInterfaceRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<[Row]>(expectedEventCount: 2)
-        request.rx.fetchAll(in: writer)
+        request.rx.observeAll(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()
@@ -211,7 +211,7 @@ extension QueryInterfaceRequestTests {
         
         try setUpDatabase(in: writer)
         let recorder = EventRecorder<Row?>(expectedEventCount: 2)
-        request.rx.fetchOne(in: writer)
+        request.rx.observeFirst(in: writer)
             .subscribe { event in
                 // events are expected on the main thread by default
                 assertMainQueue()

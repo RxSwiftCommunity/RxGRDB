@@ -34,15 +34,6 @@ extension Reactive where Base: FetchRequest {
     ///         })
     ///     // <- here "Fresh number of players" has been printed
     ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeCount(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (count: Int) in
-    ///             // on the main queue
-    ///             print("Fresh number of players: \(count)")
-    ///         })
-    ///     // <- here "Fresh number of players" may not be printed yet
-    ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
@@ -116,15 +107,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     ///         })
     ///     // <- here "Fresh players" has been printed
     ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeAll(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (players: [Player]) in
-    ///             // on the main queue
-    ///             print("Fresh players: \(players)")
-    ///         })
-    ///     // <- here "Fresh players" may not be printed yet
-    ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
@@ -171,15 +153,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     ///         })
     ///     // <- here "Fresh player" has been printed
     ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeFirst(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (player: Player?) in
-    ///             // on the main queue
-    ///             print("Fresh player: \(player)")
-    ///         })
-    ///     // <- here "Fresh player" may not be printed yet
-    ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
@@ -225,7 +198,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     ///
     ///     let dbQueue = DatabaseQueue()
     ///     let request = Player.filter(key: 1)
-    ///     let single = Single<Player?> = request.rx.fetchOne(in: dbQueue)
+    ///     let player = Single<Player?> = request.rx.fetchOne(in: dbQueue)
     ///
     /// By default, fetched values are emitted on the main dispatch queue. If
     /// you give a *scheduler*, values are emitted on that scheduler.
@@ -276,15 +249,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     ///         })
     ///     // <- here "Fresh rows" has been printed
     ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeAll(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (rows: [Row]) in
-    ///             // on the main queue
-    ///             print("Fresh rows: \(rows)")
-    ///         })
-    ///     // <- here "Fresh rows" may not be printed yet
-    ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
@@ -330,15 +294,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     ///             print("Fresh row: \(row)")
     ///         })
     ///     // <- here "Fresh row" has been printed
-    ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeFirst(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (row: Row?) in
-    ///             // on the main queue
-    ///             print("Fresh row: \(row)")
-    ///         })
-    ///     // <- here "Fresh row" may not be printed yet
     ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
@@ -436,15 +391,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///         })
     ///     // <- here "Fresh names" has been printed
     ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeAll(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (names: [String]) in
-    ///             // on the main queue
-    ///             print("Fresh names: \(names)")
-    ///         })
-    ///     // <- here "Fresh names" may not be printed yet
-    ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
@@ -491,15 +437,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///         })
     ///     // <- here "Fresh name" has been printed
     ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeFirst(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (name: String?) in
-    ///             // on the main queue
-    ///             print("Fresh name: \(name)")
-    ///         })
-    ///     // <- here "Fresh name" may not be printed yet
-    ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
@@ -545,7 +482,7 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     ///
     ///     let dbQueue = DatabaseQueue()
     ///     let request = SQLRequest<String>(sql: "SELECT name FROM player ORDER BY score DESC")
-    ///     let names: Single<String?> = request.rx.fetchOne(in: dbQueue)
+    ///     let bestPlayerName: Single<String?> = request.rx.fetchOne(in: dbQueue)
     ///
     /// The value is nil if the query returns no row, or if the fetched
     /// database value is null.
@@ -599,15 +536,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     ///         })
     ///     // <- here "Fresh names" has been printed
     ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeAll(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (names: [String?]) in
-    ///             // on the main queue
-    ///             print("Fresh names: \(names)")
-    ///         })
-    ///     // <- here "Fresh names" may not be printed yet
-    ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
     ///   element is emitted right upon subscription.
@@ -653,15 +581,6 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     ///             print("Fresh name: \(name)")
     ///         })
     ///     // <- here "Fresh name" has been printed
-    ///
-    ///     // on any queue
-    ///     request.rx
-    ///         .observeFirst(in: dbQueue, scheduler: MainScheduler.instance)
-    ///         .subscribe(onNext: { (name: String?) in
-    ///             // on the main queue
-    ///             print("Fresh name: \(name)")
-    ///         })
-    ///     // <- here "Fresh name" may not be printed yet
     ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     /// - parameter startImmediately: When true (the default), the first
@@ -724,8 +643,9 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
         scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance)
         -> Single<Base.RowDecoder._Wrapped?>
     {
+        let request = base
         return AnyDatabaseReader(reader).rx.fetch(
             scheduler: scheduler,
-            value: base.fetchOne)
+            value: { db in try Base.RowDecoder._Wrapped.fetchOne(db, request) })
     }
 }
