@@ -202,7 +202,7 @@ If you are only interested in the *values* fetched by the request, then RxGRDB c
 ```swift
 let request = Player.all()
 request.rx.observeCount(in: dbQueue) // Observable<Int>
-request.rx.observeFirst(in: dbQueue)   // Observable<Player?>
+request.rx.observeFirst(in: dbQueue) // Observable<Player?>
 request.rx.observeAll(in: dbQueue)   // Observable<[Player]>
 ```
 
@@ -210,7 +210,7 @@ Some applications need to be synchronously notified right after any impactful tr
 
 ```swift
 let request = Player.all()
-request.rx.changes(in: dbQueue)    // Observable<Database>
+request.rx.changes(in: dbQueue)      // Observable<Database>
 ```
 
 - [`rx.changes`](#requestrxchangesinstartimmediately)
