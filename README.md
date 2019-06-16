@@ -22,25 +22,24 @@ RxGRDB [![Swift 5](https://img.shields.io/badge/swift-5-orange.svg?style=flat)](
 
 ## Usage
 
+To connect to the database, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
+
 <details open>
   <summary>Observe database changes</summary>
 
 ```swift
-let players: Observable<[Player]> = 
-    Player.all().rx.observeAll(in: dbQueue)
+let players = Player.all().rx.observeAll(in: dbQueue)            // Observable<[Player]>
 players.subscribe(onNext: { (players: [Player]) in
     print("Fresh players: \(players)")
 })
 
-let players: Observable<Player?> = 
-    Player.filter(key: 1).rx.observeFirst(in: dbQueue)
+let players = Player.filter(key: 1).rx.observeFirst(in: dbQueue) // Observable<Player?>
 player.subscribe(onNext: { (player: Player?) in
     print("Fresh player: \(player)")
 })
 
 let request: SQLRequest<Int> = "SELECT MAX(score) FROM player"
-let maximumScore =
-    request.rx.observeFirst(in: dbQueue)
+let maximumScore = request.rx.observeFirst(in: dbQueue)          // Observable<Int?>
 maximumScore.subscribe(onNext: { (maxScore: Int?) in
     print("Fresh maximum score: \(maxScore)")
 })
@@ -74,8 +73,6 @@ let players: Single<[Player]> = dbQueue.rx.fetch { db in
 ```
 
 </details>
-
-To connect to the database and define the tracked requests, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
 
 
 Documentation
