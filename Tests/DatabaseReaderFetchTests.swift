@@ -21,7 +21,7 @@ private struct Player: Codable, FetchableRecord, PersistableRecord {
 class DatabaseReaderFetchTests : XCTestCase { }
 
 extension DatabaseReaderFetchTests {
-    func testRxFetch() throws {
+    func testRxRead() throws {
         func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
             try writer.write { db in
                 try Player.createTable(db)
@@ -29,13 +29,13 @@ extension DatabaseReaderFetchTests {
             }
             return writer
         }
-        try Test(testRxFetch).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetch).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxFetch).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+        try Test(testRxRead).run { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxRead).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxRead).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
-    func testRxFetch<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
-        let single = reader.rx.fetch { db in try Player.fetchCount(db) }
+    func testRxRead<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
+        let single = reader.rx.read { db in try Player.fetchCount(db) }
         let count = try single.toBlocking(timeout: 1).single()
         XCTAssertEqual(count, 1)
     }
@@ -43,7 +43,7 @@ extension DatabaseReaderFetchTests {
 
 @available(OSX 10.12, *)
 extension DatabaseReaderFetchTests {
-    func testRxFetchScheduler() throws {
+    func testRxReadScheduler() throws {
         func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
             try writer.write { db in
                 try Player.createTable(db)
@@ -51,15 +51,15 @@ extension DatabaseReaderFetchTests {
             }
             return writer
         }
-        try Test(testRxFetchScheduler).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetchScheduler).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxFetchScheduler).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+        try Test(testRxReadScheduler).run { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxReadScheduler).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxReadScheduler).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
-    func testRxFetchScheduler<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
+    func testRxReadScheduler<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
         do {
             let single = reader.rx
-                .fetch { db in try Player.fetchCount(db) }
+                .read { db in try Player.fetchCount(db) }
                 .do(onSuccess: { _ in
                     dispatchPrecondition(condition: .onQueue(.main))
                 })
@@ -68,7 +68,7 @@ extension DatabaseReaderFetchTests {
         do {
             let queue = DispatchQueue(label: "test")
             let single = reader.rx
-                .fetch(
+                .read(
                     scheduler: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
                     value: { db in try Player.fetchCount(db) })
                 .do(onSuccess: { _ in
@@ -80,7 +80,7 @@ extension DatabaseReaderFetchTests {
 }
 
 extension DatabaseReaderFetchTests {
-    func testRxFetchIsAsynchronous() throws {
+    func testRxReadIsAsynchronous() throws {
         func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
             try writer.write { db in
                 try Player.createTable(db)
@@ -88,14 +88,14 @@ extension DatabaseReaderFetchTests {
             }
             return writer
         }
-        try Test(testRxFetchIsAsynchronous).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetchIsAsynchronous).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxFetchIsAsynchronous).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+        try Test(testRxReadIsAsynchronous).run { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxReadIsAsynchronous).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxReadIsAsynchronous).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
-    func testRxFetchIsAsynchronous<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
+    func testRxReadIsAsynchronous<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
         let semaphore = DispatchSemaphore(value: 0)
-        let single = reader.rx.fetch { db -> Int in
+        let single = reader.rx.read { db -> Int in
             // Make sure this block executes asynchronously
             semaphore.wait()
             return try Player.fetchCount(db)
@@ -113,14 +113,14 @@ extension DatabaseReaderFetchTests {
 }
 
 extension DatabaseReaderFetchTests {
-    func testRxFetchIsReadonly() throws {
-        try Test(testRxFetchIsReadonly).run { try DatabaseQueue(path: $0) }
-        try Test(testRxFetchIsReadonly).run { try DatabasePool(path: $0) }
-        try Test(testRxFetchIsReadonly).run { try DatabasePool(path: $0).makeSnapshot() }
+    func testRxReadIsReadonly() throws {
+        try Test(testRxReadIsReadonly).run { try DatabaseQueue(path: $0) }
+        try Test(testRxReadIsReadonly).run { try DatabasePool(path: $0) }
+        try Test(testRxReadIsReadonly).run { try DatabasePool(path: $0).makeSnapshot() }
     }
     
-    func testRxFetchIsReadonly<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
-        let single = reader.rx.fetch { db in
+    func testRxReadIsReadonly<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
+        let single = reader.rx.read { db in
             try Player.createTable(db)
         }
         
