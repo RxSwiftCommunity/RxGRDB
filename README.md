@@ -177,7 +177,7 @@ This method returns a [Single] that completes after database updates have been s
 
 ```swift
 // Single<Int>
-let newPlayerCount = dbQueue.rx.writeCompletable { db -> Int in
+let newPlayerCount = dbQueue.rx.write { db -> Int in
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
