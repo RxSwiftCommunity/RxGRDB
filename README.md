@@ -142,6 +142,11 @@ RxGRDB provides three mehods that allow you to embed asynchronous database acces
 - [`rx.writeCompletable(scheduler:updates:)`](#databasewriterrxwritecompletableschedulerupdates)
 - [`rx.write(scheduler:updates:)`](#databasewriterrxwriteschedulerupdates)
 
+Advanced:
+
+- [`rx.flatMapWrite(updates:)`](#databasewriterrxflatmapwriteupdates)
+- [`rx.concurrentRead(scheduler:value:)`](#databasepoolrxconcurrentreadschedulervalue)
+
 
 #### `DatabaseReader.rx.read(scheduler:value:)`
 
@@ -184,6 +189,70 @@ let newPlayerCount = dbQueue.rx.write { db -> Int in
 ```
 
 The single completes on the main queue, unless you provide a specific `scheduler`.
+
+
+#### `DatabaseWriter.rx.flatMapWrite(updates:)`
+
+This method returns an Observable or a [Single] that subscribes right after database updates have been succesfully executed inside a database transaction.
+
+```swift
+// Observable<Int>
+let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Observable<Int> in
+    try Player(...).insert(db)
+    let count = try Player.fetchCount(db)
+    return Observable.just(count)
+}
+
+// Single<Int>
+let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
+    try Player(...).insert(db)
+    let count = try Player.fetchCount(db)
+    return Single.just(count)
+}
+```
+
+When you use a [database pool], and your app executes some database updates followed by some fetches, `flatMapWrite` and [`concurrentRead`](#databasepoolrxconcurrentreadschedulervalue) play well together because they optimize your database scheduling, as in the example below:
+
+```swift
+// Single<Int>
+let newPlayerCount = dbPool.rx.flatMapWrite { db in
+    // Write: delete all players
+    try Player.deleteAll(db)
+    
+    return dbPool.rx.concurrentRead { db in
+        // Read: the count is guaranteed to be zero
+        try Player.fetchCount(db)
+    }
+}
+```
+
+The optimization guarantees that the concurrent read does not block any concurrent writes. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
+
+
+#### `DatabasePool.rx.concurrentRead(scheduler:value:)`
+
+Available on [database pool], this method returns a [Single] that completes after database values have been asynchronously fetched.
+
+This Single must be subscribed from a writing database dispatch queue, outside of any transaction. You'll get a fatal error otherwise.
+
+For example:
+
+```swift
+// Single<Int>
+let newPlayerCount = dbPool.rx.flatMapWrite { db in
+    // Write: delete all players
+    try Player.deleteAll(db)
+    
+    return dbPool.rx.concurrentRead { db in
+        // Read: the count is guaranteed to be zero
+        try Player.fetchCount(db)
+    }
+}
+```
+
+See [`flatMapWrite`](#databasewriterrxflatmapwriteupdates) for more information.
+
+The fetched value is emitted on the main queue, unless you provide a specific `scheduler`.
 
 
 # Database Observation
