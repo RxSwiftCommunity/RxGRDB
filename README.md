@@ -136,13 +136,13 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 
 # Asynchronous Database Access
 
-RxGRDB provides three mehods that allow you to embed asynchronous database accesses in your reactive flows.
+RxGRDB provide reactive mehods that allow you to embed asynchronous database accesses in your reactive flows.
 
 - [`rx.read(scheduler:value:)`](#databasereaderrxreadschedulervalue)
 - [`rx.writeCompletable(scheduler:updates:)`](#databasewriterrxwritecompletableschedulerupdates)
 - [`rx.write(scheduler:updates:)`](#databasewriterrxwriteschedulerupdates)
 
-Advanced:
+The two last ones are more advanced but they allow some optimizations:
 
 - [`rx.flatMapWrite(updates:)`](#databasewriterrxflatmapwriteupdates)
 - [`rx.concurrentRead(scheduler:value:)`](#databasepoolrxconcurrentreadschedulervalue)
