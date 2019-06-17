@@ -226,7 +226,7 @@ let newPlayerCount = dbPool.rx.flatMapWrite { db in
 }
 ```
 
-The optimization guarantees that the concurrent read does not block any concurrent writes. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
+The optimization guarantees that the concurrent read does not block any concurrent write, and yet sees the database in the state left by the completed transaction. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
 
 
 #### `DatabasePool.rx.concurrentRead(scheduler:value:)`
