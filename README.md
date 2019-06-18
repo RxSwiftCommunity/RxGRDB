@@ -234,7 +234,7 @@ let newPlayerCount = dbPool.rx
 
 The optimization guarantees that the concurrent read does not block any concurrent write, and yet sees the database in the state left by the completed transaction. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
 
-When you use a [database queue], the observable returned by a `concurrentRead` wrapped into `flatMapWrite` emits exactly the same values, but the scheduling optimization is not applied. This means that you can, for example, use a database pool in your app, and an in-memory database queue in your tests.
+When you use a [database queue], the observable returned by a `concurrentRead` wrapped into `flatMapWrite` emits exactly the same values, but the scheduling optimization is not applied.
 
 
 #### `DatabaseWriter.rx.concurrentRead(scheduler:value:)`
