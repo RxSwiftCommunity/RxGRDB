@@ -211,7 +211,9 @@ let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
 }
 ```
 
-The observable from the closure is subscribed right after the database updates have been succesfully executed inside a database transaction.
+The database updates are executed inside a database transaction. If the transaction completes successfully, the observable returned from the closure is subscribed, from a database protected dispatch queue, immediately after the transaction has been committed.
+
+TODO: the error may be emitted on any dispatch queue - we can't honor the scheduler of concurrentRead. So remove the scheduler parameter from concurrentRead.
 
 When you use a [database pool], and your app executes some database updates followed by some fetches, you can wrap [`concurrentRead`](#databasewriterrxconcurrentreadschedulervalue) inside `flatMapWrite` in order to profit from optimized database scheduling. For example:
 
