@@ -103,10 +103,11 @@ extension DatabaseWriterFlatMapWriteTests {
             try writer.write(Player.createTable)
             return writer
         }
+        try Test(testRxFlatMapWriteConcurrentRead).run { try setup(DatabaseQueue(path: $0)) }
         try Test(testRxFlatMapWriteConcurrentRead).run { try setup(DatabasePool(path: $0)) }
     }
     
-    func testRxFlatMapWriteConcurrentRead(writer: DatabasePool, disposeBag: DisposeBag) throws {
+    func testRxFlatMapWriteConcurrentRead<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
         let single: Single<Int> = writer.rx.flatMapWrite { db in
             try Player(id: 1, name: "Arthur", score: 1000).insert(db)
             return writer.rx.concurrentRead { db in
@@ -128,10 +129,11 @@ extension DatabaseWriterFlatMapWriteTests {
             }
             return writer
         }
+        try Test(testRxFlatMapWriteConcurrentReadScheduler).run { try setup(DatabaseQueue(path: $0)) }
         try Test(testRxFlatMapWriteConcurrentReadScheduler).run { try setup(DatabasePool(path: $0)) }
     }
     
-    func testRxFlatMapWriteConcurrentReadScheduler(writer: DatabasePool, disposeBag: DisposeBag) throws {
+    func testRxFlatMapWriteConcurrentReadScheduler<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
         do {
             let single: Single<Int> = writer.rx
                 .flatMapWrite { db in

@@ -108,9 +108,7 @@ extension Reactive where Base: DatabaseWriter {
             }
         }).asSingle().observeOn(scheduler)
     }
-}
-
-extension Reactive where Base == DatabasePool {
+    
     /// Returns a Single that asynchronously emits the fetched value.
     ///
     /// This Single must be subscribed from a writing database dispatch queue,
@@ -140,7 +138,7 @@ extension Reactive where Base == DatabasePool {
         let writer = base
         return Single
             .create { observer in
-                writer.asyncConcurrentRead { db in
+                writer.spawnConcurrentRead { db in
                     do {
                         try observer(.success(value(db.get())))
                     } catch {

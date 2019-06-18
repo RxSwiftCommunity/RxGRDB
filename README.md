@@ -145,7 +145,7 @@ RxGRDB provide reactive mehods that allow you to embed asynchronous database acc
 The two last ones are more advanced but they allow some optimizations:
 
 - [`rx.flatMapWrite(updates:)`](#databasewriterrxflatmapwriteupdates)
-- [`rx.concurrentRead(scheduler:value:)`](#databasepoolrxconcurrentreadschedulervalue)
+- [`rx.concurrentRead(scheduler:value:)`](#databasewriterrxconcurrentreadschedulervalue)
 
 
 #### `DatabaseReader.rx.read(scheduler:value:)`
@@ -193,7 +193,7 @@ The single completes on the main queue, unless you provide a specific `scheduler
 
 #### `DatabaseWriter.rx.flatMapWrite(updates:)`
 
-This method returns an Observable or a [Single] that subscribes right after database updates have been succesfully executed inside a database transaction.
+This method returns an Observable or a [Single], depending on the result of the updates closure:
 
 ```swift
 // Observable<Int>
@@ -211,7 +211,9 @@ let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
 }
 ```
 
-When you use a [database pool], and your app executes some database updates followed by some fetches, `flatMapWrite` and [`concurrentRead`](#databasepoolrxconcurrentreadschedulervalue) play well together because they optimize your database scheduling, as in the example below:
+The observable from the closure is subscribed right after the database updates have been succesfully executed inside a database transaction.
+
+When you use a [database pool], and your app executes some database updates followed by some fetches, you can wrap [`concurrentRead`](#databasewriterrxconcurrentreadschedulervalue) inside `flatMapWrite` in order to profit from optimized database scheduling. For example:
 
 ```swift
 // Single<Int>
@@ -228,10 +230,12 @@ let newPlayerCount = dbPool.rx.flatMapWrite { db in
 
 The optimization guarantees that the concurrent read does not block any concurrent write, and yet sees the database in the state left by the completed transaction. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
 
+When you use a [database queue], the observable returned by a `concurrentRead` wrapped into `flatMapWrite` emits exactly the same values, but the scheduling optimization is not applied. This means that you can, for example, use a databaase pool in your app, and an in-memory database queue in your tests.
 
-#### `DatabasePool.rx.concurrentRead(scheduler:value:)`
 
-Available on [database pool], this method returns a [Single] that completes after database values have been asynchronously fetched.
+#### `DatabaseWriter.rx.concurrentRead(scheduler:value:)`
+
+This method returns a [Single] that completes after database values have been fetched.
 
 This Single must be subscribed from a writing database dispatch queue, outside of any transaction. You'll get a fatal error otherwise.
 
@@ -250,7 +254,7 @@ let newPlayerCount = dbPool.rx.flatMapWrite { db in
 }
 ```
 
-See [`flatMapWrite`](#databasewriterrxflatmapwriteupdates) for more information.
+`concurrentRead` executes asynchronously when you use a [database pool], and synchronously when you use a [database queue]. See [`flatMapWrite`](#databasewriterrxflatmapwriteupdates) for more information.
 
 The fetched value is emitted on the main queue, unless you provide a specific `scheduler`.
 
