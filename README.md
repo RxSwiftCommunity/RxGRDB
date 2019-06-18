@@ -213,21 +213,23 @@ let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
 
 The database updates are executed inside a database transaction. If the transaction completes successfully, the observable returned from the closure is subscribed, from a database protected dispatch queue, immediately after the transaction has been committed.
 
-TODO: the error may be emitted on any dispatch queue - we can't honor the scheduler of concurrentRead. So remove the scheduler parameter from concurrentRead.
+> :point_up: **Note**: `flatMapWrite` emits its values or errors on various dispatch queues. You may want to increase control by pouring it into `observeOn`.
 
 When you use a [database pool], and your app executes some database updates followed by some fetches, you can wrap [`concurrentRead`](#databasewriterrxconcurrentreadschedulervalue) inside `flatMapWrite` in order to profit from optimized database scheduling. For example:
 
 ```swift
 // Single<Int>
-let newPlayerCount = dbPool.rx.flatMapWrite { db in
-    // Write: delete all players
-    try Player.deleteAll(db)
+let newPlayerCount = dbPool.rx
+    .flatMapWrite { db in
+        // Write: delete all players
+        try Player.deleteAll(db)
     
-    return dbPool.rx.concurrentRead { db in
-        // Read: the count is guaranteed to be zero
-        try Player.fetchCount(db)
+        return dbPool.rx.concurrentRead { db in
+            // Read: the count is guaranteed to be zero
+            try Player.fetchCount(db)
+        }
     }
-}
+    .observeOn(MainScheduler.asyncInstance)
 ```
 
 The optimization guarantees that the concurrent read does not block any concurrent write, and yet sees the database in the state left by the completed transaction. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.

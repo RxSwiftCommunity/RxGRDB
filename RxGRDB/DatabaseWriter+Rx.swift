@@ -6,15 +6,25 @@ extension AnyDatabaseWriter: ReactiveCompatible { }
 extension Reactive where Base: DatabaseWriter {
     /// Returns an Observable that asynchronously writes into the database.
     ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let newPlayerCount: Observable<Int> = dbQueue.rx.flatMapWrite { db in
+    /// For example:
+    ///
+    ///     // Observable<Int>
+    ///     let newPlayerCount = dbQueue.rx.flatMapWrite { db in
     ///         try Player(...).insert(db)
     ///         let newPlayerCount = try Player.fetchAll(db)
     ///         return Observable.just(newPlayerCount)
     ///     }
     ///
+    /// The database updates are executed inside a database transaction. If the
+    /// transaction completes successfully, the observable returned from the
+    /// closure is subscribed, from a database protected dispatch queue,
+    /// immediately after the transaction has been committed.
+    ///
+    /// - warning: `flatMapWrite` emits its values or errors on various dispatch
+    ///   queues. You may want to increase control by pouring it
+    ///   into `observeOn`.
     /// - parameter updates: A closure which writes in the database and returns
-    ///   an Observable.
+    ///   a Single.
     public func flatMapWrite<T>(updates: @escaping (Database) throws -> Observable<T>) -> Observable<T> {
         let writer = base
         return Observable.create { observer in
@@ -40,14 +50,49 @@ extension Reactive where Base: DatabaseWriter {
     
     /// Returns a Single that asynchronously writes into the database.
     ///
-    ///     let dbPool = DatabasePool()
-    ///     let newPlayerCount: Single<Int> = dbQueue.rx.flatMapWrite { db in
+    /// For example:
+    ///
+    ///     // Single<Int>
+    ///     let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
     ///         try Player(...).insert(db)
-    ///         return dbPool.rx.concurrentRead { db in
-    ///             try Player.fetchAll(db)
-    ///         }
+    ///         let count = try Player.fetchCount(db)
+    ///         return Single.just(count)
     ///     }
     ///
+    /// The database updates are executed inside a database transaction. If the
+    /// transaction completes successfully, the single returned from the closure
+    /// is subscribed, from a database protected dispatch queue, immediately
+    /// after the transaction has been committed.
+    ///
+    /// When you use a Database Pool, and your app executes some database
+    /// updates followed by some fetches, you can wrap `concurrentRead` inside
+    /// `flatMapWrite` in order to profit from optimized database scheduling.
+    /// For example:
+    ///
+    ///     // Single<Int>
+    ///     let newPlayerCount = dbPool.rx
+    ///         .flatMapWrite { db in
+    ///             // Write: delete all players
+    ///             try Player.deleteAll(db)
+    ///
+    ///             return dbPool.rx.concurrentRead { db in
+    ///                 // Read: the count is guaranteed to be zero
+    ///                 try Player.fetchCount(db)
+    ///             }
+    ///         }
+    ///         .observeOn(MainScheduler.asyncInstance)
+    ///
+    /// The optimization guarantees that the concurrent read does not block any
+    /// concurrent write, and yet sees the database in the state left by the
+    /// completed transaction.
+    ///
+    /// When you use a Database Queue, the observable returned by a
+    /// `concurrentRead` wrapped into `flatMapWrite` emits exactly the same
+    /// values, but the scheduling optimization is not applied.
+    ///
+    /// - warning: `flatMapWrite` emits its values or errors on various dispatch
+    ///   queues. You may want to increase control by pouring it
+    ///   into `observeOn`.
     /// - parameter updates: A closure which writes in the database and returns
     ///   a Single.
     public func flatMapWrite<T>(updates: @escaping (Database) throws -> Single<T>) -> Single<T> {
@@ -111,42 +156,35 @@ extension Reactive where Base: DatabaseWriter {
     
     /// Returns a Single that asynchronously emits the fetched value.
     ///
-    /// This Single must be subscribed from a writing database dispatch queue,
+    /// The Single must be subscribed from a writing database dispatch queue,
     /// outside of any transaction. You'll get a fatal error otherwise.
+    ///
+    /// It completes on some unspecified queue.
     ///
     /// You can for example use it with `flatMapWrite`:
     ///
     ///     let dbPool = DatabasePool()
-    ///     let newPlayerCount: Single<Int> = dbQueue.rx.flatMapWrite { db in
-    ///         try Player(...).insert(db)
-    ///         return dbPool.rx.concurrentRead { db in
-    ///             try Player.fetchAll(db)
+    ///     let newPlayerCount: Single<Int> = dbPool.rx
+    ///         .flatMapWrite { db in
+    ///             try Player(...).insert(db)
+    ///             return dbPool.rx.concurrentRead { db in
+    ///                 try Player.fetchAll(db)
+    ///             }
     ///         }
-    ///     }
-    ///
-    /// By default, returned values are emitted on the main dispatch queue. If
-    /// you give a *scheduler*, values are emitted on that scheduler.
+    ///         .observeOn(MainScheduler.async)
     ///
     /// - parameter value: A closure which accesses the database.
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
-    public func concurrentRead<T>(
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance,
-        value: @escaping (Database) throws -> T)
-        -> Single<T>
-    {
+    public func concurrentRead<T>(value: @escaping (Database) throws -> T) -> Single<T> {
         let writer = base
-        return Single
-            .create { observer in
-                writer.spawnConcurrentRead { db in
-                    do {
-                        try observer(.success(value(db.get())))
-                    } catch {
-                        observer(.error(error))
-                    }
+        return Single.create { observer in
+            writer.spawnConcurrentRead { db in
+                do {
+                    try observer(.success(value(db.get())))
+                } catch {
+                    observer(.error(error))
                 }
-                return Disposables.create { }
             }
-            .observeOn(scheduler)
+            return Disposables.create { }
+        }
     }
 }
