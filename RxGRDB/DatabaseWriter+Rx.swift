@@ -74,16 +74,15 @@ extension Reactive where Base: DatabaseWriter {
     /// For example:
     ///
     ///     // Single<Int>
-    ///     let newPlayerCount = dbPool.rx
-    ///         .flatMapWrite { db in
-    ///             // Write: delete all players
-    ///             try Player.deleteAll(db)
+    ///     let newPlayerCount = dbPool.rx.flatMapWrite { db in
+    ///         // First write: delete all players
+    ///         try Player.deleteAll(db)
     ///
-    ///             return dbPool.rx.concurrentRead { db in
-    ///                 // Read: the count is guaranteed to be zero
-    ///                 try Player.fetchCount(db)
-    ///             }
+    ///         return dbPool.rx.concurrentRead { db in
+    ///             // Then read: the count is guaranteed to be zero
+    ///             try Player.fetchCount(db)
     ///         }
+    ///     }
     ///
     /// The optimization guarantees that the concurrent read does not block any
     /// concurrent write, and yet sees the database in the state left by the
@@ -178,13 +177,12 @@ extension Reactive where Base: DatabaseWriter {
     /// You can for example use it with `flatMapWrite`:
     ///
     ///     let dbPool = DatabasePool()
-    ///     let newPlayerCount: Single<Int> = dbPool.rx
-    ///         .flatMapWrite { db in
-    ///             try Player(...).insert(db)
-    ///             return dbPool.rx.concurrentRead { db in
-    ///                 try Player.fetchAll(db)
-    ///             }
+    ///     let newPlayerCount: Single<Int> = dbPool.rx.flatMapWrite { db in
+    ///         try Player(...).insert(db)
+    ///         return dbPool.rx.concurrentRead { db in
+    ///             try Player.fetchAll(db)
     ///         }
+    ///     }
     ///
     /// - parameter scheduler: The scheduler on which the single completes.
     ///   Defaults to MainScheduler.instance.

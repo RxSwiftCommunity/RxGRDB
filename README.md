@@ -220,16 +220,15 @@ When you use a [database pool], and your app executes some database updates foll
 
 ```swift
 // Single<Int>
-let newPlayerCount = dbPool.rx
-    .flatMapWrite { db in
-        // Write: delete all players
-        try Player.deleteAll(db)
+let newPlayerCount = dbPool.rx.flatMapWrite { db in
+    // First write: delete all players
+    try Player.deleteAll(db)
     
-        return dbPool.rx.concurrentRead { db in
-            // Read: the count is guaranteed to be zero
-            try Player.fetchCount(db)
-        }
+    return dbPool.rx.concurrentRead { db in
+        // Then read: the count is guaranteed to be zero
+        try Player.fetchCount(db)
     }
+}
 ```
 
 The optimization guarantees that the concurrent read does not block any concurrent write, and yet sees the database in the state left by the completed transaction. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
