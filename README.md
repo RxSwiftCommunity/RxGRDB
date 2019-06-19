@@ -28,24 +28,27 @@ To connect to the database, please refer to [GRDB](https://github.com/groue/GRDB
   <summary>Observe database changes</summary>
 
 ```swift
-// Observable<[Player]>
-let players = Player.all().rx.observeAll(in: dbQueue)
-players.subscribe(onNext: { (players: [Player]) in
-    print("Fresh players: \(players)")
-})
+// Observe the results of a request
+Player.all().rx
+    .observeAll(in: dbQueue)
+    .subscribe(onNext: { (players: [Player]) in
+        print("Fresh players: \(players)")
+    })
 
-// Observable<Player?>
-let players = Player.filter(key: 1).rx.observeFirst(in: dbQueue)
-player.subscribe(onNext: { (player: Player?) in
-    print("Fresh player: \(player)")
-})
+// Observe the first result of a request
+Player.filter(key: 1).rx
+    .observeFirst(in: dbQueue)
+    .subscribe(onNext: { (player: Player?) in
+        print("Fresh player: \(player)")
+    })
 
-// Observable<Int?>
+// Observe raw SQL requests
 let request: SQLRequest<Int> = "SELECT MAX(score) FROM player"
-let maximumScore = request.rx.observeFirst(in: dbQueue)
-maximumScore.subscribe(onNext: { (score: Int?) in
-    print("Fresh maximum score: \(score)")
-})
+request.rx
+    .observeFirst(in: dbQueue)
+    .subscribe(onNext: { (score: Int?) in
+        print("Fresh maximum score: \(score)")
+    })
 ```
 
 </details>
