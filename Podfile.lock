@@ -1,8 +1,10 @@
 PODS:
   - Differentiator (4.0.1)
-  - GRDB.swift (4.0.0):
-    - GRDB.swift/standard (= 4.0.0)
-  - GRDB.swift/standard (4.0.0)
+  - GRDB.swift (4.1.0):
+    - GRDB.swift/standard (= 4.1.0)
+  - GRDB.swift/standard (4.1.0)
+  - RxBlocking (5.0.0):
+    - RxSwift (~> 5)
   - RxCocoa (5.0.0):
     - RxRelay (~> 5)
     - RxSwift (~> 5)
@@ -10,10 +12,10 @@ PODS:
     - Differentiator (~> 4.0)
     - RxCocoa (~> 5.0)
     - RxSwift (~> 5.0)
-  - RxGRDB (0.13.0):
-    - RxGRDB/default (= 0.13.0)
+  - RxGRDB (0.14.0):
+    - RxGRDB/default (= 0.14.0)
     - RxSwift (~> 5.0)
-  - RxGRDB/default (0.13.0):
+  - RxGRDB/default (0.14.0):
     - GRDB.swift (~> 4.0)
     - RxSwift (~> 5.0)
   - RxRelay (5.0.0):
@@ -21,7 +23,8 @@ PODS:
   - RxSwift (5.0.0)
 
 DEPENDENCIES:
-  - GRDB.swift (~> 4.0)
+  - GRDB.swift (from `https://github.com/groue/GRDB.swift.git`, branch `GRDB-4.1`)
+  - RxBlocking
   - RxDataSources
   - RxGRDB (from `.`)
   - RxSwift (~> 5.0)
@@ -29,25 +32,34 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Differentiator
-    - GRDB.swift
+    - RxBlocking
     - RxCocoa
     - RxDataSources
     - RxRelay
     - RxSwift
 
 EXTERNAL SOURCES:
+  GRDB.swift:
+    :branch: GRDB-4.1
+    :git: https://github.com/groue/GRDB.swift.git
   RxGRDB:
     :path: "."
 
+CHECKOUT OPTIONS:
+  GRDB.swift:
+    :commit: 49d098eb7b4003668ac8d1642820930b67ff4849
+    :git: https://github.com/groue/GRDB.swift.git
+
 SPEC CHECKSUMS:
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
-  GRDB.swift: 30cf6c14fea491549b654d7649493320ed7e93ed
+  GRDB.swift: 6482ebe542ec5ce24111159739619757dd50ad77
+  RxBlocking: c67185d26498ea3cbe3e121917c3c16739e43123
   RxCocoa: fcf32050ac00d801f34a7f71d5e8e7f23026dcd8
   RxDataSources: efee07fa4de48477eca0a4611e6d11e2da9c1114
-  RxGRDB: b46d8b925f5a4defa970d5e3b4f079363c3eb365
+  RxGRDB: b61f9094bb15404d5694f89618324f6f064cc535
   RxRelay: 4f7409406a51a55cd88483f21ed898c234d60f18
   RxSwift: 8b0671caa829a763bbce7271095859121cbd895f
 
-PODFILE CHECKSUM: c6d8e6f3271024e6229b5e3d9d3a98ab367677f9
+PODFILE CHECKSUM: ad39cab3999c103e58186fa07a53282c5e32d129
 
-COCOAPODS: 1.7.0
+COCOAPODS: 1.7.2
