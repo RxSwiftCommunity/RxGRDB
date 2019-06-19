@@ -91,7 +91,7 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchDefaultScheduling() throws {
         func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
@@ -122,7 +122,7 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchDefaultSchedulingSubscribedOffMainThread() throws {
         func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
@@ -155,7 +155,7 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchDefaultSchedulingStartLater() throws {
         func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
@@ -186,7 +186,7 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchSchedulingAsync() throws {
         func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
@@ -212,7 +212,7 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchSchedulingAsyncOnMainQueue() throws {
         func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
@@ -242,7 +242,7 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchScheduler() throws {
         func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {

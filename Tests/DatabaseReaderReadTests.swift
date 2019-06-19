@@ -41,7 +41,7 @@ extension DatabaseReaderReadTests {
     }
 }
 
-@available(OSX 10.12, *)
+@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension DatabaseReaderReadTests {
     func testRxReadScheduler() throws {
         func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
