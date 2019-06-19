@@ -41,21 +41,23 @@ extension DatabaseReaderReadTests {
     }
 }
 
-@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension DatabaseReaderReadTests {
     func testRxReadScheduler() throws {
-        func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
-            try writer.write { db in
-                try Player.createTable(db)
-                try Player(id: 1, name: "Arthur", score: 1000).insert(db)
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
+                try writer.write { db in
+                    try Player.createTable(db)
+                    try Player(id: 1, name: "Arthur", score: 1000).insert(db)
+                }
+                return writer
             }
-            return writer
+            try Test(testRxReadScheduler).run { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxReadScheduler).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxReadScheduler).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
-        try Test(testRxReadScheduler).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxReadScheduler).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxReadScheduler).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
+    @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxReadScheduler<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
         do {
             let single = reader.rx

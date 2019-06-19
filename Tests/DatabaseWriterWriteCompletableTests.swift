@@ -40,19 +40,21 @@ extension DatabaseWriterWriteCompletableTests {
     }
 }
 
-@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension DatabaseWriterWriteCompletableTests {
     func testRxWriteCompletableScheduler() throws {
-        func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
-            try writer.write { db in
-                try Player.createTable(db)
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
+                try writer.write { db in
+                    try Player.createTable(db)
+                }
+                return writer
             }
-            return writer
+            try Test(testRxWriteCompletableScheduler).run { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxWriteCompletableScheduler).run { try setup(DatabasePool(path: $0)) }
         }
-        try Test(testRxWriteCompletableScheduler).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxWriteCompletableScheduler).run { try setup(DatabasePool(path: $0)) }
     }
     
+    @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxWriteCompletableScheduler<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
         do {
             let completable = writer.rx

@@ -61,7 +61,7 @@ extension ValueObservationTests {
             .observe(in: writer)
             .subscribe(testSubject)
             .disposed(by: disposeBag)
-
+        
         try writer.writeWithoutTransaction { db in
             // 2: modify observed requests
             try db.inTransaction {
@@ -91,18 +91,20 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchDefaultScheduling() throws {
-        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-            try writer.write(Player.createTable)
-            return writer
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+                try writer.write(Player.createTable)
+                return writer
+            }
+            try Test(testRxFetchDefaultScheduling).run { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchDefaultScheduling).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchDefaultScheduling).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
-        try Test(testRxFetchDefaultScheduling).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetchDefaultScheduling).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxFetchDefaultScheduling).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
+    @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxFetchDefaultScheduling<Reader: DatabaseReader>(reader: Reader, disposeBag: DisposeBag) throws {
         let semaphore = DispatchSemaphore(value: 0)
         let observation = Player.observationForCount()
@@ -122,18 +124,20 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchDefaultSchedulingSubscribedOffMainThread() throws {
-        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-            try writer.write(Player.createTable)
-            return writer
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+                try writer.write(Player.createTable)
+                return writer
+            }
+            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
-        try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
+    @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxFetchDefaultSchedulingSubscribedOffMainThread<Reader: DatabaseReader>(reader: Reader, disposeBag: DisposeBag) throws {
         let semaphore = DispatchSemaphore(value: 0)
         let observation = Player.observationForCount()
@@ -155,17 +159,19 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchDefaultSchedulingStartLater() throws {
-        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-            try writer.write(Player.createTable)
-            return writer
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+                try writer.write(Player.createTable)
+                return writer
+            }
+            try Test(testRxFetchDefaultSchedulingStartLater).run { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchDefaultSchedulingStartLater).run { try setup(DatabasePool(path: $0)) }
         }
-        try Test(testRxFetchDefaultSchedulingStartLater).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetchDefaultSchedulingStartLater).run { try setup(DatabasePool(path: $0)) }
     }
     
+    @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxFetchDefaultSchedulingStartLater<Writer: DatabaseWriter>(writer: Writer, disposeBag: DisposeBag) throws {
         let observation = Player.select(max(Player.Columns.name), as: String.self).observationForFirst()
         let testSubject = ReplaySubject<String?>.createUnbounded()
@@ -186,18 +192,20 @@ extension ValueObservationTests {
     }
 }
 
-@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchSchedulingAsync() throws {
-        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-            try writer.write(Player.createTable)
-            return writer
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+                try writer.write(Player.createTable)
+                return writer
+            }
+            try Test(testRxFetchSchedulingAsync).run { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchSchedulingAsync).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchSchedulingAsync).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
-        try Test(testRxFetchSchedulingAsync).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetchSchedulingAsync).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxFetchSchedulingAsync).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
+    @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxFetchSchedulingAsync<Reader: DatabaseReader>(reader: Reader, disposeBag: DisposeBag) throws {
         let queue = DispatchQueue(label: "test")
         var observation = Player.observationForCount()
@@ -207,23 +215,25 @@ extension ValueObservationTests {
             .do(onNext: { _ in
                 dispatchPrecondition(condition: .onQueue(queue))
             })
-
+        
         _ = try observable.take(1).toBlocking(timeout: 1).toArray()
     }
 }
 
-@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchSchedulingAsyncOnMainQueue() throws {
-        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-            try writer.write(Player.createTable)
-            return writer
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+                try writer.write(Player.createTable)
+                return writer
+            }
+            try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
-        try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
+    @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxFetchSchedulingAsyncOnMainQueue<Reader: DatabaseReader>(reader: Reader, disposeBag: DisposeBag) throws {
         let semaphore = DispatchSemaphore(value: 0)
         var observation = ValueObservation.tracking(DatabaseRegion.fullDatabase, fetch: { db in
@@ -237,23 +247,25 @@ extension ValueObservationTests {
                 dispatchPrecondition(condition: .onQueue(.main))
             })
         semaphore.signal()
-
+        
         _ = try observable.take(1).toBlocking(timeout: 1).toArray()
     }
 }
 
-@available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
 extension ValueObservationTests {
     func testRxFetchScheduler() throws {
-        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-            try writer.write(Player.createTable)
-            return writer
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+                try writer.write(Player.createTable)
+                return writer
+            }
+            try Test(testRxFetchScheduler).run { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchScheduler).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchScheduler).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
-        try Test(testRxFetchScheduler).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFetchScheduler).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxFetchScheduler).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
+    @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxFetchScheduler<Reader: DatabaseReader>(reader: Reader, disposeBag: DisposeBag) throws {
         let observation = Player.observationForCount()
         let queue = DispatchQueue(label: "test")
@@ -269,30 +281,30 @@ extension ValueObservationTests {
 }
 
 extension ValueObservationTests {
-
+    
     // This is a regression test that fails in v0.8.0
     func testSubscriptionOffMainThread() throws {
         try Test(testSubscriptionOffMainThread)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
-
+    
     func testSubscriptionOffMainThread(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "t") { t in
                 t.column("id", .integer).primaryKey()
             }
         }
-
+        
         let request: SQLRequest<Int> = "SELECT COUNT(*) FROM t"
-
+        
         let initialFetchExpectation = expectation(description: "initial fetch")
         initialFetchExpectation.assertForOverFulfill = false
         let observation = ValueObservation.tracking(request, fetch: { db -> Int in
             initialFetchExpectation.fulfill()
             return try request.fetchOne(db)!
         })
-
+        
         let testSubject = ReplaySubject<Int>.createUnbounded()
         DispatchQueue.global().async {
             observation.rx
@@ -300,7 +312,7 @@ extension ValueObservationTests {
                 .subscribe(testSubject)
                 .disposed(by: disposeBag)
         }
-
+        
         // wait until we have fetched initial value before we perform database changes
         wait(for: [initialFetchExpectation], timeout: 1)
         try writer.writeWithoutTransaction { db in
@@ -314,23 +326,23 @@ extension ValueObservationTests {
 }
 
 extension ValueObservationTests {
-
+    
     // This is a regression test that fails in v0.9.0
     func testSubscriptionFromMainThread() throws {
         try Test(testSubscriptionFromMainThread)
             .run { try DatabaseQueue(path: $0) }
             .run { try DatabasePool(path: $0) }
     }
-
+    
     func testSubscriptionFromMainThread(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
         try writer.write { db in
             try db.create(table: "t") { t in
                 t.column("id", .integer).primaryKey()
             }
         }
-
+        
         let request: SQLRequest<Int> = "SELECT COUNT(*) FROM t"
-
+        
         let expectation1 = expectation(description: "1st subscription")
         expectation1.expectedFulfillmentCount = 2
         var count1: Int? = nil
@@ -342,11 +354,11 @@ extension ValueObservationTests {
             })
             .disposed(by: disposeBag)
         XCTAssertEqual(count1, 0) // synchronous emission of the 1st event
-
+        
         try writer.write { db in
             try db.execute(sql: "INSERT INTO t DEFAULT VALUES")
         }
-
+        
         var count2: Int? = nil
         request.rx.observeFirst(in: writer)
             .subscribe(onNext: {
@@ -355,7 +367,7 @@ extension ValueObservationTests {
             })
             .disposed(by: disposeBag)
         XCTAssertEqual(count2, 1) // synchronous emission of the 1st event
-
+        
         waitForExpectations(timeout: 1, handler: nil)
     }
 }
