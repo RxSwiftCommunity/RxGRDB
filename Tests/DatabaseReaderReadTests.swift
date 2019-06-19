@@ -18,9 +18,9 @@ private struct Player: Codable, FetchableRecord, PersistableRecord {
     }
 }
 
-class DatabaseReaderFetchTests : XCTestCase { }
+class DatabaseReaderReadTests : XCTestCase { }
 
-extension DatabaseReaderFetchTests {
+extension DatabaseReaderReadTests {
     func testRxRead() throws {
         func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
             try writer.write { db in
@@ -42,7 +42,7 @@ extension DatabaseReaderFetchTests {
 }
 
 @available(OSX 10.12, *)
-extension DatabaseReaderFetchTests {
+extension DatabaseReaderReadTests {
     func testRxReadScheduler() throws {
         func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
             try writer.write { db in
@@ -79,7 +79,7 @@ extension DatabaseReaderFetchTests {
     }
 }
 
-extension DatabaseReaderFetchTests {
+extension DatabaseReaderReadTests {
     func testRxReadIsAsynchronous() throws {
         func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
             try writer.write { db in
@@ -112,7 +112,7 @@ extension DatabaseReaderFetchTests {
     }
 }
 
-extension DatabaseReaderFetchTests {
+extension DatabaseReaderReadTests {
     func testRxReadIsReadonly() throws {
         try Test(testRxReadIsReadonly).run { try DatabaseQueue(path: $0) }
         try Test(testRxReadIsReadonly).run { try DatabasePool(path: $0) }
