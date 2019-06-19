@@ -216,8 +216,6 @@ let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
 
 The database updates are executed inside a database transaction. If the transaction completes successfully, the observable returned from the closure is subscribed, from a database protected dispatch queue, immediately after the transaction has been committed.
 
-> :point_up: **Note**: `flatMapWrite` emits its values or errors on various dispatch queues. You may want to increase control by pouring it into `observeOn`.
-
 When you use a [database pool], and your app executes some database updates followed by some fetches, you can wrap [`concurrentRead`](#databasewriterrxconcurrentreadschedulervalue) inside `flatMapWrite` in order to profit from optimized database scheduling. For example:
 
 ```swift
