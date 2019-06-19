@@ -3,7 +3,48 @@ Release Notes
 
 ## Next Version
 
+### New
+
 - [#55](https://github.com/RxSwiftCommunity/RxGRDB/pull/55): Asynchronous database access
+    
+    ```swift
+    let dbQueue: DatabaseQueue = ...
+    
+    // Async write
+    let write: Completable = dbQueue.rx.writeCompletable { db in
+        try Player(...).insert(db)
+    }
+    
+    let newPlayerCount: Single<Int> = dbQueue.rx.write { db in
+        try Player(...).insert(db)
+        return try Player.fetchCount(db)
+    }
+    
+    // Async read
+    let players: Single<[Player]> = dbQueue.rx.read { db in
+        try Player.fetchAll(db)
+    }
+    ```
+
+### Breaking Changes
+
+- Observation methods have been renamed from `fetch...` to `observe...`:
+    
+    ```diff
+    -Player.all().rx.fetchOne(in: dbQueue)
+    -Player.all().rx.fetchAll(in: dbQueue)
+    -Player.all().rx.fetchCount(in: dbQueue)
+    +Player.all().rx.observeFirst(in: dbQueue)
+    +Player.all().rx.observeAll(in: dbQueue)
+    +Player.all().rx.observeCount(in: dbQueue)
+    ```
+
+- The way to provide a specific scheduler to a value observable has changed:
+    
+    ```diff
+    -Player.all().rx.fetchAll(in: dbQueue, scheduler: MainScheduler.asyncInstance)
+    +Player.all().rx.observeAll(on: MainScheduler.asyncInstance, in: dbQueue)
+    ```
 
 
 ## 0.14.0
