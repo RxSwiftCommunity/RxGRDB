@@ -42,6 +42,53 @@ extension DatabaseWriterFlatMapWriteTests {
     }
 }
 
+@available(OSX 10.12, *)
+extension DatabaseWriterWriteTests {
+    func testRxFlatMapWriteScheduler() throws {
+        func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
+            try writer.write { db in
+                try Player.createTable(db)
+            }
+            return writer
+        }
+        try Test(testRxFlatMapWriteScheduler).run { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxFlatMapWriteScheduler).run { try setup(DatabasePool(path: $0)) }
+    }
+    
+    func testRxFlatMapWriteScheduler<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
+        do {
+            let queue = DispatchQueue(label: "test")
+            let single = writer.rx
+                .flatMapWrite { db -> Observable<Int> in
+                    try Player(id: 1, name: "Arthur", score: 1000).insert(db)
+                    let newPlayerCount = try Player.fetchCount(db)
+                    return Observable
+                        .just(newPlayerCount)
+                        .observeOn(SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"))
+                }
+                .do(onNext: { _ in
+                    dispatchPrecondition(condition: .onQueue(.main))
+                })
+            _ = try single.toBlocking(timeout: 1).single()
+        }
+        do {
+            let queue = DispatchQueue(label: "test")
+            let single = writer.rx
+                .flatMapWrite(
+                    observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
+                    updates: { db -> Observable<Int> in
+                        try Player(id: 2, name: "Barbara", score: nil).insert(db)
+                        let newPlayerCount = try Player.fetchCount(db)
+                        return Observable.just(newPlayerCount)
+                })
+                .do(onNext: { _ in
+                    dispatchPrecondition(condition: .onQueue(queue))
+                })
+            _ = try single.toBlocking(timeout: 1).single()
+        }
+    }
+}
+
 extension DatabaseWriterFlatMapWriteTests {
     func testRxFlatMapWriteIsAsynchronous() throws {
         func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {

@@ -259,8 +259,8 @@ extension ValueObservationTests {
         let queue = DispatchQueue(label: "test")
         let observable = observation.rx
             .observe(
-                in: reader,
-                scheduler: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"))
+                on: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
+                in: reader)
             .do(onNext: { _ in
                 dispatchPrecondition(condition: .onQueue(queue))
             })

@@ -19,9 +19,9 @@ extension Reactive where Base: DatabaseReader {
     ///
     /// - parameter value: A closure which accesses the database.
     /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
+    ///   Defaults to MainScheduler.instance.
     public func read<T>(
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance,
+        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         value: @escaping (Database) throws -> T)
         -> Single<T>
     {

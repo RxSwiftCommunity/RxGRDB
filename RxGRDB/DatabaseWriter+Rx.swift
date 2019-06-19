@@ -20,32 +20,36 @@ extension Reactive where Base: DatabaseWriter {
     /// closure is subscribed, from a database protected dispatch queue,
     /// immediately after the transaction has been committed.
     ///
-    /// - warning: `flatMapWrite` emits its values or errors on various dispatch
-    ///   queues. You may want to increase control by pouring it
-    ///   into `observeOn`.
-    /// - parameter updates: A closure which writes in the database and returns
-    ///   a Single.
-    public func flatMapWrite<T>(updates: @escaping (Database) throws -> Observable<T>) -> Observable<T> {
+    /// - parameter scheduler: The scheduler on which the observable completes.
+    ///   Defaults to MainScheduler.instance.
+    /// - parameter updates: A closure which writes in the database.
+    public func flatMapWrite<T>(
+        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        updates: @escaping (Database) throws -> Observable<T>)
+        -> Observable<T>
+    {
         let writer = base
-        return Observable.create { observer in
-            var disposable: Disposable?
-            writer.asyncWriteWithoutTransaction { db in
-                var observable: Observable<T>?
-                do {
-                    try db.inTransaction {
-                        observable = try updates(db)
-                        return .commit
+        return Observable
+            .create { observer in
+                var disposable: Disposable?
+                writer.asyncWriteWithoutTransaction { db in
+                    var observable: Observable<T>?
+                    do {
+                        try db.inTransaction {
+                            observable = try updates(db)
+                            return .commit
+                        }
+                        // Subscribe after transaction
+                        disposable = observable!.subscribe(observer)
+                    } catch {
+                        observer.onError(error)
                     }
-                    // Subscribe after transaction
-                    disposable = observable!.subscribe(observer)
-                } catch {
-                    observer.onError(error)
+                }
+                return Disposables.create {
+                    disposable?.dispose()
                 }
             }
-            return Disposables.create {
-                disposable?.dispose()
-            }
-        }
+            .observeOn(scheduler)
     }
     
     /// Returns a Single that asynchronously writes into the database.
@@ -80,7 +84,6 @@ extension Reactive where Base: DatabaseWriter {
     ///                 try Player.fetchCount(db)
     ///             }
     ///         }
-    ///         .observeOn(MainScheduler.asyncInstance)
     ///
     /// The optimization guarantees that the concurrent read does not block any
     /// concurrent write, and yet sees the database in the state left by the
@@ -90,13 +93,18 @@ extension Reactive where Base: DatabaseWriter {
     /// `concurrentRead` wrapped into `flatMapWrite` emits exactly the same
     /// values, but the scheduling optimization is not applied.
     ///
-    /// - warning: `flatMapWrite` emits its values or errors on various dispatch
-    ///   queues. You may want to increase control by pouring it
-    ///   into `observeOn`.
-    /// - parameter updates: A closure which writes in the database and returns
-    ///   a Single.
-    public func flatMapWrite<T>(updates: @escaping (Database) throws -> Single<T>) -> Single<T> {
-        return flatMapWrite { try updates($0).asObservable() }.asSingle()
+    /// - parameter scheduler: The scheduler on which the single completes.
+    ///   Defaults to MainScheduler.instance.
+    /// - parameter updates: A closure which writes in the database.
+    public func flatMapWrite<T>(
+        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        updates: @escaping (Database) throws -> Single<T>)
+        -> Single<T>
+    {
+        return flatMapWrite(
+            observeOn: scheduler,
+            updates: { try updates($0).asObservable() })
+            .asSingle()
     }
     
     /// Returns a Completable that asynchronously writes into the database.
@@ -109,22 +117,25 @@ extension Reactive where Base: DatabaseWriter {
     /// By default, the completable completes on the main dispatch queue. If
     /// you give a *scheduler*, is completes on that scheduler.
     ///
+    /// - parameter scheduler: The scheduler on which the completable completes.
+    ///   Defaults to MainScheduler.instance.
     /// - parameter updates: A closure which writes in the database.
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
     public func writeCompletable(
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance,
+        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         updates: @escaping (Database) throws -> Void)
         -> Completable
     {
-        return flatMapWrite(updates: { db in
-            do {
-                try updates(db)
-                return .empty()
-            } catch {
-                return .error(error)
-            }
-        }).asCompletable().observeOn(scheduler)
+        return flatMapWrite(
+            observeOn: scheduler,
+            updates: { db in
+                do {
+                    try updates(db)
+                    return .empty()
+                } catch {
+                    return .error(error)
+                }
+        })
+            .asCompletable()
     }
     
     /// Returns a Single that asynchronously writes into the database.
@@ -137,21 +148,24 @@ extension Reactive where Base: DatabaseWriter {
     /// By default, the single completes on the main dispatch queue. If
     /// you give a *scheduler*, is completes on that scheduler.
     ///
+    /// - parameter scheduler: The scheduler on which the observable completes.
+    ///   Defaults to MainScheduler.instance.
     /// - parameter updates: A closure which writes in the database.
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.asyncInstance.
     public func write<T>(
-        scheduler: ImmediateSchedulerType = MainScheduler.asyncInstance,
+        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         updates: @escaping (Database) throws -> T)
         -> Single<T>
     {
-        return flatMapWrite(updates: { db in
-            do {
-                return try .just(updates(db))
-            } catch {
-                return .error(error)
-            }
-        }).asSingle().observeOn(scheduler)
+        return flatMapWrite(
+            observeOn: scheduler,
+            updates: { db in
+                do {
+                    return try .just(updates(db))
+                } catch {
+                    return .error(error)
+                }
+        })
+            .asSingle()
     }
     
     /// Returns a Single that asynchronously emits the fetched value.
@@ -171,12 +185,18 @@ extension Reactive where Base: DatabaseWriter {
     ///                 try Player.fetchAll(db)
     ///             }
     ///         }
-    ///         .observeOn(MainScheduler.async)
     ///
+    /// - parameter scheduler: The scheduler on which the single completes.
+    ///   Defaults to MainScheduler.instance.
     /// - parameter value: A closure which accesses the database.
-    public func concurrentRead<T>(value: @escaping (Database) throws -> T) -> Single<T> {
+    public func concurrentRead<T>(
+        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
+        value: @escaping (Database) throws -> T)
+        -> Single<T>
+    {
         let writer = base
-        return Single.create { observer in
+        return Single
+            .create { observer in
             writer.spawnConcurrentRead { db in
                 do {
                     try observer(.success(value(db.get())))
@@ -186,5 +206,6 @@ extension Reactive where Base: DatabaseWriter {
             }
             return Disposables.create { }
         }
+            .observeOn(scheduler)
     }
 }

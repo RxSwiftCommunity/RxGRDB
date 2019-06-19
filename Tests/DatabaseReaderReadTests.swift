@@ -69,7 +69,7 @@ extension DatabaseReaderReadTests {
             let queue = DispatchQueue(label: "test")
             let single = reader.rx
                 .read(
-                    scheduler: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
+                    observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
                     value: { db in try Player.fetchCount(db) })
                 .do(onSuccess: { _ in
                     dispatchPrecondition(condition: .onQueue(queue))

@@ -52,9 +52,9 @@ extension Reactive where Base: _ValueObservationProtocol {
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observe(
+        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true,
-        scheduler: ImmediateSchedulerType? = nil)
+        startImmediately: Bool = true)
         -> Observable<Base._Reducer.Value>
     {
         var observation = base
@@ -82,14 +82,14 @@ extension Reactive where Base: _ValueObservationProtocol {
         }
     }
     
-    @available(*, deprecated, renamed: "observe(in:startImmediately:scheduler:)")
+    @available(*, deprecated, renamed: "observe(on:in:startImmediately:)")
     public func fetch(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base._Reducer.Value>
     {
-        return observe(in: reader, startImmediately: startImmediately, scheduler: scheduler)
+        return observe(on: scheduler, in: reader, startImmediately: startImmediately)
     }
 }
 

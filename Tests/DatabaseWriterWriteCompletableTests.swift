@@ -66,7 +66,7 @@ extension DatabaseWriterWriteCompletableTests {
             let queue = DispatchQueue(label: "test")
             let completable = writer.rx
                 .writeCompletable(
-                    scheduler: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
+                    observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
                     updates: { db in try Player(id: 2, name: "Barbara", score: nil).insert(db) })
                 .do(onCompleted: {
                     dispatchPrecondition(condition: .onQueue(queue))

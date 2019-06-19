@@ -138,17 +138,17 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 
 RxGRDB provide reactive mehods that allow you to embed asynchronous database accesses in your reactive flows.
 
-- [`rx.read(scheduler:value:)`](#databasereaderrxreadschedulervalue)
-- [`rx.writeCompletable(scheduler:updates:)`](#databasewriterrxwritecompletableschedulerupdates)
-- [`rx.write(scheduler:updates:)`](#databasewriterrxwriteschedulerupdates)
+- [`rx.read(observeOn:value:)`](#databasereaderrxreadobserveonvalue)
+- [`rx.writeCompletable(observeOn:updates:)`](#databasewriterrxwritecompletableobserveonupdates)
+- [`rx.write(observeOn:updates:)`](#databasewriterrxwriteobserveonupdates)
 
 The two last ones are more advanced but they allow some optimizations:
 
-- [`rx.flatMapWrite(updates:)`](#databasewriterrxflatmapwriteupdates)
-- [`rx.concurrentRead(scheduler:value:)`](#databasewriterrxconcurrentreadschedulervalue)
+- [`rx.flatMapWrite(observeOn:updates:)`](#databasewriterrxflatmapwriteobserveonupdates)
+- [`rx.concurrentRead(observeOn:value:)`](#databasewriterrxconcurrentreadobserveonvalue)
 
 
-#### `DatabaseReader.rx.read(scheduler:value:)`
+#### `DatabaseReader.rx.read(observeOn:value:)`
 
 This method returns a [Single] that completes after database values have been asynchronously fetched.
 
@@ -159,10 +159,10 @@ let player = dbQueue.rx.read { db in
 }
 ```
 
-The fetched value is emitted on the main queue, unless you provide a specific `scheduler`.
+The fetched value is emitted on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 
-#### `DatabaseWriter.rx.writeCompletable(scheduler:updates:)`
+#### `DatabaseWriter.rx.writeCompletable(observeOn:updates:)`
 
 This method returns a [Completable] that completes after database updates have been succesfully executed inside a database transaction.
 
@@ -173,10 +173,10 @@ let write = dbQueue.rx.writeCompletable { db in
 }
 ```
 
-The completable completes on the main queue, unless you provide a specific `scheduler`.
+The completable completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 
-#### `DatabaseWriter.rx.write(scheduler:updates:)`
+#### `DatabaseWriter.rx.write(observeOn:updates:)`
 
 This method returns a [Single] that completes after database updates have been succesfully executed inside a database transaction.
 
@@ -188,10 +188,10 @@ let newPlayerCount = dbQueue.rx.write { db -> Int in
 }
 ```
 
-The single completes on the main queue, unless you provide a specific `scheduler`.
+The single completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 
-#### `DatabaseWriter.rx.flatMapWrite(updates:)`
+#### `DatabaseWriter.rx.flatMapWrite(observeOn:updates:)`
 
 This method returns an Observable or a [Single], depending on the result of the updates closure:
 
@@ -229,7 +229,6 @@ let newPlayerCount = dbPool.rx
             try Player.fetchCount(db)
         }
     }
-    .observeOn(MainScheduler.asyncInstance)
 ```
 
 The optimization guarantees that the concurrent read does not block any concurrent write, and yet sees the database in the state left by the completed transaction. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
@@ -237,7 +236,7 @@ The optimization guarantees that the concurrent read does not block any concurre
 When you use a [database queue], the observable returned by a `concurrentRead` wrapped into `flatMapWrite` emits exactly the same values, but the scheduling optimization is not applied.
 
 
-#### `DatabaseWriter.rx.concurrentRead(scheduler:value:)`
+#### `DatabaseWriter.rx.concurrentRead(observeOn:value:)`
 
 This method returns a [Single] that completes after database values have been fetched.
 
@@ -260,7 +259,7 @@ let newPlayerCount = dbPool.rx.flatMapWrite { db in
 
 `concurrentRead` executes asynchronously when you use a [database pool], and synchronously when you use a [database queue]. See [`flatMapWrite`](#databasewriterrxflatmapwriteupdates) for more information.
 
-The fetched value is emitted on the main queue, unless you provide a specific `scheduler`.
+The fetched value is emitted on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 
 # Database Observation
@@ -280,7 +279,7 @@ RxGRDB observables are based on GRDB's [ValueObservation] and [DatabaseRegionObs
 
 **When your application observes a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests), it gets notified each time a change in the results of the request has been committed in the database.**
 
-If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.observeCount](#fetchrequestrxobservecountinstartimmediatelyscheduler), [rx.observeFirst](#fetchrequestrxobservefirstinstartimmediatelyscheduler), and [rx.observeAll](#fetchrequestrxobserveallinstartimmediatelyscheduler) methods, depending on whether you want to track the number of results, the first one, or all of them:
+If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.observeCount](#fetchrequestrxobservecountoninstartimmediately), [rx.observeFirst](#fetchrequestrxobservefirstoninstartimmediately), and [rx.observeAll](#fetchrequestrxobservealloninstartimmediately) methods, depending on whether you want to track the number of results, the first one, or all of them:
 
 ```swift
 let request = Player.all()
@@ -297,9 +296,9 @@ request.rx.changes(in: dbQueue)      // Observable<Database>
 ```
 
 - [`rx.changes`](#fetchrequestrxchangesinstartimmediately)
-- [`rx.observeCount`](#fetchrequestrxobservecountinstartimmediatelyscheduler)
-- [`rx.observeFirst`](#fetchrequestrxobservefirstinstartimmediatelyscheduler)
-- [`rx.observeAll`](#fetchrequestrxobserveallinstartimmediatelyscheduler)
+- [`rx.observeCount`](#fetchrequestrxobservecountoninstartimmediately)
+- [`rx.observeFirst`](#fetchrequestrxobservefirstoninstartimmediately)
+- [`rx.observeAll`](#fetchrequestrxobservealloninstartimmediately)
 
 
 ---
@@ -349,7 +348,7 @@ try dbQueue.write { db in
 
 ---
 
-#### `FetchRequest.rx.observeCount(in:startImmediately:scheduler:)`
+#### `FetchRequest.rx.observeCount(on:in:startImmediately:)`
 
 This [database values observable](#values-observables) emits the number of results of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests) after each database transaction that changes it:
 
@@ -367,7 +366,7 @@ try dbQueue.write { db in
 // Eventually prints "Fresh player count: 1"
 ```
 
-All elements are emitted on the main queue by default, unless you provide a specific `scheduler`.
+All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `on` argument.
 
 If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
 
@@ -385,7 +384,7 @@ This observable filters out identical consecutive values.
 
 ---
 
-#### `FetchRequest.rx.observeFirst(in:startImmediately:scheduler:)`
+#### `FetchRequest.rx.observeFirst(on:in:startImmediately:)`
 
 This [database values observable](#values-observables) emits a value after each database transaction which has modified the result of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests):
 
@@ -405,7 +404,7 @@ try dbQueue.write { db in
 // Eventually prints "Fresh player"
 ```
 
-All elements are emitted on the main queue by default, unless you provide a specific `scheduler`.
+All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `on` argument.
 
 If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
 
@@ -437,7 +436,7 @@ This observable filters out identical consecutive values by comparing raw databa
 
 ---
 
-#### `FetchRequest.rx.observeAll(in:startImmediately:scheduler:)`
+#### `FetchRequest.rx.observeAll(on:in:startImmediately:)`
 
 This [database values observable](#values-observables) emits an array of values  after each database transaction which has modified the result of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests):
 
@@ -456,7 +455,7 @@ try dbQueue.write { db in
 // Eventually prints "[Arthur, Barbara]"
 ```
 
-All elements are emitted on the main queue by default, unless you provide a specific `scheduler`.
+All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `on` argument.
 
 If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
 
@@ -510,7 +509,7 @@ request.rx.observeAll(in: dbQueue)   // Observable<[Player]>
 
 Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseRegionObservation.rx.changes](#databaseregionobservationrxchangesinstartimmediately).
 
-And when you need to fetch database values from several requests, use [ValueObservation.rx.observe](#valueobservationrxobserveinstartimmediatelyscheduler).
+And when you need to fetch database values from several requests, use [ValueObservation.rx.observe](#valueobservationrxobserveoninstartimmediately).
 
 
 ---
@@ -545,7 +544,7 @@ All elements are emitted in a protected database dispatch queue, serialized with
 
 ---
 
-#### `ValueObservation.rx.observe(in:startImmediately:scheduler:)`
+#### `ValueObservation.rx.observe(on:in:startImmediately:)`
 
 This [database values observable](#values-observables) emits the same values as a [ValueObservation].
 
@@ -568,7 +567,7 @@ observation.rx.observe(in: dbQueue)
     })
 ```
 
-All elements are emitted on the main queue by default, unless you provide a specific `scheduler`.
+All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `on` argument.
 
 If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
 
@@ -814,7 +813,7 @@ This guarantee is lifted whenever you provide a specific scheduler (including `M
 
 ```swift
 Player.all().rx
-    .observeAll(in: dbQueue, scheduler: MainScheduler.instance)
+    .observeAll(on: MainScheduler.instance, in: dbQueue)
     .subscribe(onNext: { (players: [Player]) in
         print("Fresh players: \(players)")
     })
@@ -907,7 +906,7 @@ If the observable is subscribed from the main queue, the first element is fetche
 ```swift
 // On any thread
 Player.all().rx
-    .observeAll(in: dbQueue, scheduler: MainScheduler.asyncInstance)
+    .observeAll(on: MainScheduler.asyncInstance, in: dbQueue)
     .subscribe(onNext: { (players: [Player]) in
         // On the main queue
         print("Fresh players: \(players)")
@@ -923,7 +922,7 @@ let scheduler = SerialDispatchQueueScheduler(qos: .default)
 
 // On any thread
 Player.all().rx
-    .observeAll(in: dbQueue, scheduler: scheduler)
+    .observeAll(on: scheduler, in: dbQueue)
     .subscribe(onNext: { (db: Database) in
         // Off the main queue, in the global dispatch queue
         print("Fresh players: \(players)")
@@ -959,3 +958,4 @@ Player.all().rx
 [database queue]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-queues
 [open an issue]: https://github.com/RxSwiftCommunity/RxGRDB/issues
 [query interface]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
+[scheduler]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md
