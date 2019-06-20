@@ -23,7 +23,7 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter scheduler: The scheduler on which the observable completes.
     ///   Defaults to MainScheduler.instance.
     /// - parameter updates: A closure which writes in the database.
-    public func flatMapWrite<T>(
+    func flatMapWrite<T>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         updates: @escaping (Database) throws -> Observable<T>)
         -> Observable<T>

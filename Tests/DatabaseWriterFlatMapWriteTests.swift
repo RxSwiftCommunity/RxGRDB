@@ -26,18 +26,18 @@ extension DatabaseWriterFlatMapWriteTests {
             try writer.write(Player.createTable)
             return writer
         }
-        try Test(testRxFlatMapWrite).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFlatMapWrite).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxFlatMapWriteSingle).run { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxFlatMapWriteSingle).run { try setup(DatabasePool(path: $0)) }
     }
     
-    func testRxFlatMapWrite<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
-        let observable: Observable<Int> = writer.rx.flatMapWrite { db in
+    func testRxFlatMapWriteSingle<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
+        let single: Single<Int> = writer.rx.flatMapWrite { db in
             try Player(id: 1, name: "Arthur", score: 1000).insert(db)
             let newPlayerCount = try Player.fetchCount(db)
-            return Observable.just(newPlayerCount)
+            return Single.just(newPlayerCount)
         }
         try XCTAssertEqual(writer.read(Player.fetchCount), 0)
-        let count = try observable.toBlocking(timeout: 1).single()
+        let count = try single.toBlocking(timeout: 1).single()
         XCTAssertEqual(count, 1)
     }
 }
@@ -61,14 +61,14 @@ extension DatabaseWriterWriteAndReturnTests {
         do {
             let queue = DispatchQueue(label: "test")
             let single = writer.rx
-                .flatMapWrite { db -> Observable<Int> in
+                .flatMapWrite { db -> Single<Int> in
                     try Player(id: 1, name: "Arthur", score: 1000).insert(db)
                     let newPlayerCount = try Player.fetchCount(db)
-                    return Observable
+                    return Single
                         .just(newPlayerCount)
                         .observeOn(SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"))
                 }
-                .do(onNext: { _ in
+                .do(onSuccess: { _ in
                     dispatchPrecondition(condition: .onQueue(.main))
                 })
             _ = try single.toBlocking(timeout: 1).single()
@@ -78,12 +78,12 @@ extension DatabaseWriterWriteAndReturnTests {
             let single = writer.rx
                 .flatMapWrite(
                     observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
-                    updates: { db -> Observable<Int> in
+                    updates: { db -> Single<Int> in
                         try Player(id: 2, name: "Barbara", score: nil).insert(db)
                         let newPlayerCount = try Player.fetchCount(db)
-                        return Observable.just(newPlayerCount)
+                        return Single.just(newPlayerCount)
                 })
-                .do(onNext: { _ in
+                .do(onSuccess: { _ in
                     dispatchPrecondition(condition: .onQueue(queue))
                 })
             _ = try single.toBlocking(timeout: 1).single()
@@ -105,43 +105,21 @@ extension DatabaseWriterFlatMapWriteTests {
     
     func testRxFlatMapWriteIsAsynchronous<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
         let semaphore = DispatchSemaphore(value: 0)
-        let observable: Observable<Int> = writer.rx.flatMapWrite { db in
+        let single: Single<Int> = writer.rx.flatMapWrite { db in
             // Make sure this block executes asynchronously
             semaphore.wait()
             try Player(id: 1, name: "Arthur", score: 1000).insert(db)
             let newPlayerCount = try Player.fetchCount(db)
-            return Observable.just(newPlayerCount)
+            return Single.just(newPlayerCount)
         }
         
-        let count = try observable
+        let count = try single
             .asObservable()
             .do(onSubscribed: {
                 semaphore.signal()
             })
             .toBlocking(timeout: 1)
             .single()
-        XCTAssertEqual(count, 1)
-    }
-}
-
-extension DatabaseWriterFlatMapWriteTests {
-    func testRxFlatMapWriteSingle() throws {
-        func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
-            try writer.write(Player.createTable)
-            return writer
-        }
-        try Test(testRxFlatMapWriteSingle).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxFlatMapWriteSingle).run { try setup(DatabasePool(path: $0)) }
-    }
-    
-    func testRxFlatMapWriteSingle<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
-        let single: Single<Int> = writer.rx.flatMapWrite { db in
-            try Player(id: 1, name: "Arthur", score: 1000).insert(db)
-            let newPlayerCount = try Player.fetchCount(db)
-            return Single.just(newPlayerCount)
-        }
-        try XCTAssertEqual(writer.read(Player.fetchCount), 0)
-        let count = try single.toBlocking(timeout: 1).single()
         XCTAssertEqual(count, 1)
     }
 }

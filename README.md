@@ -198,16 +198,9 @@ When you use a [database pool], and your app executes some database updates foll
 
 #### `DatabaseWriter.rx.flatMapWrite(observeOn:updates:)`
 
-This method returns an Observable or a [Single], depending on the result of the updates closure:
+This method returns a [Single] that completes after database updates have been succesfully executed inside a database transaction:
 
 ```swift
-// Observable<Int>
-let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Observable<Int> in
-    try Player(...).insert(db)
-    let count = try Player.fetchCount(db)
-    return Observable.just(count)
-}
-
 // Single<Int>
 let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
     try Player(...).insert(db)
@@ -216,7 +209,7 @@ let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
 }
 ```
 
-The database updates are executed inside a database transaction. If the transaction completes successfully, the observable returned from the closure is subscribed, from a database protected dispatch queue, immediately after the transaction has been committed.
+The database updates are executed inside a database transaction. If the transaction completes successfully, the single returned from the closure is subscribed, from a database protected dispatch queue, immediately after the transaction has been committed.
 
 When you use a [database pool], and your app executes some database updates followed by some slow fetches, you can wrap [`concurrentRead`](#databasewriterrxconcurrentreadschedulervalue) inside `flatMapWrite` in order to profit from optimized database scheduling. For example:
 
