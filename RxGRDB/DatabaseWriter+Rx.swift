@@ -119,7 +119,7 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter scheduler: The scheduler on which the completable completes.
     ///   Defaults to MainScheduler.instance.
     /// - parameter updates: A closure which writes in the database.
-    public func writeCompletable(
+    public func write(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         updates: @escaping (Database) throws -> Void)
         -> Completable
@@ -139,7 +139,7 @@ extension Reactive where Base: DatabaseWriter {
     
     /// Returns a Single that asynchronously writes into the database.
     ///
-    ///     let newPlayerCount: Single<Int> = dbQueue.rx.write { db in
+    ///     let newPlayerCount: Single<Int> = dbQueue.rx.writeAndReturn { db in
     ///         try Player(...).insert(db)
     ///         return try Player.fetchCount(db)
     ///     }
@@ -150,7 +150,7 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter scheduler: The scheduler on which the observable completes.
     ///   Defaults to MainScheduler.instance.
     /// - parameter updates: A closure which writes in the database.
-    public func write<T>(
+    public func writeAndReturn<T>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         updates: @escaping (Database) throws -> T)
         -> Single<T>

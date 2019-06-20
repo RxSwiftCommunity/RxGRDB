@@ -58,12 +58,12 @@ request.rx
 
 ```swift
 // Completable
-let write = dbQueue.rx.writeCompletable { db in
+let write = dbQueue.rx.write { db in
     try Player(...).insert(db)
 }
 
 // Single<Int>
-let newPlayerCount = dbQueue.rx.write { db -> Int in
+let newPlayerCount = dbQueue.rx.writeAndReturn { db -> Int in
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
@@ -142,8 +142,8 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
 RxGRDB provide reactive mehods that allow you to embed asynchronous database accesses in your reactive flows.
 
 - [`rx.read(observeOn:value:)`](#databasereaderrxreadobserveonvalue)
-- [`rx.writeCompletable(observeOn:updates:)`](#databasewriterrxwritecompletableobserveonupdates)
 - [`rx.write(observeOn:updates:)`](#databasewriterrxwriteobserveonupdates)
+- [`rx.writeAndReturn(observeOn:updates:)`](#databasewriterrxwriteandreturnobserveonupdates)
 
 The two last ones are more advanced but they allow some optimizations:
 
@@ -165,13 +165,13 @@ let player = dbQueue.rx.read { db in
 The fetched value is emitted on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 
-#### `DatabaseWriter.rx.writeCompletable(observeOn:updates:)`
+#### `DatabaseWriter.rx.write(observeOn:updates:)`
 
 This method returns a [Completable] that completes after database updates have been succesfully executed inside a database transaction.
 
 ```swift
 // Completable
-let write = dbQueue.rx.writeCompletable { db in
+let write = dbQueue.rx.write { db in
     try Player(...).insert(db)
 }
 ```
@@ -179,19 +179,21 @@ let write = dbQueue.rx.writeCompletable { db in
 The completable completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 
-#### `DatabaseWriter.rx.write(observeOn:updates:)`
+#### `DatabaseWriter.rx.writeAndReturn(observeOn:updates:)`
 
 This method returns a [Single] that completes after database updates have been succesfully executed inside a database transaction.
 
 ```swift
 // Single<Int>
-let newPlayerCount = dbQueue.rx.write { db -> Int in
+let newPlayerCount = dbQueue.rx.writeAndReturn { db -> Int in
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
 ```
 
 The single completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
+
+When you use a [database pool], and your app executes some database updates followed by some slow fetches, you may profit from optimized scheduling with [`rx.flatMapWrite(observeOn:updates:)`](#databasewriterrxflatmapwriteobserveonupdates). See below.
 
 
 #### `DatabaseWriter.rx.flatMapWrite(observeOn:updates:)`
@@ -216,7 +218,7 @@ let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
 
 The database updates are executed inside a database transaction. If the transaction completes successfully, the observable returned from the closure is subscribed, from a database protected dispatch queue, immediately after the transaction has been committed.
 
-When you use a [database pool], and your app executes some database updates followed by some fetches, you can wrap [`concurrentRead`](#databasewriterrxconcurrentreadschedulervalue) inside `flatMapWrite` in order to profit from optimized database scheduling. For example:
+When you use a [database pool], and your app executes some database updates followed by some slow fetches, you can wrap [`concurrentRead`](#databasewriterrxconcurrentreadschedulervalue) inside `flatMapWrite` in order to profit from optimized database scheduling. For example:
 
 ```swift
 // Single<Int>
@@ -231,7 +233,7 @@ let newPlayerCount = dbPool.rx.flatMapWrite { db in
 }
 ```
 
-The optimization guarantees that the concurrent read does not block any concurrent write, and yet sees the database in the state left by the completed transaction. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
+The optimization guarantees that the slow concurrent read sees the database in the state left by the completed transaction, and yet does not block any concurrent writes. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
 
 When you use a [database queue], the observable returned by a `concurrentRead` wrapped into `flatMapWrite` emits exactly the same values, but the scheduling optimization is not applied.
 

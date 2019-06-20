@@ -11,11 +11,11 @@ Release Notes
     let dbQueue: DatabaseQueue = ...
     
     // Async write
-    let write: Completable = dbQueue.rx.writeCompletable { db in
+    let write: Completable = dbQueue.rx.write { db in
         try Player(...).insert(db)
     }
     
-    let newPlayerCount: Single<Int> = dbQueue.rx.write { db in
+    let newPlayerCount: Single<Int> = dbQueue.rx.writeAndReturn { db in
         try Player(...).insert(db)
         return try Player.fetchCount(db)
     }

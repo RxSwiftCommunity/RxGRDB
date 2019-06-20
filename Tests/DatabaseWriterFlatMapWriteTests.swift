@@ -42,7 +42,7 @@ extension DatabaseWriterFlatMapWriteTests {
     }
 }
 
-extension DatabaseWriterWriteTests {
+extension DatabaseWriterWriteAndReturnTests {
     func testRxFlatMapWriteScheduler() throws {
         if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
             func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {

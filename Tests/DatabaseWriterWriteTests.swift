@@ -31,32 +31,12 @@ extension DatabaseWriterWriteTests {
     }
     
     func testRxWrite<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
-        let single = writer.rx.write { db in
+        let completable = writer.rx.write { db in
             try Player(id: 1, name: "Arthur", score: 1000).insert(db)
         }
         try XCTAssertEqual(writer.read(Player.fetchCount), 0)
-        let _: Void = try single.toBlocking(timeout: 1).single()
+        _ = try completable.toBlocking(timeout: 1).toArray()
         try XCTAssertEqual(writer.read(Player.fetchCount), 1)
-    }
-}
-
-extension DatabaseWriterWriteTests {
-    func testRxWriteReturnValue() throws {
-        func setup<Writer: DatabaseWriter & ReactiveCompatible>(_ writer: Writer) throws -> Writer {
-            try writer.write(Player.createTable)
-            return writer
-        }
-        try Test(testRxWriteReturnValue).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxWriteReturnValue).run { try setup(DatabasePool(path: $0)) }
-    }
-    
-    func testRxWriteReturnValue<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
-        let single = writer.rx.write { db -> Int in
-            try Player(id: 1, name: "Arthur", score: 1000).insert(db)
-            return try Player.fetchCount(db)
-        }
-        let count = try single.toBlocking(timeout: 1).single()
-        XCTAssertEqual(count, 1)
     }
 }
 
@@ -77,23 +57,23 @@ extension DatabaseWriterWriteTests {
     @available(OSX 10.12, iOS 10.0, watchOS 3.0, *)
     func testRxWriteScheduler<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
         do {
-            let single = writer.rx
+            let completable = writer.rx
                 .write { db in try Player(id: 1, name: "Arthur", score: 1000).insert(db) }
-                .do(onSuccess: { _ in
+                .do(onCompleted: {
                     dispatchPrecondition(condition: .onQueue(.main))
                 })
-            _ = try single.toBlocking(timeout: 1).single()
+            _ = try completable.toBlocking(timeout: 1).toArray()
         }
         do {
             let queue = DispatchQueue(label: "test")
-            let single = writer.rx
+            let completable = writer.rx
                 .write(
                     observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
                     updates: { db in try Player(id: 2, name: "Barbara", score: nil).insert(db) })
-                .do(onSuccess: { _ in
+                .do(onCompleted: {
                     dispatchPrecondition(condition: .onQueue(queue))
                 })
-            _ = try single.toBlocking(timeout: 1).single()
+            _ = try completable.toBlocking(timeout: 1).toArray()
         }
     }
 }
@@ -112,20 +92,17 @@ extension DatabaseWriterWriteTests {
     
     func testRxWriteIsAsynchronous<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
         let semaphore = DispatchSemaphore(value: 0)
-        let single = writer.rx.write { db -> Int in
+        let completable = writer.rx.write { db in
             // Make sure this block executes asynchronously
             semaphore.wait()
             try Player(id: 1, name: "Arthur", score: 1000).insert(db)
-            return try Player.fetchCount(db)
         }
         
-        let count = try single
-            .asObservable()
+        _ = try completable
             .do(onSubscribed: {
                 semaphore.signal()
             })
             .toBlocking(timeout: 1)
-            .single()
-        XCTAssertEqual(count, 1)
+            .toArray()
     }
 }
