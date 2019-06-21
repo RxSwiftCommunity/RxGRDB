@@ -200,13 +200,15 @@ This method returns a [Single] that completes after database updates have been s
 // Single<Int>
 let newPlayerCount = dbQueue.rx.write(
     updates: { db in try Player(...).insert(db) }
-    thenRead: { db in try Player.fetchCount(db) })
+    thenRead: { db, _ in try Player.fetchCount(db) })
 }
 ```
 
+The `thenRead` function accepts two arguments: a readonly database connection, and the result of the `updates` function. This allows you to pass information from a function to the other (it is ignored in the sample code above).
+
 The single completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
 
-When you use a [database pool], this method applies a scheduling optimization: the `thenRead` argument sees the database in the state left by the completed transaction, and yet does not block any concurrent writes. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
+When you use a [database pool], this method applies a scheduling optimization: the `thenRead` function sees the database in the state left by the `updates` function, and yet does not block any concurrent writes. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
 
 When you use a [database queue], no optimization is applied, and this method has the same behavior as [`writeAndReturn`](#databasewriterrxwriteandreturnobserveonupdates).
 

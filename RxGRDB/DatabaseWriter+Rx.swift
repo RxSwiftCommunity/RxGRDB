@@ -117,7 +117,7 @@ extension Reactive where Base: DatabaseWriter {
     ///
     ///     let newPlayerCount: Single<Int> = dbQueue.rx.write(
     ///         updates: { db in try Player(...).insert(db) },
-    ///         thenRead: { db in try Player.fetchCount(db) })
+    ///         thenRead: { db, _ in try Player.fetchCount(db) })
     ///
     /// By default, the single completes on the main dispatch queue. If
     /// you give a *scheduler*, is completes on that scheduler.
