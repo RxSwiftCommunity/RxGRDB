@@ -210,7 +210,7 @@ The single completes on the main queue, unless you provide a specific [scheduler
 
 When you use a [database pool], this method applies a scheduling optimization: the `thenRead` function sees the database in the state left by the `updates` function, and yet does not block any concurrent writes. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
 
-When you use a [database queue], no optimization is applied, and this method has the same behavior as [`writeAndReturn`](#databasewriterrxwriteandreturnobserveonupdates).
+When you use a [database queue], the results are guaranteed to be identical, but no scheduling optimization is applied.
 
 
 # Database Observation
