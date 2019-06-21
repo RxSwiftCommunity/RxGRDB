@@ -26,8 +26,9 @@ extension DatabaseWriterWriteTests {
             try writer.write(Player.createTable)
             return writer
         }
-        try Test(testRxWrite).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxWrite).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxWrite).run { try setup(DatabaseQueue()) }
+        try Test(testRxWrite).runAtPath { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxWrite).runAtPath { try setup(DatabasePool(path: $0)) }
     }
     
     func testRxWrite<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
@@ -49,8 +50,9 @@ extension DatabaseWriterWriteTests {
                 }
                 return writer
             }
-            try Test(testRxWriteScheduler).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxWriteScheduler).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxWriteScheduler).run { try setup(DatabaseQueue()) }
+            try Test(testRxWriteScheduler).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxWriteScheduler).runAtPath { try setup(DatabasePool(path: $0)) }
         }
     }
     
@@ -86,8 +88,9 @@ extension DatabaseWriterWriteTests {
             }
             return writer
         }
-        try Test(testRxWriteIsAsynchronous).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxWriteIsAsynchronous).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxWriteIsAsynchronous).run { try setup(DatabaseQueue()) }
+        try Test(testRxWriteIsAsynchronous).runAtPath { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxWriteIsAsynchronous).runAtPath { try setup(DatabasePool(path: $0)) }
     }
     
     func testRxWriteIsAsynchronous<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {

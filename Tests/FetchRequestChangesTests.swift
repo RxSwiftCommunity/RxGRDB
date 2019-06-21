@@ -10,8 +10,9 @@ class FetchRequestChangesTests : XCTestCase { }
 extension FetchRequestChangesTests {
     func testRxChanges() throws {
         try Test(testRxChanges)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxChanges(writer: DatabaseWriter, disposeBag: DisposeBag) throws {

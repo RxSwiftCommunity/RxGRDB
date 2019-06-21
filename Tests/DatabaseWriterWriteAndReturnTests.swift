@@ -26,8 +26,9 @@ extension DatabaseWriterWriteAndReturnTests {
             try writer.write(Player.createTable)
             return writer
         }
-        try Test(testRxWriteAndReturn).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxWriteAndReturn).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxWriteAndReturn).run { try setup(DatabaseQueue()) }
+        try Test(testRxWriteAndReturn).runAtPath { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxWriteAndReturn).runAtPath { try setup(DatabasePool(path: $0)) }
     }
     
     func testRxWriteAndReturn<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
@@ -46,8 +47,9 @@ extension DatabaseWriterWriteAndReturnTests {
             try writer.write(Player.createTable)
             return writer
         }
-        try Test(testRxWriteAndReturnValue).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxWriteAndReturnValue).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxWriteAndReturnValue).run { try setup(DatabaseQueue()) }
+        try Test(testRxWriteAndReturnValue).runAtPath { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxWriteAndReturnValue).runAtPath { try setup(DatabasePool(path: $0)) }
     }
     
     func testRxWriteAndReturnValue<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {
@@ -69,8 +71,9 @@ extension DatabaseWriterWriteAndReturnTests {
                 }
                 return writer
             }
-            try Test(testRxWriteAndReturnScheduler).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxWriteAndReturnScheduler).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxWriteAndReturnScheduler).run { try setup(DatabaseQueue()) }
+            try Test(testRxWriteAndReturnScheduler).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxWriteAndReturnScheduler).runAtPath { try setup(DatabasePool(path: $0)) }
         }
     }
     
@@ -106,8 +109,9 @@ extension DatabaseWriterWriteAndReturnTests {
             }
             return writer
         }
-        try Test(testRxWriteAndReturnIsAsynchronous).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxWriteAndReturnIsAsynchronous).run { try setup(DatabasePool(path: $0)) }
+        try Test(testRxWriteAndReturnIsAsynchronous).run { try setup(DatabaseQueue()) }
+        try Test(testRxWriteAndReturnIsAsynchronous).runAtPath { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxWriteAndReturnIsAsynchronous).runAtPath { try setup(DatabasePool(path: $0)) }
     }
     
     func testRxWriteAndReturnIsAsynchronous<Writer: DatabaseWriter & ReactiveCompatible>(writer: Writer, disposeBag: DisposeBag) throws {

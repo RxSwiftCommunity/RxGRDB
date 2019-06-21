@@ -29,8 +29,9 @@ extension ValueObservationTests {
     
     func testFetch() throws {
         try Test(testFetch)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testFetch(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -98,9 +99,10 @@ extension ValueObservationTests {
                 try writer.write(Player.createTable)
                 return writer
             }
-            try Test(testRxFetchDefaultScheduling).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxFetchDefaultScheduling).run { try setup(DatabasePool(path: $0)) }
-            try Test(testRxFetchDefaultScheduling).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+            try Test(testRxFetchDefaultScheduling).run { try setup(DatabaseQueue()) }
+            try Test(testRxFetchDefaultScheduling).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchDefaultScheduling).runAtPath { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchDefaultScheduling).runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
     }
     
@@ -131,9 +133,10 @@ extension ValueObservationTests {
                 try writer.write(Player.createTable)
                 return writer
             }
-            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabasePool(path: $0)) }
-            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).run { try setup(DatabaseQueue()) }
+            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).runAtPath { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchDefaultSchedulingSubscribedOffMainThread).runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
     }
     
@@ -166,8 +169,9 @@ extension ValueObservationTests {
                 try writer.write(Player.createTable)
                 return writer
             }
-            try Test(testRxFetchDefaultSchedulingStartLater).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxFetchDefaultSchedulingStartLater).run { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchDefaultSchedulingStartLater).run { try setup(DatabaseQueue()) }
+            try Test(testRxFetchDefaultSchedulingStartLater).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchDefaultSchedulingStartLater).runAtPath { try setup(DatabasePool(path: $0)) }
         }
     }
     
@@ -199,9 +203,10 @@ extension ValueObservationTests {
                 try writer.write(Player.createTable)
                 return writer
             }
-            try Test(testRxFetchSchedulingAsync).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxFetchSchedulingAsync).run { try setup(DatabasePool(path: $0)) }
-            try Test(testRxFetchSchedulingAsync).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+            try Test(testRxFetchSchedulingAsync).run { try setup(DatabaseQueue()) }
+            try Test(testRxFetchSchedulingAsync).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchSchedulingAsync).runAtPath { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchSchedulingAsync).runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
     }
     
@@ -227,9 +232,10 @@ extension ValueObservationTests {
                 try writer.write(Player.createTable)
                 return writer
             }
-            try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabasePool(path: $0)) }
-            try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+            try Test(testRxFetchSchedulingAsyncOnMainQueue).run { try setup(DatabaseQueue()) }
+            try Test(testRxFetchSchedulingAsyncOnMainQueue).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchSchedulingAsyncOnMainQueue).runAtPath { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchSchedulingAsyncOnMainQueue).runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
     }
     
@@ -259,9 +265,10 @@ extension ValueObservationTests {
                 try writer.write(Player.createTable)
                 return writer
             }
-            try Test(testRxFetchScheduler).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxFetchScheduler).run { try setup(DatabasePool(path: $0)) }
-            try Test(testRxFetchScheduler).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+            try Test(testRxFetchScheduler).run { try setup(DatabaseQueue()) }
+            try Test(testRxFetchScheduler).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxFetchScheduler).runAtPath { try setup(DatabasePool(path: $0)) }
+            try Test(testRxFetchScheduler).runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
     }
     
@@ -285,8 +292,9 @@ extension ValueObservationTests {
     // This is a regression test that fails in v0.8.0
     func testSubscriptionOffMainThread() throws {
         try Test(testSubscriptionOffMainThread)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testSubscriptionOffMainThread(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -330,8 +338,9 @@ extension ValueObservationTests {
     // This is a regression test that fails in v0.9.0
     func testSubscriptionFromMainThread() throws {
         try Test(testSubscriptionFromMainThread)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testSubscriptionFromMainThread(writer: DatabaseWriter, disposeBag: DisposeBag) throws {

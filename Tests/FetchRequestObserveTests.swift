@@ -62,8 +62,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveCount() throws {
         try Test(testRxObserveCount)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveCount(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -90,8 +91,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveCountRetry() throws {
         try Test(testRxObserveCountRetry)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveCountRetry(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -136,8 +138,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveAllRecords() throws {
         try Test(testRxObserveAllRecords)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveAllRecords(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -170,8 +173,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveAllRecordsIdentifiedByIds() throws {
         try Test(testRxObserveAllRecordsIdentifiedByIds)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveAllRecordsIdentifiedByIds(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -204,8 +208,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveFirstRecord() throws {
         try Test(testRxObserveFirstRecord)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveFirstRecord(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -233,8 +238,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveFirstRecordIdentifiedById() throws {
         try Test(testRxObserveFirstRecordIdentifiedById)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveFirstRecordIdentifiedById(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -264,8 +270,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveAllRows() throws {
         try Test(testRxObserveAllRows)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveAllRows(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -298,8 +305,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveAllRowsIdentifiedByIds() throws {
         try Test(testRxObserveAllRowsIdentifiedByIds)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveAllRowsIdentifiedByIds(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -332,8 +340,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveFirstRow() throws {
         try Test(testRxObserveFirstRow)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveFirstRow(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -361,8 +370,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveFirstRowIdentifiedById() throws {
         try Test(testRxObserveFirstRowIdentifiedById)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveFirstRowIdentifiedById(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -392,8 +402,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveAllDatabaseValues() throws {
         try Test(testRxObserveAllDatabaseValues)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveAllDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -425,8 +436,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveFirstDatabaseValue() throws {
         try Test(testRxObserveFirstDatabaseValue)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveFirstDatabaseValue(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -455,8 +467,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveAllOptionalDatabaseValues() throws {
         try Test(testRxObserveAllOptionalDatabaseValues)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveAllOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -487,8 +500,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testRxObserveFirstOptionalDatabaseValues() throws {
         try Test(testRxObserveFirstOptionalDatabaseValues)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxObserveFirstOptionalDatabaseValues(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -517,8 +531,9 @@ extension FetchRequestObserveTests {
 extension FetchRequestObserveTests {
     func testPrimaryKeyDiffScanner() throws {
         try Test(testPrimaryKeyDiffScanner)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testPrimaryKeyDiffScanner(writer: DatabaseWriter, disposeBag: DisposeBag) throws {

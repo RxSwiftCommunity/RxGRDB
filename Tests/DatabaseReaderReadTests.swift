@@ -29,9 +29,10 @@ extension DatabaseReaderReadTests {
             }
             return writer
         }
-        try Test(testRxRead).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxRead).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxRead).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+        try Test(testRxRead).run { try setup(DatabaseQueue()) }
+        try Test(testRxRead).runAtPath { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxRead).runAtPath { try setup(DatabasePool(path: $0)) }
+        try Test(testRxRead).runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
     func testRxRead<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
@@ -51,9 +52,10 @@ extension DatabaseReaderReadTests {
                 }
                 return writer
             }
-            try Test(testRxReadScheduler).run { try setup(DatabaseQueue(path: $0)) }
-            try Test(testRxReadScheduler).run { try setup(DatabasePool(path: $0)) }
-            try Test(testRxReadScheduler).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+            try Test(testRxReadScheduler).run { try setup(DatabaseQueue()) }
+            try Test(testRxReadScheduler).runAtPath { try setup(DatabaseQueue(path: $0)) }
+            try Test(testRxReadScheduler).runAtPath { try setup(DatabasePool(path: $0)) }
+            try Test(testRxReadScheduler).runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
         }
     }
     
@@ -90,9 +92,10 @@ extension DatabaseReaderReadTests {
             }
             return writer
         }
-        try Test(testRxReadIsAsynchronous).run { try setup(DatabaseQueue(path: $0)) }
-        try Test(testRxReadIsAsynchronous).run { try setup(DatabasePool(path: $0)) }
-        try Test(testRxReadIsAsynchronous).run { try setup(DatabasePool(path: $0)).makeSnapshot() }
+        try Test(testRxReadIsAsynchronous).run { try setup(DatabaseQueue()) }
+        try Test(testRxReadIsAsynchronous).runAtPath { try setup(DatabaseQueue(path: $0)) }
+        try Test(testRxReadIsAsynchronous).runAtPath { try setup(DatabasePool(path: $0)) }
+        try Test(testRxReadIsAsynchronous).runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
     }
     
     func testRxReadIsAsynchronous<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {
@@ -116,9 +119,10 @@ extension DatabaseReaderReadTests {
 
 extension DatabaseReaderReadTests {
     func testRxReadIsReadonly() throws {
-        try Test(testRxReadIsReadonly).run { try DatabaseQueue(path: $0) }
-        try Test(testRxReadIsReadonly).run { try DatabasePool(path: $0) }
-        try Test(testRxReadIsReadonly).run { try DatabasePool(path: $0).makeSnapshot() }
+        try Test(testRxReadIsReadonly).run { DatabaseQueue() }
+        try Test(testRxReadIsReadonly).runAtPath { try DatabaseQueue(path: $0) }
+        try Test(testRxReadIsReadonly).runAtPath { try DatabasePool(path: $0) }
+        try Test(testRxReadIsReadonly).runAtPath { try DatabasePool(path: $0).makeSnapshot() }
     }
     
     func testRxReadIsReadonly<Reader: DatabaseReader & ReactiveCompatible>(reader: Reader, disposeBag: DisposeBag) throws {

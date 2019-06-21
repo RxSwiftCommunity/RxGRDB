@@ -52,60 +52,6 @@ extension Reactive where Base: DatabaseWriter {
             .observeOn(scheduler)
     }
     
-    /// Returns a Single that asynchronously writes into the database.
-    ///
-    /// For example:
-    ///
-    ///     // Single<Int>
-    ///     let newPlayerCount = dbQueue.rx.flatMapWrite { db -> Single<Int> in
-    ///         try Player(...).insert(db)
-    ///         let count = try Player.fetchCount(db)
-    ///         return Single.just(count)
-    ///     }
-    ///
-    /// The database updates are executed inside a database transaction. If the
-    /// transaction completes successfully, the single returned from the closure
-    /// is subscribed, from a database protected dispatch queue, immediately
-    /// after the transaction has been committed.
-    ///
-    /// When you use a Database Pool, and your app executes some database
-    /// updates followed by some fetches, you can wrap `concurrentRead` inside
-    /// `flatMapWrite` in order to profit from optimized database scheduling.
-    /// For example:
-    ///
-    ///     // Single<Int>
-    ///     let newPlayerCount = dbPool.rx.flatMapWrite { db in
-    ///         // First write: delete all players
-    ///         try Player.deleteAll(db)
-    ///
-    ///         return dbPool.rx.concurrentRead { db in
-    ///             // Then read: the count is guaranteed to be zero
-    ///             try Player.fetchCount(db)
-    ///         }
-    ///     }
-    ///
-    /// The optimization guarantees that the concurrent read does not block any
-    /// concurrent write, and yet sees the database in the state left by the
-    /// completed transaction.
-    ///
-    /// When you use a Database Queue, the observable returned by a
-    /// `concurrentRead` wrapped into `flatMapWrite` emits exactly the same
-    /// values, but the scheduling optimization is not applied.
-    ///
-    /// - parameter scheduler: The scheduler on which the single completes.
-    ///   Defaults to MainScheduler.instance.
-    /// - parameter updates: A closure which writes in the database.
-    public func flatMapWrite<T>(
-        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
-        updates: @escaping (Database) throws -> Single<T>)
-        -> Single<T>
-    {
-        return flatMapWrite(
-            observeOn: scheduler,
-            updates: { try updates($0).asObservable() })
-            .asSingle()
-    }
-    
     /// Returns a Completable that asynchronously writes into the database.
     ///
     ///     let dbQueue = DatabaseQueue()
@@ -167,43 +113,41 @@ extension Reactive where Base: DatabaseWriter {
             .asSingle()
     }
     
-    /// Returns a Single that asynchronously emits the fetched value.
+    /// Returns a Single that asynchronously writes into the database.
     ///
-    /// The Single must be subscribed from a writing database dispatch queue,
-    /// outside of any transaction. You'll get a fatal error otherwise.
+    ///     let newPlayerCount: Single<Int> = dbQueue.rx.write(
+    ///         updates: { db in try Player(...).insert(db) },
+    ///         thenRead: { db in try Player.fetchCount(db) })
     ///
-    /// It completes on some unspecified queue.
+    /// By default, the single completes on the main dispatch queue. If
+    /// you give a *scheduler*, is completes on that scheduler.
     ///
-    /// You can for example use it with `flatMapWrite`:
-    ///
-    ///     let dbPool = DatabasePool()
-    ///     let newPlayerCount: Single<Int> = dbPool.rx.flatMapWrite { db in
-    ///         try Player(...).insert(db)
-    ///         return dbPool.rx.concurrentRead { db in
-    ///             try Player.fetchAll(db)
-    ///         }
-    ///     }
-    ///
-    /// - parameter scheduler: The scheduler on which the single completes.
+    /// - parameter scheduler: The scheduler on which the observable completes.
     ///   Defaults to MainScheduler.instance.
-    /// - parameter value: A closure which accesses the database.
-    public func concurrentRead<T>(
+    /// - parameter updates: A closure which writes in the database.
+    /// - parameter value: A closure which reads from the database.
+    public func write<T, U>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
-        value: @escaping (Database) throws -> T)
-        -> Single<T>
+        updates: @escaping (Database) throws -> T,
+        thenRead value: @escaping (Database, T) throws -> U)
+        -> Single<U>
     {
-        let writer = base
-        return Single
-            .create { observer in
-            writer.spawnConcurrentRead { db in
-                do {
-                    try observer(.success(value(db.get())))
-                } catch {
-                    observer(.error(error))
+        return flatMapWrite(
+            observeOn: scheduler,
+            updates: { db in
+                let updatesValue = try updates(db)
+                return Observable.create { observer in
+                    self.base.spawnConcurrentRead { db in
+                        do {
+                            try observer.onNext(value(db.get(), updatesValue))
+                            observer.onCompleted()
+                        } catch {
+                            observer.onError(error)
+                        }
+                    }
+                    return Disposables.create { }
                 }
-            }
-            return Disposables.create { }
-        }
-            .observeOn(scheduler)
+        })
+            .asSingle()
     }
 }
