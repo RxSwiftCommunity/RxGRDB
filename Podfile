@@ -3,9 +3,9 @@ workspace 'RxGRDB.xcworkspace'
 
 def common_pods
   pod 'RxSwift', '~> 5.0'
-  # pod 'GRDB.swift', '~> 4.0'
+  pod 'GRDB.swift', '~> 4.1'
   # pod 'GRDB.swift', path: '../GRDB.swift'
-  pod 'GRDB.swift', git: 'https://github.com/groue/GRDB.swift.git', branch: 'GRDB-4.1'
+  # pod 'GRDB.swift', git: 'https://github.com/groue/GRDB.swift.git', branch: '...'
 end
 
 def test_pods
