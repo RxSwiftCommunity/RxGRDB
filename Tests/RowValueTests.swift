@@ -8,8 +8,9 @@ class RowValueTests: XCTestCase { }
 extension RowValueTests {
     func testRowValueComparison() throws {
         try Test(testRowValueComparison)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRowValueComparison(writer: DatabaseWriter, disposeBag: DisposeBag) throws {

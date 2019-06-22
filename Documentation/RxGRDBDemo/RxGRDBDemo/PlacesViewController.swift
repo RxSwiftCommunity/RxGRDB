@@ -113,7 +113,7 @@ extension PlacesViewController: MKMapViewDelegate {
         placeAnnotations
             .asRequest(of: Row.self)
             .rx
-            .fetchAll(in: dbPool)
+            .observeAll(in: dbPool)
             .scan(diffScanner) { (diffScanner, rows) in diffScanner.diffed(from: rows) }
             .subscribe(onNext: { [weak self] diffScanner in
                 guard let strongSelf = self else { return }

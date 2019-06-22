@@ -3,16 +3,16 @@ import GRDB
 import RxSwift
 import RxGRDB
 
-class RequestTests : XCTestCase { }
-
+class FetchRequestChangesTests : XCTestCase { }
 
 // MARK: - Changes
 
-extension RequestTests {
+extension FetchRequestChangesTests {
     func testRxChanges() throws {
         try Test(testRxChanges)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxChanges(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -30,9 +30,9 @@ extension RequestTests {
         }
         
         let requests: [SQLRequest<Row>] = [
-            SQLRequest(sql: "SELECT * FROM table1"),
-            SQLRequest(sql: "SELECT id, a FROM table1"),
-            SQLRequest(sql: "SELECT table1.id, table1.a, table2.a FROM table1 JOIN table2 ON table1.id = table2.id")]
+            "SELECT * FROM table1",
+            "SELECT id, a FROM table1",
+            "SELECT table1.id, table1.a, table2.a FROM table1 JOIN table2 ON table1.id = table2.id"]
         
         var changes = requests.map { _ in false }
         for (index, request) in requests.enumerated() {
@@ -88,7 +88,7 @@ extension RequestTests {
 }
 
 // TODO: restore this test, which 1. fails, 2. makes some other tests fails as well (WTF?)
-//extension RequestTests {
+//extension FetchRequestChangesTests {
 //    func testChangesRetry() throws {
 //        try Test(testChangesRetry)
 ////            .run { try DatabaseQueue(path: $0) }
@@ -139,99 +139,3 @@ extension RequestTests {
 //    }
 //}
 
-
-// MARK: - Count
-
-extension RequestTests {
-    func testRxFetchCount() throws {
-        try Test(testRxFetchCount)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchCount(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        try writer.write { db in
-            try db.create(table: "persons") { t in
-                t.column("id", .integer).primaryKey()
-                t.column("name", .text)
-            }
-            try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Arthur"])
-            try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Barbara"])
-        }
-        
-        let expectedCounts = [2, 0, 3]
-        let recorder = EventRecorder<Int>(expectedEventCount: expectedCounts.count)
-        
-        struct Person : TableRecord { static let databaseTableName = "persons" }
-        let request = Person.all()
-        request.rx.fetchCount(in: writer)
-            .subscribe { event in
-                // events are expected on the main thread by default
-                assertMainQueue()
-                recorder.on(event)
-            }
-            .disposed(by: disposeBag)
-        try writer.writeWithoutTransaction { db in
-            try db.execute(sql: "UPDATE persons SET name = name")
-            try db.execute(sql: "DELETE FROM persons")
-            try db.inTransaction {
-                try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Craig"])
-                try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["David"])
-                try db.execute(sql: "INSERT INTO persons (name) VALUES (?)", arguments: ["Eve"])
-                return .commit
-            }
-        }
-        wait(for: recorder, timeout: 1)
-        
-        for (event, count) in zip(recorder.recordedEvents, expectedCounts) {
-            XCTAssertEqual(event.element!, count)
-        }
-    }
-}
-
-extension RequestTests {
-    func testRxFetchCountRetry() throws {
-        try Test(testRxFetchCountRetry)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
-    }
-    
-    func testRxFetchCountRetry(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
-        try writer.write { db in
-            try db.create(table: "table1") { t in
-                t.column("id", .integer).primaryKey()
-            }
-        }
-        
-        // Expectation for later transaction
-        let expectation = self.expectation(description: "1")
-        expectation.expectedFulfillmentCount = 2    // two because subscription receives an immediate event, then a second one on retry.
-        
-        // Subscribe to a request
-        struct Record : TableRecord { static let databaseTableName = "table1" }
-        let request = Record.all()
-        var eventsCount = 0
-        var needsThrow = false
-        request.rx
-            .fetchCount(in: writer)
-            .map { db in
-                if needsThrow {
-                    needsThrow = false
-                    throw NSError(domain: "RxGRDB", code: 0)
-                }
-            }
-            .retry()
-            .subscribe(onNext: {
-                eventsCount += 1
-                expectation.fulfill()
-            })
-            .disposed(by: disposeBag)
-        
-        XCTAssertEqual(eventsCount, 1)
-        
-        needsThrow = true
-        try writer.write { try $0.execute(sql: "INSERT INTO table1 (id) VALUES (NULL)") }
-        waitForExpectations(timeout: 1, handler: nil)
-        XCTAssertEqual(eventsCount, 2)
-    }
-}

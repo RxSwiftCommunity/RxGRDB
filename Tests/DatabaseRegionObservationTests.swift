@@ -11,8 +11,9 @@ class DatabaseRegionObservationTests : XCTestCase { }
 extension DatabaseRegionObservationTests {
     func testRxChanges() throws {
         try Test(testRxChanges)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testRxChanges(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -33,13 +34,12 @@ extension DatabaseRegionObservationTests {
             SQLRequest(sql: "SELECT a FROM table1"),
             SQLRequest(sql: "SELECT table1.a, table2.b FROM table1, table2")]
         
-        let recorder = EventRecorder<Void>(expectedEventCount: 5)
-        
         // 1 (startImmediately parameter is true by default)
+        let testSubject = ReplaySubject<Void>.createUnbounded()
         DatabaseRegionObservation(tracking: requests).rx
             .changes(in: writer)
             .map { _ in }
-            .subscribe(recorder)
+            .subscribe(testSubject)
             .disposed(by: disposeBag)
         
         try writer.writeWithoutTransaction { db in
@@ -67,8 +67,8 @@ extension DatabaseRegionObservationTests {
             // 5 (modify one request)
             try db.execute(sql: "INSERT INTO table2 (id, a, b) VALUES (NULL, 0, 0)")
         }
-
-        wait(for: recorder, timeout: 1)
+        
+        _ = try testSubject.take(5).toBlocking().toArray()
     }
 }
 
@@ -76,8 +76,9 @@ extension DatabaseRegionObservationTests {
     
     func testChangesInFullDatabase() throws {
         try Test(testChangesInFullDatabase)
-            .run { try DatabaseQueue(path: $0) }
-            .run { try DatabasePool(path: $0) }
+            .run { DatabaseQueue() }
+            .runAtPath { try DatabaseQueue(path: $0) }
+            .runAtPath { try DatabasePool(path: $0) }
     }
     
     func testChangesInFullDatabase(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
@@ -91,15 +92,14 @@ extension DatabaseRegionObservationTests {
             }
         }
         
-        let recorder = EventRecorder<Void>(expectedEventCount: 4)
-        
         // 1
+        let testSubject = ReplaySubject<Void>.createUnbounded()
         DatabaseRegionObservation(tracking: DatabaseRegion.fullDatabase).rx
             .changes(in: writer)
             .map { _ in }
-            .subscribe(recorder)
+            .subscribe(testSubject)
             .disposed(by: disposeBag)
-        
+
         try writer.writeWithoutTransaction { db in
             // 2
             try db.inTransaction {
@@ -115,6 +115,7 @@ extension DatabaseRegionObservationTests {
             // 4
             try db.execute(sql: "DELETE FROM table1")
         }
-        wait(for: recorder, timeout: 1)
+        
+        _ = try testSubject.take(4).toBlocking().toArray()
     }
 }

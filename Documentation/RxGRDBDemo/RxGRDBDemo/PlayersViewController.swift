@@ -149,7 +149,7 @@ extension PlayersViewController {
         
         ordering
             .distinctUntilChanged()
-            .flatMapLatest { $0.request.rx.fetchAll(in: dbPool) }
+            .flatMapLatest { $0.request.rx.observeAll(in: dbPool) }
             .map { [Section(items: $0)] }
             .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
