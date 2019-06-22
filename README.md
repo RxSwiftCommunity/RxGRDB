@@ -204,13 +204,23 @@ let newPlayerCount = dbQueue.rx.write(
 }
 ```
 
-The `thenRead` function accepts two arguments: a readonly database connection, and the result of the `updates` function. This allows you to pass information from a function to the other (it is ignored in the sample code above).
+It emits exactly the same values as [`writeAndReturn`](#databasewriterrxwriteandreturnobserveonupdates):
 
-The single completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
+```swift
+// Single<Int>
+let newPlayerCount = dbQueue.rx.writeAndReturn { db -> Int in
+    try Player(...).insert(db)
+    return try Player.fetchCount(db)
+}
+```
+
+The difference is that the last fetches are performed in the `thenRead` function. This function accepts two arguments: a readonly database connection, and the result of the `updates` function. This allows you to pass information from a function to the other (it is ignored in the sample code above).
 
 When you use a [database pool], this method applies a scheduling optimization: the `thenRead` function sees the database in the state left by the `updates` function, and yet does not block any concurrent writes. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/tree/GRDB-4.1#advanced-databasepool) for more information.
 
 When you use a [database queue], the results are guaranteed to be identical, but no scheduling optimization is applied.
+
+The single completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 
 # Database Observation
