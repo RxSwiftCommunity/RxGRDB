@@ -43,7 +43,7 @@ Release Notes
     
     ```diff
     -Player.all().rx.fetchAll(in: dbQueue, scheduler: MainScheduler.asyncInstance)
-    +Player.all().rx.observeAll(on: MainScheduler.asyncInstance, in: dbQueue)
+    +Player.all().rx.observeAll(in: dbQueue, observeOn: MainScheduler.asyncInstance)
     ```
 
 
