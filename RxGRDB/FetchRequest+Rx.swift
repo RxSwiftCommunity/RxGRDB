@@ -41,25 +41,25 @@ extension Reactive where Base: FetchRequest {
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeCount(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Int>
     {
         return base.observationForCount().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeCount(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeCount(in:startImmediately:observeOn:)")
     public func fetchCount(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Int>
     {
-        return observeCount(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeCount(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
 }
 
@@ -101,25 +101,25 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeAll(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder]>
     {
         return base.observationForAll().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeAll(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeAll(in:startImmediately:observeOn:)")
     public func fetchAll(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder]>
     {
-        return observeAll(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeAll(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
 
     /// Returns an Observable that emits after each committed database
@@ -157,25 +157,25 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: FetchableRecord {
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeFirst(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder?>
     {
         return base.observationForFirst().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeFirst(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeFirst(in:startImmediately:observeOn:)")
     public func fetchOne(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder?>
     {
-        return observeFirst(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeFirst(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
 }
 
@@ -217,25 +217,25 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeAll(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Row]>
     {
         return base.observationForAll().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeAll(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeAll(in:startImmediately:observeOn:)")
     public func fetchAll(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Row]>
     {
-        return observeAll(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeAll(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
     
     /// Returns an Observable that emits after each committed database
@@ -273,25 +273,25 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder == Row {
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeFirst(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Row?>
     {
         return base.observationForFirst().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeFirst(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeFirst(in:startImmediately:observeOn:)")
     public func fetchOne(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Row?>
     {
-        return observeFirst(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeFirst(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
 }
 
@@ -334,25 +334,25 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeAll(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder]>
     {
         return base.observationForAll().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeAll(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeAll(in:startImmediately:observeOn:)")
     public func fetchAll(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder]>
     {
-        return observeAll(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeAll(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
 
     /// Returns an Observable that emits after each committed database
@@ -391,25 +391,25 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: DatabaseValueConve
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeFirst(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder?>
     {
         return base.observationForFirst().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeFirst(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeFirst(in:startImmediately:observeOn:)")
     public func fetchOne(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder?>
     {
-        return observeFirst(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeFirst(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
 }
 
@@ -452,25 +452,25 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeAll(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder._Wrapped?]>
     {
         return base.observationForAll().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeAll(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeAll(in:startImmediately:observeOn:)")
     public func fetchAll(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<[Base.RowDecoder._Wrapped?]>
     {
-        return observeAll(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeAll(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
 
     /// Returns an Observable that emits after each committed database
@@ -509,24 +509,24 @@ extension Reactive where Base: FetchRequest, Base.RowDecoder: _OptionalProtocol,
     /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
     public func observeFirst(
-        on scheduler: ImmediateSchedulerType? = nil,
         in reader: DatabaseReader,
-        startImmediately: Bool = true)
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder._Wrapped?>
     {
         return base.observationForFirst().rx.observe(
-            on: scheduler,
             in: reader,
-            startImmediately: startImmediately)
+            startImmediately: startImmediately,
+            observeOn: scheduler)
     }
     
-    @available(*, deprecated, renamed: "observeFirst(on:in:startImmediately:)")
+    @available(*, deprecated, renamed: "observeFirst(in:startImmediately:observeOn:)")
     public func fetchOne(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
         -> Observable<Base.RowDecoder._Wrapped?>
     {
-        return observeFirst(on: scheduler, in: reader, startImmediately: startImmediately)
+        return observeFirst(in: reader, startImmediately: startImmediately, observeOn: scheduler)
     }
 }

@@ -230,7 +230,7 @@ RxGRDB observables are based on GRDB's [ValueObservation] and [DatabaseRegionObs
 
 **When your application observes a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests), it gets notified each time a change in the results of the request has been committed in the database.**
 
-If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.observeCount](#fetchrequestrxobservecountoninstartimmediately), [rx.observeFirst](#fetchrequestrxobservefirstoninstartimmediately), and [rx.observeAll](#fetchrequestrxobservealloninstartimmediately) methods, depending on whether you want to track the number of results, the first one, or all of them:
+If you are only interested in the *values* fetched by the request, then RxGRDB can fetch them for you after each database modification, and emit them in order, ready for consumption. See the [rx.observeCount](#fetchrequestrxobservecountinstartImmediatelyobserveon), [rx.observeFirst](#fetchrequestrxobservefirstinstartImmediatelyobserveon), and [rx.observeAll](#fetchrequestrxobserveallinstartImmediatelyobserveon) methods, depending on whether you want to track the number of results, the first one, or all of them:
 
 ```swift
 let request = Player.all()
@@ -247,9 +247,9 @@ request.rx.changes(in: dbQueue)      // Observable<Database>
 ```
 
 - [`rx.changes`](#fetchrequestrxchangesinstartimmediately)
-- [`rx.observeCount`](#fetchrequestrxobservecountoninstartimmediately)
-- [`rx.observeFirst`](#fetchrequestrxobservefirstoninstartimmediately)
-- [`rx.observeAll`](#fetchrequestrxobservealloninstartimmediately)
+- [`rx.observeCount`](#fetchrequestrxobservecountinstartImmediatelyobserveon)
+- [`rx.observeFirst`](#fetchrequestrxobservefirstinstartImmediatelyobserveon)
+- [`rx.observeAll`](#fetchrequestrxobserveallinstartImmediatelyobserveon)
 
 
 ---
@@ -299,7 +299,7 @@ try dbQueue.write { db in
 
 ---
 
-#### `FetchRequest.rx.observeCount(on:in:startImmediately:)`
+#### `FetchRequest.rx.observeCount(in:startImmediately:observeOn:)`
 
 This [database values observable](#values-observables) emits the number of results of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests) after each database transaction that changes it:
 
@@ -317,7 +317,7 @@ try dbQueue.write { db in
 // Eventually prints "Fresh player count: 1"
 ```
 
-All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `on` argument.
+All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
 
@@ -335,7 +335,7 @@ This observable filters out identical consecutive values.
 
 ---
 
-#### `FetchRequest.rx.observeFirst(on:in:startImmediately:)`
+#### `FetchRequest.rx.observeFirst(in:startImmediately:observeOn:)`
 
 This [database values observable](#values-observables) emits a value after each database transaction which has modified the result of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests):
 
@@ -355,7 +355,7 @@ try dbQueue.write { db in
 // Eventually prints "Fresh player"
 ```
 
-All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `on` argument.
+All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
 
@@ -387,7 +387,7 @@ This observable filters out identical consecutive values by comparing raw databa
 
 ---
 
-#### `FetchRequest.rx.observeAll(on:in:startImmediately:)`
+#### `FetchRequest.rx.observeAll(in:startImmediately:observeOn:)`
 
 This [database values observable](#values-observables) emits an array of values  after each database transaction which has modified the result of a [request](https://github.com/groue/GRDB.swift/blob/master/README.md#requests):
 
@@ -406,7 +406,7 @@ try dbQueue.write { db in
 // Eventually prints "[Arthur, Barbara]"
 ```
 
-All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `on` argument.
+All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
 
@@ -460,7 +460,7 @@ request.rx.observeAll(in: dbQueue)   // Observable<[Player]>
 
 Instead, to be notified of each transaction that impacts any of several requests, use [DatabaseRegionObservation.rx.changes](#databaseregionobservationrxchangesinstartimmediately).
 
-And when you need to fetch database values from several requests, use [ValueObservation.rx.observe](#valueobservationrxobserveoninstartimmediately).
+And when you need to fetch database values from several requests, use [ValueObservation.rx.observe](#valueobservationrxobserveinstartImmediatelyobserveon).
 
 
 ---
@@ -495,7 +495,7 @@ All elements are emitted in a protected database dispatch queue, serialized with
 
 ---
 
-#### `ValueObservation.rx.observe(on:in:startImmediately:)`
+#### `ValueObservation.rx.observe(in:startImmediately:observeOn:)`
 
 This [database values observable](#values-observables) emits the same values as a [ValueObservation].
 
@@ -518,7 +518,7 @@ observation.rx.observe(in: dbQueue)
     })
 ```
 
-All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `on` argument.
+All elements are emitted on the main queue by default, unless you provide a specific [scheduler] to the `observeOn` argument.
 
 If you set `startImmediately` to true (the default value), the first element is emitted immediately, from the current database state. Furthermore, this first element is emitted *synchronously* if and only if the observable is subscribed on the main queue, and is given a nil `scheduler` argument:
 
@@ -764,7 +764,7 @@ This guarantee is lifted whenever you provide a specific scheduler (including `M
 
 ```swift
 Player.all().rx
-    .observeAll(on: MainScheduler.instance, in: dbQueue)
+    .observeAll(in: dbQueue, observeOn: MainScheduler.instance)
     .subscribe(onNext: { (players: [Player]) in
         print("Fresh players: \(players)")
     })
@@ -857,7 +857,7 @@ If the observable is subscribed from the main queue, the first element is fetche
 ```swift
 // On any thread
 Player.all().rx
-    .observeAll(on: MainScheduler.asyncInstance, in: dbQueue)
+    .observeAll(in: dbQueue, observeOn: MainScheduler.asyncInstance)
     .subscribe(onNext: { (players: [Player]) in
         // On the main queue
         print("Fresh players: \(players)")
@@ -873,7 +873,7 @@ let scheduler = SerialDispatchQueueScheduler(qos: .default)
 
 // On any thread
 Player.all().rx
-    .observeAll(on: scheduler, in: dbQueue)
+    .observeAll(in: dbQueue, observeOn: scheduler)
     .subscribe(onNext: { (db: Database) in
         // Off the main queue, in the global dispatch queue
         print("Fresh players: \(players)")
