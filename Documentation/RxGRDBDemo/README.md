@@ -1,7 +1,9 @@
 RxGRDBDemo
 ==========
 
-This demo application uses [RxSwift], [RxGRDB], and [RxDataSources](https://github.com/RxSwiftCommunity/RxDataSources) to synchronize its view with the content of the database.
+<img align="right" src="https://github.com/grouue/RxGRDB/raw/dev/demo-app/Documentation/RxGRDBDemo/Documentation/Demo1.png" width="50%">
+
+This demo application uses [RxSwift], [RxGRDB], [Action] and [RxDataSources] to synchronize its view with the content of the database.
 
 To play with it:
 
@@ -12,14 +14,41 @@ To play with it:
 
 The rows of the players table view animate as you change the players ordering, delete all players, or refresh them (refreshing applies random transformations to the database)
 
-The annotations of the map view move, appear, and disappear as you refresh the map view content.
+## Models
 
-In both screens, the bomb icon spawns 50 dispatch items that concurrently perform random database transformations.
+- [AppDatabase.swift](RxGRDBDemo/AppDatabase.swift)
+    
+    AppDatabase defines the database for the whole application. It uses [DatabaseMigrator](https://github.com/groue/GRDB.swift/blob/master/README.md#migrations) in order to setup the database schema.
 
-| [PlayersViewController](RxGRDBDemo/PlayersViewController.swift) | [PlacesViewController](RxGRDBDemo/PlacesViewController.swift) |
-| :-----: | :-----: |
-| ![Screen shot 1](Documentation/Screen1.png) | ![Screen shot 2](Documentation/Screen2.png) |
+- [Player.swift](RxGRDBDemo/Models/Player.swift)
+    
+    Player is a [Record](https://github.com/groue/GRDB.swift/blob/master/README.md#records) type, able to read and write in the database. It conforms to the standard Codable protocol in order to gain all advantages of [Codable Records](https://github.com/groue/GRDB.swift/blob/master/README.md#codable-records).
+    
+    ```swift
+    struct Player: Codable, Equatable {
+        var id: Int64?
+        var name: String
+        var score: Int
+    }
+    ```
 
+- [Players.swift](RxGRDBDemo/Models/Players.swift)
+    
+    Players defines read and write operations on the players database.
+
+
+## User Interface
+
+- [PlayersViewModel.swift](RxGRDBDemo/UI/PlayersViewModel.swift)
+    
+    PlayersViewModel defines the content displayed on screen, and a bunch of available actions of players.
+
+- [PlayersViewController.swift](RxGRDBDemo/UI/PlayersViewController.swift)
+    
+    PlayersViewController feeds from PlayersViewModel and displays it on screen.
+
+
+[Action]: https://github.com/RxSwiftCommunity/Action
 [RxDataSources]: https://github.com/RxSwiftCommunity/RxDataSources
 [RxGRDB]: http://github.com/RxSwiftCommunity/RxGRDB
 [RxSwift]: https://github.com/ReactiveX/RxSwift
