@@ -16,7 +16,7 @@ extension Player: FetchableRecord { }
 extension Player: MutablePersistableRecord {
     static let databaseTableName = "player"
     
-    enum Columns {
+    fileprivate enum Columns {
         static let id = Column(CodingKeys.id)
         static let name = Column(CodingKeys.name)
         static let score = Column(CodingKeys.score)
@@ -24,6 +24,18 @@ extension Player: MutablePersistableRecord {
     
     mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
+    }
+}
+
+// Define requests of players in a constrained extension to the
+// DerivableRequest protocol.
+extension DerivableRequest where RowDecoder == Player {
+    func orderByScore() -> Self {
+        return order(Player.Columns.score.desc)
+    }
+    
+    func orderByName() -> Self {
+        return order(Player.Columns.name)
     }
 }
 
