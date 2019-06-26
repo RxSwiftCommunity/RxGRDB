@@ -69,11 +69,21 @@ class PlayersViewController: UIViewController {
             reloadAnimation: .fade,
             deleteAnimation: .fade)
         
+        dataSource.canEditRowAtIndexPath = { _, _ in true }
+        
         viewModel
             .players
             .asDriver(onErrorJustReturn: [])
             .map { [Section(items: $0)] }
             .drive(tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        tableView.rx
+            .itemDeleted
+            .subscribe(onNext: { indexPath in
+                let player = dataSource[indexPath]
+                self.viewModel.deleteOne.execute(player)
+            })
             .disposed(by: disposeBag)
     }
     

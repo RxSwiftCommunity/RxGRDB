@@ -14,6 +14,7 @@ class PlayersViewModel {
     
     var toggleOrdering: CocoaAction
     var deleteAll: CocoaAction
+    var deleteOne: CompletableAction<Player>
     var refresh: CocoaAction
     var stressTest: CocoaAction
     
@@ -64,6 +65,10 @@ class PlayersViewModel {
             Current.players().deleteAll()
         }
         
+        deleteOne = CompletableAction { player in
+            Current.players().deleteOne(player)
+        }
+        
         refresh = CocoaAction {
             Current.players().refresh()
         }
@@ -72,7 +77,7 @@ class PlayersViewModel {
             Current.players().stressTest()
         }
         
-        toggleOrdering = CocoaAction {
+        toggleOrdering = CocoaAction { _ -> Completable in
             switch ordering.value {
             case .byName:
                 ordering.accept(.byScore)

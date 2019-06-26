@@ -37,6 +37,12 @@ struct Players {
         return AnyDatabaseWriter(database).rx.write(updates: _deleteAll)
     }
     
+    func deleteOne(_ player: Player) -> Completable {
+        return AnyDatabaseWriter(database).rx.write(updates: { db in
+            try self._deleteOne(db, player: player)
+        })
+    }
+    
     func refresh() -> Completable {
         return AnyDatabaseWriter(database).rx.write(updates: _refresh)
     }
@@ -54,9 +60,8 @@ struct Players {
     
     // MARK: - Implementation
     //
-    // Good practice: defining methods that accept a Database connection.
-    // They can easily be composed in safe database transactions in our
-    // high-level public methods.
+    // ⭐️ Good practice: when we want to update the database, we define methods
+    // that accept a Database connection, becayse they can easily be composed.
     
     /// Creates random players if needed, and returns whether the database
     /// was empty.
@@ -74,7 +79,11 @@ struct Players {
     }
 
     private func _deleteAll(_ db: Database) throws {
-        _ = try Player.deleteAll(db)
+        try Player.deleteAll(db)
+    }
+    
+    private func _deleteOne(_ db: Database, player: Player) throws {
+        try player.delete(db)
     }
     
     private func _refresh(_ db: Database) throws {
