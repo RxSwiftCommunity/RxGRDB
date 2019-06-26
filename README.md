@@ -88,6 +88,7 @@ Documentation
 =============
 
 - [Installation]
+- [Demo Application]
 - [Asynchronous Database Access]
 - [Database Observation]
     - [Observing Individual Requests]
@@ -134,6 +135,14 @@ In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sql
     import RxGRDB
     import GRDB
     ```
+
+## Demo Application
+
+The repository comes with a [demo application](Documentation/RxGRDBDemo/README.md) that shows you:
+
+- how to define a database layer that can be tested
+- how to perform asynchronous database changes with RxGRDB
+- how to track database changes with RxGRDB
 
 
 # Asynchronous Database Access
@@ -813,6 +822,7 @@ Player.all().rx
 [Database Changes Observation]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-changes-observation
 [Database Observation]: #database-observation
 [DatabaseRegionObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregionobservation
+[Demo Application]: #demo-application
 [GRDB Concurrency Guide]: https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency
 [GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [Installation]: #installation
