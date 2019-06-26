@@ -92,7 +92,6 @@ Documentation
 - [Database Observation]
     - [Observing Individual Requests]
     - [Observing Multiple Requests]
-    - [Diffs]
     - [Scheduling]
 
 
@@ -542,91 +541,6 @@ observation.rx.observe(in: dbQueue)
 ```
 
 
-## Diffs
-
-Since RxGRDB is able to track database changes, it is a natural desire to compute diffs between two consecutive request results.
-
-**There are several diff algorithms**: you'll have to pick the one that suits your needs.
-
-RxGRDB ships with one diff algorithm which computes the inserted, updated, and deleted elements between two record arrays. This algorithm is well suited for collections whose order does not matter, such as annotations in a map view. See [`PrimaryKeyDiffScanner`](#primarykeydiffscanner).
-
-For other diff algorithms, we advise you to have a look to [RxDataSources](https://github.com/RxSwiftCommunity/RxDataSources), [Differ](https://github.com/tonyarnold/Differ), [Dwifft](https://github.com/jflinter/Dwifft), or your favorite diffing library. RxGRDB ships with a [demo application](Documentation/RxGRDBDemo) that uses RxDataSources in order to animate the content of a table view.
-
-
-### PrimaryKeyDiffScanner
-
-**PrimaryKeyDiffScanner computes diffs between collections whose order does not matter.** It uses an algorithm that has a low, linear, complexity.
-
-It is well suited, for example, for synchronizing annotations in a map view with the contents of the database.
-
-Conversely, PrimaryKeyDiffScanner is not suited at all for updating table views. Those are better serviced by [FetchedRecordsController](https://github.com/groue/GRDB.swift#fetchedrecordscontroller), or by using RxGRDB with a well-chosen diff algorithm (see the [demo application](Documentation/RxGRDBDemo)).
-
-In a glance:
-
-```swift
-struct PrimaryKeyDiffScanner<Record: FetchableRecord & MutablePersistableRecord> {
-    let diff: PrimaryKeyDiff<Record>
-    func diffed(from rows: [Row]) -> PrimaryKeyDiffScanner
-}
-
-struct PrimaryKeyDiff<Record> {
-    let inserted: [Record]
-    let updated: [Record]
-    let deleted: [Record]
-}
-```
-
-Everything starts from a GRDB [record type](https://github.com/groue/GRDB.swift/blob/master/README.md#records), and a request ordered by primary key, whose results are used to compute diffs after each database transaction which has modified the results of the request:
-
-```swift
-let request = Place.orderByPrimaryKey()
-```
-
-> :point_up: **Note**: PrimaryKeyDiffScanner expects string columns of the primary key to be sorted according to the default [BINARY collation](https://www.sqlite.org/datatype3.html#collation) of SQLite. When this is not the case, restore the binary ordering in the diffed request:
->
-> ```swift
-> try db.create(table: "place") { t in
->     t.column("uuid", .text).primaryKey().collate(.nocase)
->     ...
-> }
->
-> // Restore binary ordering
-> let request = Place.order(Column("uuid").collating(.binary))
-> ```
-
-You then create the PrimaryKeyDiffScanner, with a database connection and an eventual initial array of records which is used to compute the first diff:
-
-```swift
-let scanner = try dbQueue.read { db in
-    try PrimaryKeyDiffScanner(
-        database: db,       // extracts primary key information
-        request: request,   // the diffed request
-        initialRecords: []) // initial records, if any, must be sorted by primary key
-}
-```
-
-> :point_up: **Note**: the PrimaryKeyDiffScanner initializer accepts a fourth argument, `updateRecord`, which allows you to customize the processing of elements that are updated between two impactful transactions. The [demo application](Documentation/RxGRDBDemo) uses this extra argument in order to reuse MKAnnotation instances, a recommended practice when updating MKMapView annotations. See [RxGRDBDemo/PlacesViewController.swift](Documentation/RxGRDBDemo/RxGRDBDemo/PlacesViewController.swift) for the code.
-
-Now the scanner is defined: it is time to compute diffs.
-
-Diffs are computed from raw database rows: we need to turn the request of records into a request of raw rows before feeding the scanner, and let the built-in RxSwift `scan` operator grab diffs for us:
-
-```swift
-request
-    .asRequest(of: Row.self)
-    .rx
-    .observeAll(in: dbQueue)
-    .scan(scanner) { (scanner, rows) in scanner.diffed(from: rows) }
-    .subscribe(onNext: { scanner in
-        let insertedPlaces = scanner.diff.inserted // [Place]
-        let updatedPlaces = scanner.diff.updated   // [Place]
-        let deletedPlaces = scanner.diff.deleted   // [Place]
-    })
-```
-
-Check the [demo application](Documentation/RxGRDBDemo) for an example app that uses `PrimaryKeyDiffScanner` to synchronize the content of a map view with the content of the database.
-
-
 ## Scheduling
 
 GRDB and RxGRDB go a long way in order to smooth out subtleties of multi-threaded SQLite. You're unlikely to use those libraries in a *very* wrong way.
@@ -899,7 +813,6 @@ Player.all().rx
 [Database Changes Observation]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-changes-observation
 [Database Observation]: #database-observation
 [DatabaseRegionObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregionobservation
-[Diffs]: #diffs
 [GRDB Concurrency Guide]: https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency
 [GRDB requests]: https://github.com/groue/GRDB.swift/blob/master/README.md#requests
 [Installation]: #installation
