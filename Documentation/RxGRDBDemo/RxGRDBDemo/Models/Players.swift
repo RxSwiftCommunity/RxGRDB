@@ -4,8 +4,6 @@ import RxGRDB
 import RxSwift
 
 /// Players is responsible for high-level operations on the players database.
-///
-///
 struct Players {
     private let database: DatabaseWriter
     
@@ -14,6 +12,13 @@ struct Players {
     }
     
     // MARK: - Modify Players
+    
+    /// Creates random players if needed, and returns whether the database
+    /// was empty.
+    @discardableResult
+    func populateIfEmpty() throws -> Bool {
+        return try database.write(_populateIfEmpty)
+    }
     
     func deleteAll() -> Completable {
         // Erase the database writer type in an AnyDatabaseWriter, so that we
@@ -53,32 +58,43 @@ struct Players {
     // They can easily be composed in safe database transactions in our
     // high-level public methods.
     
+    /// Creates random players if needed, and returns whether the database
+    /// was empty.
+    private func _populateIfEmpty(_ db: Database) throws -> Bool {
+        if try Player.fetchCount(db) > 0 {
+            return false
+        }
+        
+        // Insert new random players
+        for _ in 0..<8 {
+            var player = Player(id: nil, name: Player.randomName(), score: Player.randomScore())
+            try player.insert(db)
+        }
+        return true
+    }
+
     private func _deleteAll(_ db: Database) throws {
         _ = try Player.deleteAll(db)
     }
     
     private func _refresh(_ db: Database) throws {
-        if try Player.fetchCount(db) == 0 {
-            // Insert new random players
-            for _ in 0..<8 {
-                var player = Player(id: nil, name: Player.randomName(), score: Player.randomScore())
-                try player.insert(db)
-            }
-        } else {
-            // Insert a player
-            if Bool.random() {
-                var player = Player(id: nil, name: Player.randomName(), score: Player.randomScore())
-                try player.insert(db)
-            }
-            // Delete a random player
-            if Bool.random() {
-                try Player.order(sql: "RANDOM()").limit(1).deleteAll(db)
-            }
-            // Update some players
-            for var player in try Player.fetchAll(db) where Bool.random() {
-                try player.updateChanges(db) {
-                    $0.score = Player.randomScore()
-                }
+        if try _populateIfEmpty(db) {
+            return
+        }
+        
+        // Insert a player
+        if Bool.random() {
+            var player = Player(id: nil, name: Player.randomName(), score: Player.randomScore())
+            try player.insert(db)
+        }
+        // Delete a random player
+        if Bool.random() {
+            try Player.order(sql: "RANDOM()").limit(1).deleteAll(db)
+        }
+        // Update some players
+        for var player in try Player.fetchAll(db) where Bool.random() {
+            try player.updateChanges(db) {
+                $0.score = Player.randomScore()
             }
         }
     }

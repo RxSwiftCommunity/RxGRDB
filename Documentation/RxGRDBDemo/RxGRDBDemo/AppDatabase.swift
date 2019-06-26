@@ -1,27 +1,29 @@
 import GRDB
 
-/// A type responsible for initializing the application database.
+/// A type responsible for initializing an application database.
 ///
 /// See AppDelegate.setupDatabase()
 struct AppDatabase {
     
-    /// Creates a fully initialized database at path
-    static func openDatabase(atPath path: String) throws -> DatabasePool {
-        // Connect to the database
-        // See https://github.com/groue/GRDB.swift/#database-connections
-        let dbPool = try DatabasePool(path: path)
-        
+    /// Prepares a fully initialized database at path
+    func setup(_ database: DatabaseWriter) throws {
         // Use DatabaseMigrator to define the database schema
         // See https://github.com/groue/GRDB.swift/#migrations
-        try migrator.migrate(dbPool)
+        try migrator.migrate(database)
         
-        return dbPool
+        // Other possible setup include: custom functions, collations,
+        // full-text tokenizers, etc.
     }
     
     /// The DatabaseMigrator that defines the database schema.
     // See https://github.com/groue/GRDB.swift/#migrations
-    static var migrator: DatabaseMigrator {
+    private var migrator: DatabaseMigrator {
         var migrator = DatabaseMigrator()
+        
+        #if DEBUG
+        // Speed up development by nuking the database when migrations change
+        migrator.eraseDatabaseOnSchemaChange = true
+        #endif
         
         migrator.registerMigration("v1.0") { db in
             try db.create(table: "player") { t in
@@ -34,17 +36,6 @@ struct AppDatabase {
                 t.autoIncrementedPrimaryKey("id")
                 t.column("latitude", .double).notNull()
                 t.column("longitude", .double).notNull()
-            }
-        }
-        
-        migrator.registerMigration("fixtures") { db in
-            for _ in 0..<10 {
-                var player = Player(id: nil, name: Player.randomName(), score: Player.randomScore())
-                try player.insert(db)
-            }
-            for _ in 0..<10 {
-                var place = Place(id: nil, coordinate: Place.randomCoordinate())
-                try place.insert(db)
             }
         }
         

@@ -11,19 +11,21 @@ struct Player: Codable, Equatable {
 // Implementation is automatically derived from Codable.
 extension Player: FetchableRecord { }
 
-// Adopt MutablePersistable so that we can create/update/delete players in the database.
-// Implementation is partially derived from Codable.
+// Adopt MutablePersistable so that we can create/update/delete players in the
+// database. Implementation is partially derived from Codable.
 extension Player: MutablePersistableRecord {
-    static let databaseTableName = "player"
-    
+    mutating func didInsert(with rowID: Int64, for column: String?) {
+        id = rowID
+    }
+}
+
+// Define Columns that we can use for our database requests.
+// They are derived from the CodingKeys enum for extra safety.
+extension Player {
     fileprivate enum Columns {
         static let id = Column(CodingKeys.id)
         static let name = Column(CodingKeys.name)
         static let score = Column(CodingKeys.score)
-    }
-    
-    mutating func didInsert(with rowID: Int64, for column: String?) {
-        id = rowID
     }
 }
 
@@ -41,13 +43,21 @@ extension DerivableRequest where RowDecoder == Player {
 
 // Player randomization
 extension Player {
-    private static let names = ["Arthur", "Anita", "Barbara", "Bernard", "Craig", "Chiara", "David", "Dean", "Éric", "Elena", "Fatima", "Frederik", "Gilbert", "Georgette", "Henriette", "Hassan", "Ignacio", "Irene", "Julie", "Jack", "Karl", "Kristel", "Louis", "Liz", "Masashi", "Mary", "Noam", "Nicole", "Ophelie", "Oleg", "Pascal", "Patricia", "Quentin", "Quinn", "Raoul", "Rachel", "Stephan", "Susie", "Tristan", "Tatiana", "Ursule", "Urbain", "Victor", "Violette", "Wilfried", "Wilhelmina", "Yvon", "Yann", "Zazie", "Zoé"]
+    private static let names = [
+        "Arthur", "Anita", "Barbara", "Bernard", "Clément", "Chiara", "David",
+        "Dean", "Éric", "Elena", "Fatima", "Frederik", "Gilbert", "Georgette",
+        "Henriette", "Hassan", "Ignacio", "Irene", "Julie", "Jack", "Karl",
+        "Kristel", "Louis", "Liz", "Masashi", "Mary", "Noam", "Nolwenn",
+        "Ophelie", "Oleg", "Pascal", "Patricia", "Quentin", "Quinn", "Raoul",
+        "Rachel", "Stephan", "Susie", "Tristan", "Tatiana", "Ursule", "Urbain",
+        "Victor", "Violette", "Wilfried", "Wilhelmina", "Yvon", "Yann",
+        "Zazie", "Zoé"]
     
     static func randomName() -> String {
-        return names[Int(arc4random_uniform(UInt32(names.count)))]
+        return names.randomElement()!
     }
     
     static func randomScore() -> Int {
-        return 10 * Int(arc4random_uniform(101))
+        return 10 * Int.random(in: 0...100)
     }
 }

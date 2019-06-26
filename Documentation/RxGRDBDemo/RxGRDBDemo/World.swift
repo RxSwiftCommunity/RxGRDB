@@ -6,9 +6,6 @@ struct World {
     /// Access to the players database
     func players() -> Players { return Players(database: database()) }
     
-    /// Access to the places database
-    func places() -> Places { return Places(database: database()) }
-
     /// The database, private so that only high-level operations exposed by
     /// `players` are available to the rest of the application.
     private var database: () -> DatabaseWriter

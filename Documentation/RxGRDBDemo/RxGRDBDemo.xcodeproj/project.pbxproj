@@ -7,12 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		563BD2CE1F81363A006A5390 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2CD1F81363A006A5390 /* Place.swift */; };
-		563BD2D11F81369D006A5390 /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */; };
-		563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2D21F81395F006A5390 /* PlacesViewController.swift */; };
 		567515A222C3A7DC00A6FF66 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A122C3A7DC00A6FF66 /* World.swift */; };
 		567515A422C3A9BC00A6FF66 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A322C3A9BC00A6FF66 /* Players.swift */; };
-		567515A622C3ABA700A6FF66 /* Places.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A522C3ABA700A6FF66 /* Places.swift */; };
 		567515A822C3B1F100A6FF66 /* PlayersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */; };
 		567515AB22C3CDAC00A6FF66 /* Action+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515AA22C3CDAC00A6FF66 /* Action+App.swift */; };
 		56E1F97D1F8101EE00793BFA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F97C1F8101EE00793BFA /* AppDelegate.swift */; };
@@ -40,12 +36,8 @@
 
 /* Begin PBXFileReference section */
 		322E774A7E3F8CCBF10E926B /* Pods-RxGRDBDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBDemo.debug.xcconfig"; path = "../../Pods/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo.debug.xcconfig"; sourceTree = "<group>"; };
-		563BD2CD1F81363A006A5390 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
-		563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
-		563BD2D21F81395F006A5390 /* PlacesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesViewController.swift; sourceTree = "<group>"; };
 		567515A122C3A7DC00A6FF66 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
 		567515A322C3A9BC00A6FF66 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
-		567515A522C3ABA700A6FF66 /* Places.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Places.swift; sourceTree = "<group>"; };
 		567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersViewModel.swift; sourceTree = "<group>"; };
 		567515AA22C3CDAC00A6FF66 /* Action+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action+App.swift"; sourceTree = "<group>"; };
 		56E1F9791F8101EE00793BFA /* RxGRDBDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxGRDBDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,9 +68,6 @@
 		5675159E22C3A77800A6FF66 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				563BD2CD1F81363A006A5390 /* Place.swift */,
-				563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */,
-				567515A522C3ABA700A6FF66 /* Places.swift */,
 				56E1F9951F81033200793BFA /* Player.swift */,
 				567515A322C3A9BC00A6FF66 /* Players.swift */,
 			);
@@ -88,7 +77,6 @@
 		5675159F22C3A7AE00A6FF66 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				563BD2D21F81395F006A5390 /* PlacesViewController.swift */,
 				56E1F97E1F8101EE00793BFA /* PlayersViewController.swift */,
 				567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */,
 			);
@@ -295,14 +283,10 @@
 				56E1F9961F81033200793BFA /* Player.swift in Sources */,
 				56E1F9941F81021300793BFA /* AppDatabase.swift in Sources */,
 				567515A822C3B1F100A6FF66 /* PlayersViewModel.swift in Sources */,
-				563BD2CE1F81363A006A5390 /* Place.swift in Sources */,
-				563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */,
-				567515A622C3ABA700A6FF66 /* Places.swift in Sources */,
 				56E1F97F1F8101EE00793BFA /* PlayersViewController.swift in Sources */,
 				56E1F97D1F8101EE00793BFA /* AppDelegate.swift in Sources */,
 				567515AB22C3CDAC00A6FF66 /* Action+App.swift in Sources */,
 				567515A222C3A7DC00A6FF66 /* World.swift in Sources */,
-				563BD2D11F81369D006A5390 /* PlaceAnnotation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
