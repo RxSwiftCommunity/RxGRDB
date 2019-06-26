@@ -20,10 +20,7 @@ class PlayersViewController: UIViewController {
     private func setupNavigationItem() {
         viewModel
             .orderingButtonTitle
-            .subscribe(onNext: { [weak self] orderingButtonTitle in
-                guard let self = self else { return }
-                self.updateRightBarButtonItem(title: orderingButtonTitle)
-            })
+            .subscribe(onNext: updateRightBarButtonItem)
             .disposed(by: disposeBag)
     }
     
