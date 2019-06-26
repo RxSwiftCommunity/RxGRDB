@@ -24,15 +24,6 @@ struct Players {
         // accept a DatabasePool in the app, a DatabaseQueue in tests, and also
         // have access to the RxGRDB APIs with the `rx` joiner defined on the
         // ReactiveCompatible protocol.
-        //
-        // TODO GRDB: If we define the `database` property as AnyDatabaseWriter
-        // and erase the type in the initializer, we have a crash when the
-        // database changes and observations are triggered. Workaround: perform
-        // late type erasing.
-        //
-        // TODO RxRGDB: We could avoid this churn by exposing observables
-        // without the `rx` joiner, directly on DatabaseWriter and
-        // DatabaseReader protocols, as in GRDBCombine.
         return AnyDatabaseWriter(database).rx.write(updates: _deleteAll)
     }
     
@@ -76,7 +67,7 @@ struct Players {
         }
         return true
     }
-
+    
     private func _deleteAll(_ db: Database) throws {
         try Player.deleteAll(db)
     }

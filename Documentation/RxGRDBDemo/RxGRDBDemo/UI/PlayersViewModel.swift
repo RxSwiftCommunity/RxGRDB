@@ -58,7 +58,7 @@ class PlayersViewModel {
                 case .byName:
                     return NSLocalizedString("Name ⬆︎", comment: "")
                 }
-            }
+        }
         
         // Actions
         deleteAll = CocoaAction {
