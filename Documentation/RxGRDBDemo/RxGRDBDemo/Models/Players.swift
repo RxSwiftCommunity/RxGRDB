@@ -61,7 +61,7 @@ struct Players {
     // MARK: - Implementation
     //
     // ⭐️ Good practice: when we want to update the database, we define methods
-    // that accept a Database connection, becayse they can easily be composed.
+    // that accept a Database connection, because they can easily be composed.
     
     /// Creates random players if needed, and returns whether the database
     /// was empty.
