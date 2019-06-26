@@ -1,8 +1,6 @@
 import GRDB
 
 /// A type responsible for initializing an application database.
-///
-/// See AppDelegate.setupDatabase()
 struct AppDatabase {
     
     /// Prepares a fully initialized database at path

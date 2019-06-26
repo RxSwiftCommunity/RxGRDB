@@ -5,6 +5,7 @@ import RxSwift
 /// An MVVM ViewController that displays PlayersViewModel
 class PlayersViewController: UIViewController {
     @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet private weak var emptyView: UIView!
     private let viewModel = PlayersViewModel()
     private let disposeBag = DisposeBag()
     
@@ -13,25 +14,31 @@ class PlayersViewController: UIViewController {
         setupNavigationItem()
         setupToolbar()
         setupTableView()
+        setupEmptyView()
     }
     
     private func setupNavigationItem() {
-        // Navigation item invokes viewModel actions
-        
         viewModel
             .orderingButtonTitle
             .subscribe(onNext: { [weak self] orderingButtonTitle in
                 guard let self = self else { return }
-                var barButtonItem = UIBarButtonItem(title: orderingButtonTitle, style: .plain, target: nil, action: nil)
-                barButtonItem.rx.action = self.viewModel.toggleOrdering
-                self.navigationItem.rightBarButtonItem = barButtonItem
+                self.updateRightBarButtonItem(title: orderingButtonTitle)
             })
             .disposed(by: disposeBag)
     }
     
-    private func setupToolbar() {
-        // Toolbar invokes viewModel actions
+    private func updateRightBarButtonItem(title: String?) {
+        guard let title = title else {
+            navigationItem.rightBarButtonItem = nil
+            return
+        }
         
+        var barButtonItem = UIBarButtonItem(title: title, style: .plain, target: nil, action: nil)
+        barButtonItem.rx.action = viewModel.toggleOrdering
+        navigationItem.rightBarButtonItem = barButtonItem
+    }
+    
+    private func setupToolbar() {
         var deleteAllButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
         deleteAllButtonItem.rx.action = viewModel.deleteAll
         
@@ -51,8 +58,6 @@ class PlayersViewController: UIViewController {
     }
     
     private func setupTableView() {
-        // TableView content depends on the viewModel
-        
         let dataSource = RxTableViewSectionedAnimatedDataSource<Section>(configureCell: { (dataSource, tableView, indexPath, _) in
             let section = dataSource.sectionModels[indexPath.section]
             let player = section.items[indexPath.row]
@@ -69,8 +74,18 @@ class PlayersViewController: UIViewController {
         
         viewModel
             .players
+            .asDriver(onErrorJustReturn: [])
             .map { [Section(items: $0)] }
-            .bind(to: tableView.rx.items(dataSource: dataSource))
+            .drive(tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+    }
+    
+    private func setupEmptyView() {
+        viewModel
+            .players
+            .map { !$0.isEmpty }
+            .asDriver(onErrorJustReturn: false)
+            .drive(emptyView.rx.isHidden)
             .disposed(by: disposeBag)
     }
 }

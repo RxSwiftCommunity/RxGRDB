@@ -7,19 +7,20 @@ struct Player: Codable, Equatable {
     var score: Int
 }
 
-// Adopt RowConvertible so that we can fetch players from the database.
+// Adopt FetchableRecord so that we can fetch players from the database.
 // Implementation is automatically derived from Codable.
 extension Player: FetchableRecord { }
 
 // Adopt MutablePersistable so that we can create/update/delete players in the
 // database. Implementation is partially derived from Codable.
 extension Player: MutablePersistableRecord {
+    // Update auto-incremented id upon successful insertion
     mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
     }
 }
 
-// Define Columns that we can use for our database requests.
+// Define columns that we can use for our database requests.
 // They are derived from the CodingKeys enum for extra safety.
 extension Player {
     fileprivate enum Columns {
@@ -33,7 +34,7 @@ extension Player {
 // DerivableRequest protocol.
 extension DerivableRequest where RowDecoder == Player {
     func orderByScore() -> Self {
-        return order(Player.Columns.score.desc)
+        return order(Player.Columns.score.desc, Player.Columns.name)
     }
     
     func orderByName() -> Self {

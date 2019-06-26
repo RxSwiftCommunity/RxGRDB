@@ -7,7 +7,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        // Setup the Current world
+        // Setup the Current World
         let dbPool = try! setupDatabase(application)
         Current = World(database: { dbPool })
         

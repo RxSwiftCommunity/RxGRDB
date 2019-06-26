@@ -48,24 +48,49 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d2C-E5-vHW">
+                                <rect key="frame" x="0.0" y="64" width="375" height="559"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="jHw-6h-iUF">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="559"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Player" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rZc-LE-xF6">
+                                            <rect key="frame" x="151" y="269" width="73.5" height="21"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="rZc-LE-xF6" firstAttribute="centerY" secondItem="jHw-6h-iUF" secondAttribute="centerY" id="QUf-R7-eRK"/>
+                                        <constraint firstItem="rZc-LE-xF6" firstAttribute="centerX" secondItem="jHw-6h-iUF" secondAttribute="centerX" id="Vxw-R3-mxL"/>
+                                    </constraints>
+                                </view>
+                                <blurEffect style="prominent"/>
+                            </visualEffectView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="J24-oS-fQn" firstAttribute="bottom" secondItem="d2C-E5-vHW" secondAttribute="bottom" id="3aY-JG-086"/>
+                            <constraint firstItem="d2C-E5-vHW" firstAttribute="leading" secondItem="t9e-5y-1YT" secondAttribute="leading" id="3lh-10-DaJ"/>
                             <constraint firstItem="bXR-pQ-fFV" firstAttribute="top" secondItem="t9e-5y-1YT" secondAttribute="top" id="BrP-Nz-4ZZ"/>
+                            <constraint firstAttribute="trailing" secondItem="d2C-E5-vHW" secondAttribute="trailing" id="D7P-Zp-MgG"/>
                             <constraint firstItem="bXR-pQ-fFV" firstAttribute="leading" secondItem="t9e-5y-1YT" secondAttribute="leading" id="DqX-wI-Qjp"/>
                             <constraint firstItem="bXR-pQ-fFV" firstAttribute="trailing" secondItem="t9e-5y-1YT" secondAttribute="trailing" id="Q9v-wC-nwK"/>
+                            <constraint firstItem="d2C-E5-vHW" firstAttribute="top" secondItem="J24-oS-fQn" secondAttribute="top" id="Umo-im-bz7"/>
                             <constraint firstAttribute="bottom" secondItem="bXR-pQ-fFV" secondAttribute="bottom" id="dit-bQ-w2u"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="J24-oS-fQn"/>
                     </view>
                     <navigationItem key="navigationItem" title="Hall of Fame" id="XOX-J3-Q9U"/>
                     <connections>
+                        <outlet property="emptyView" destination="d2C-E5-vHW" id="3xT-Hj-O9G"/>
                         <outlet property="tableView" destination="bXR-pQ-fFV" id="JFe-wC-Zyg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="v2h-i8-h1r" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-783" y="-153"/>
+            <point key="canvasLocation" x="-783.20000000000005" y="-153.37331334332833"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="K9r-My-Kvk">

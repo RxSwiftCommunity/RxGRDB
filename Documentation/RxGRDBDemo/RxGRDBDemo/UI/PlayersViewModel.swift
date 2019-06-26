@@ -7,7 +7,7 @@ import RxSwift
 class PlayersViewModel {
     // MARK: - Values Displayed on Screen
     
-    var orderingButtonTitle: Observable<String>
+    var orderingButtonTitle: Observable<String?>
     var players: Observable<[Player]>
     
     // MARK: - Actions
@@ -30,16 +30,6 @@ class PlayersViewModel {
         let ordering = BehaviorRelay<Ordering>(value: .byScore)
         
         // Values Displayed on Screen
-        
-        orderingButtonTitle = ordering.map { ordering in
-            switch ordering {
-            case .byScore:
-                return NSLocalizedString("Score ⬇︎", comment: "")
-            case .byName:
-                return NSLocalizedString("Name ⬆︎", comment: "")
-            }
-        }
-        
         players = ordering
             .distinctUntilChanged()
             .map { ordering -> QueryInterfaceRequest<Player> in
@@ -52,10 +42,24 @@ class PlayersViewModel {
             }
             .flatMapLatest { request -> Observable<[Player]> in
                 Current.players().observeAll(request)
-        }
+            }
+            .share(replay: 1)
+        
+        orderingButtonTitle = Observable
+            .combineLatest(players, ordering)
+            .map { players, ordering -> String? in
+                if players.isEmpty {
+                    return nil
+                }
+                switch ordering {
+                case .byScore:
+                    return NSLocalizedString("Score ⬇︎", comment: "")
+                case .byName:
+                    return NSLocalizedString("Name ⬆︎", comment: "")
+                }
+            }
         
         // Actions
-        
         deleteAll = CocoaAction {
             Current.players().deleteAll()
         }
