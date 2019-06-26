@@ -1,7 +1,7 @@
 RxGRDBDemo
 ==========
 
-<img align="right" src="https://github.com/grouue/RxGRDB/raw/dev/demo-app/Documentation/RxGRDBDemo/Documentation/Demo1.png" width="50%">
+<img align="right" src="https://github.com/groue/RxGRDB/raw/dev/demo-app/Documentation/RxGRDBDemo/Documentation/Demo1.png" width="50%">
 
 This demo application uses [RxSwift], [RxGRDB], [Action] and [RxDataSources] to synchronize its view with the content of the database.
 
