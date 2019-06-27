@@ -1,7 +1,9 @@
 Release Notes
 =============
 
-## Next Version
+## 0.16.0
+
+Released June 27, 2019 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.15.0...v0.16.0)
 
 - [#57](https://github.com/RxSwiftCommunity/RxGRDB/pull/57): Deprecate PrimaryKeyScanner
 
