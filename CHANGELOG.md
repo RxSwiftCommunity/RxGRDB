@@ -3,6 +3,11 @@ Release Notes
 
 ## Next Version
 
+- [#57](https://github.com/RxSwiftCommunity/RxGRDB/pull/57): Deprecate PrimaryKeyScanner
+
+The [demo app](Documentation/RxGRDBDemo/README.md) has been refactored with the latest GRDB good practices, MVVM architecture, and some tests of the database layer
+
+
 ## 0.15.0
 
 Released June 20, 2019 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.14.0...v0.15.0)

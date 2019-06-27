@@ -7,9 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		563BD2CE1F81363A006A5390 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2CD1F81363A006A5390 /* Place.swift */; };
-		563BD2D11F81369D006A5390 /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */; };
-		563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BD2D21F81395F006A5390 /* PlacesViewController.swift */; };
+		565BD7C522C3F8D600BB9B5A /* AppDatabaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565BD7C422C3F8D600BB9B5A /* AppDatabaseTests.swift */; };
+		565BD7C622C3F92F00BB9B5A /* AppDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F9931F81021300793BFA /* AppDatabase.swift */; };
+		565BD7C722C3F97900BB9B5A /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F9951F81033200793BFA /* Player.swift */; };
+		565BD7C922C3FA8B00BB9B5A /* PlayersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565BD7C822C3FA8B00BB9B5A /* PlayersTests.swift */; };
+		565BD7CA22C3FAA700BB9B5A /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A322C3A9BC00A6FF66 /* Players.swift */; };
+		567515A222C3A7DC00A6FF66 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A122C3A7DC00A6FF66 /* World.swift */; };
+		567515A422C3A9BC00A6FF66 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A322C3A9BC00A6FF66 /* Players.swift */; };
+		567515A822C3B1F100A6FF66 /* PlayersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */; };
+		567515AB22C3CDAC00A6FF66 /* Action+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515AA22C3CDAC00A6FF66 /* Action+App.swift */; };
 		56E1F97D1F8101EE00793BFA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F97C1F8101EE00793BFA /* AppDelegate.swift */; };
 		56E1F97F1F8101EE00793BFA /* PlayersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F97E1F8101EE00793BFA /* PlayersViewController.swift */; };
 		56E1F9821F8101EE00793BFA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 56E1F9801F8101EE00793BFA /* Main.storyboard */; };
@@ -18,7 +24,18 @@
 		56E1F9941F81021300793BFA /* AppDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F9931F81021300793BFA /* AppDatabase.swift */; };
 		56E1F9961F81033200793BFA /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F9951F81033200793BFA /* Player.swift */; };
 		721E7FE4FB32DBD772EB3F53 /* Pods_RxGRDBDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC09FEC56643890A22E14D79 /* Pods_RxGRDBDemo.framework */; };
+		E2EE30EA903E605A54586977 /* Pods_RxGRDBDemoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EA50757713C1B9E720AD49D /* Pods_RxGRDBDemoTests.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		565BD7BB22C3F84A00BB9B5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 56E1F9711F8101EE00793BFA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 56E1F9781F8101EE00793BFA;
+			remoteInfo = RxGRDBDemo;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		569E8501200A5C720028D1EC /* Embed Frameworks */ = {
@@ -34,10 +51,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0EA50757713C1B9E720AD49D /* Pods_RxGRDBDemoTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxGRDBDemoTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		322E774A7E3F8CCBF10E926B /* Pods-RxGRDBDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBDemo.debug.xcconfig"; path = "../../Pods/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo.debug.xcconfig"; sourceTree = "<group>"; };
-		563BD2CD1F81363A006A5390 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
-		563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
-		563BD2D21F81395F006A5390 /* PlacesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesViewController.swift; sourceTree = "<group>"; };
+		565BD7B622C3F84A00BB9B5A /* RxGRDBDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RxGRDBDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		565BD7BA22C3F84A00BB9B5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		565BD7C422C3F8D600BB9B5A /* AppDatabaseTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDatabaseTests.swift; sourceTree = "<group>"; };
+		565BD7C822C3FA8B00BB9B5A /* PlayersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersTests.swift; sourceTree = "<group>"; };
+		567515A122C3A7DC00A6FF66 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
+		567515A322C3A9BC00A6FF66 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
+		567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersViewModel.swift; sourceTree = "<group>"; };
+		567515AA22C3CDAC00A6FF66 /* Action+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action+App.swift"; sourceTree = "<group>"; };
 		56E1F9791F8101EE00793BFA /* RxGRDBDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxGRDBDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		56E1F97C1F8101EE00793BFA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		56E1F97E1F8101EE00793BFA /* PlayersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersViewController.swift; sourceTree = "<group>"; };
@@ -48,10 +71,20 @@
 		56E1F9931F81021300793BFA /* AppDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDatabase.swift; sourceTree = "<group>"; };
 		56E1F9951F81033200793BFA /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		7EF1D71A5F3F88A9E04D7B93 /* Pods-RxGRDBDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBDemo.release.xcconfig"; path = "../../Pods/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo.release.xcconfig"; sourceTree = "<group>"; };
+		8C489FACBD4D5F9AF4385BD2 /* Pods-RxGRDBDemoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBDemoTests.debug.xcconfig"; path = "../../Pods/Target Support Files/Pods-RxGRDBDemoTests/Pods-RxGRDBDemoTests.debug.xcconfig"; sourceTree = "<group>"; };
+		9855AE5D583BB3A7EEBEBBDD /* Pods-RxGRDBDemoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxGRDBDemoTests.release.xcconfig"; path = "../../Pods/Target Support Files/Pods-RxGRDBDemoTests/Pods-RxGRDBDemoTests.release.xcconfig"; sourceTree = "<group>"; };
 		BC09FEC56643890A22E14D79 /* Pods_RxGRDBDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxGRDBDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		565BD7B322C3F84A00BB9B5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2EE30EA903E605A54586977 /* Pods_RxGRDBDemoTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		56E1F9761F8101EE00793BFA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -63,10 +96,57 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		565BD7B722C3F84A00BB9B5A /* RxGRDBDemoTests */ = {
+			isa = PBXGroup;
+			children = (
+				565BD7BA22C3F84A00BB9B5A /* Info.plist */,
+				565BD7C422C3F8D600BB9B5A /* AppDatabaseTests.swift */,
+				565BD7C822C3FA8B00BB9B5A /* PlayersTests.swift */,
+			);
+			path = RxGRDBDemoTests;
+			sourceTree = "<group>";
+		};
+		5675159E22C3A77800A6FF66 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				56E1F9951F81033200793BFA /* Player.swift */,
+				567515A322C3A9BC00A6FF66 /* Players.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5675159F22C3A7AE00A6FF66 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				56E1F97E1F8101EE00793BFA /* PlayersViewController.swift */,
+				567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		567515A022C3A7BA00A6FF66 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				56E1F9831F8101EE00793BFA /* Assets.xcassets */,
+				56E1F9851F8101EE00793BFA /* LaunchScreen.storyboard */,
+				56E1F9801F8101EE00793BFA /* Main.storyboard */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		567515A922C3CD9B00A6FF66 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				567515AA22C3CDAC00A6FF66 /* Action+App.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		56E1F9701F8101EE00793BFA = {
 			isa = PBXGroup;
 			children = (
 				56E1F97B1F8101EE00793BFA /* RxGRDBDemo */,
+				565BD7B722C3F84A00BB9B5A /* RxGRDBDemoTests */,
 				56E1F97A1F8101EE00793BFA /* Products */,
 				56E1F9A21F81083800793BFA /* Frameworks */,
 				8EA05AB27A11A09DA4413BE2 /* Pods */,
@@ -77,6 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				56E1F9791F8101EE00793BFA /* RxGRDBDemo.app */,
+				565BD7B622C3F84A00BB9B5A /* RxGRDBDemoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,17 +165,14 @@
 		56E1F97B1F8101EE00793BFA /* RxGRDBDemo */ = {
 			isa = PBXGroup;
 			children = (
+				56E1F9881F8101EE00793BFA /* Info.plist */,
 				56E1F9931F81021300793BFA /* AppDatabase.swift */,
 				56E1F97C1F8101EE00793BFA /* AppDelegate.swift */,
-				563BD2CD1F81363A006A5390 /* Place.swift */,
-				563BD2D01F81369D006A5390 /* PlaceAnnotation.swift */,
-				563BD2D21F81395F006A5390 /* PlacesViewController.swift */,
-				56E1F9951F81033200793BFA /* Player.swift */,
-				56E1F97E1F8101EE00793BFA /* PlayersViewController.swift */,
-				56E1F9801F8101EE00793BFA /* Main.storyboard */,
-				56E1F9831F8101EE00793BFA /* Assets.xcassets */,
-				56E1F9851F8101EE00793BFA /* LaunchScreen.storyboard */,
-				56E1F9881F8101EE00793BFA /* Info.plist */,
+				567515A122C3A7DC00A6FF66 /* World.swift */,
+				5675159E22C3A77800A6FF66 /* Models */,
+				5675159F22C3A7AE00A6FF66 /* UI */,
+				567515A922C3CD9B00A6FF66 /* Utils */,
+				567515A022C3A7BA00A6FF66 /* Resources */,
 			);
 			path = RxGRDBDemo;
 			sourceTree = "<group>";
@@ -103,6 +181,7 @@
 			isa = PBXGroup;
 			children = (
 				BC09FEC56643890A22E14D79 /* Pods_RxGRDBDemo.framework */,
+				0EA50757713C1B9E720AD49D /* Pods_RxGRDBDemoTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -112,6 +191,8 @@
 			children = (
 				322E774A7E3F8CCBF10E926B /* Pods-RxGRDBDemo.debug.xcconfig */,
 				7EF1D71A5F3F88A9E04D7B93 /* Pods-RxGRDBDemo.release.xcconfig */,
+				8C489FACBD4D5F9AF4385BD2 /* Pods-RxGRDBDemoTests.debug.xcconfig */,
+				9855AE5D583BB3A7EEBEBBDD /* Pods-RxGRDBDemoTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -119,6 +200,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		565BD7B522C3F84A00BB9B5A /* RxGRDBDemoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 565BD7BD22C3F84A00BB9B5A /* Build configuration list for PBXNativeTarget "RxGRDBDemoTests" */;
+			buildPhases = (
+				4AF987A17FC367F80F2B1EDB /* [CP] Check Pods Manifest.lock */,
+				565BD7B222C3F84A00BB9B5A /* Sources */,
+				565BD7B322C3F84A00BB9B5A /* Frameworks */,
+				565BD7B422C3F84A00BB9B5A /* Resources */,
+				6CDD6268ED0269DE482A1FA8 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				565BD7BC22C3F84A00BB9B5A /* PBXTargetDependency */,
+			);
+			name = RxGRDBDemoTests;
+			productName = RxGRDBDemoTests;
+			productReference = 565BD7B622C3F84A00BB9B5A /* RxGRDBDemoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		56E1F9781F8101EE00793BFA /* RxGRDBDemo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 56E1F98B1F8101EE00793BFA /* Build configuration list for PBXNativeTarget "RxGRDBDemo" */;
@@ -145,10 +246,15 @@
 		56E1F9711F8101EE00793BFA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0900;
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Gwendal Roué";
 				TargetAttributes = {
+					565BD7B522C3F84A00BB9B5A = {
+						CreatedOnToolsVersion = 10.2.1;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 56E1F9781F8101EE00793BFA;
+					};
 					56E1F9781F8101EE00793BFA = {
 						CreatedOnToolsVersion = 9.0;
 						ProvisioningStyle = Automatic;
@@ -169,11 +275,19 @@
 			projectRoot = "";
 			targets = (
 				56E1F9781F8101EE00793BFA /* RxGRDBDemo */,
+				565BD7B522C3F84A00BB9B5A /* RxGRDBDemoTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		565BD7B422C3F84A00BB9B5A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		56E1F9771F8101EE00793BFA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -187,6 +301,52 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		4AF987A17FC367F80F2B1EDB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RxGRDBDemoTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6CDD6268ED0269DE482A1FA8 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RxGRDBDemoTests/Pods-RxGRDBDemoTests-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GRDB.swift-iOS/GRDB.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift-iOS/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/RxBlocking-iOS/RxBlocking.framework",
+				"${BUILT_PRODUCTS_DIR}/RxGRDB/RxGRDB.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRDB.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxBlocking.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxGRDB.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RxGRDBDemoTests/Pods-RxGRDBDemoTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		95963AD3C11B669F6A76FFF0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -214,6 +374,7 @@
 				"${PODS_ROOT}/Target Support Files/Pods-RxGRDBDemo/Pods-RxGRDBDemo-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/GRDB.swift-iOS/GRDB.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift-iOS/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/Action/Action.framework",
 				"${BUILT_PRODUCTS_DIR}/Differentiator/Differentiator.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxDataSources/RxDataSources.framework",
@@ -224,6 +385,7 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRDB.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Action.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Differentiator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxDataSources.framework",
@@ -238,21 +400,42 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		565BD7B222C3F84A00BB9B5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				565BD7C922C3FA8B00BB9B5A /* PlayersTests.swift in Sources */,
+				565BD7CA22C3FAA700BB9B5A /* Players.swift in Sources */,
+				565BD7C622C3F92F00BB9B5A /* AppDatabase.swift in Sources */,
+				565BD7C722C3F97900BB9B5A /* Player.swift in Sources */,
+				565BD7C522C3F8D600BB9B5A /* AppDatabaseTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		56E1F9751F8101EE00793BFA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				567515A422C3A9BC00A6FF66 /* Players.swift in Sources */,
 				56E1F9961F81033200793BFA /* Player.swift in Sources */,
 				56E1F9941F81021300793BFA /* AppDatabase.swift in Sources */,
-				563BD2CE1F81363A006A5390 /* Place.swift in Sources */,
-				563BD2D31F81395F006A5390 /* PlacesViewController.swift in Sources */,
+				567515A822C3B1F100A6FF66 /* PlayersViewModel.swift in Sources */,
 				56E1F97F1F8101EE00793BFA /* PlayersViewController.swift in Sources */,
 				56E1F97D1F8101EE00793BFA /* AppDelegate.swift in Sources */,
-				563BD2D11F81369D006A5390 /* PlaceAnnotation.swift in Sources */,
+				567515AB22C3CDAC00A6FF66 /* Action+App.swift in Sources */,
+				567515A222C3A7DC00A6FF66 /* World.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		565BD7BC22C3F84A00BB9B5A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 56E1F9781F8101EE00793BFA /* RxGRDBDemo */;
+			targetProxy = 565BD7BB22C3F84A00BB9B5A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		56E1F9801F8101EE00793BFA /* Main.storyboard */ = {
@@ -274,6 +457,47 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		565BD7BE22C3F84A00BB9B5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8C489FACBD4D5F9AF4385BD2 /* Pods-RxGRDBDemoTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = AMD8W895CT;
+				INFOPLIST_FILE = RxGRDBDemoTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBDemoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RxGRDBDemo.app/RxGRDBDemo";
+			};
+			name = Debug;
+		};
+		565BD7BF22C3F84A00BB9B5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9855AE5D583BB3A7EEBEBBDD /* Pods-RxGRDBDemoTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = AMD8W895CT;
+				INFOPLIST_FILE = RxGRDBDemoTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.groue.RxGRDBDemoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RxGRDBDemo.app/RxGRDBDemo";
+			};
+			name = Release;
+		};
 		56E1F9891F8101EE00793BFA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -418,6 +642,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		565BD7BD22C3F84A00BB9B5A /* Build configuration list for PBXNativeTarget "RxGRDBDemoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				565BD7BE22C3F84A00BB9B5A /* Debug */,
+				565BD7BF22C3F84A00BB9B5A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		56E1F9741F8101EE00793BFA /* Build configuration list for PBXProject "RxGRDBDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

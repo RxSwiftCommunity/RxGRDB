@@ -1,6 +1,7 @@
 import GRDB
 
 /// TODO
+@available(*, deprecated, message: "PrimaryKeyDiffScanner is deprecated and no longer maintained")
 public struct PrimaryKeyDiffScanner<Record: FetchableRecord & MutablePersistableRecord> {
     private let primaryKey: (Row) -> RowValue
     private let updateRecord: (Record, Row) -> Record
@@ -100,7 +101,7 @@ public struct PrimaryKeyDiffScanner<Record: FetchableRecord & MutablePersistable
     }
 }
 
-public struct PrimaryKeyDiff<Record> {
+public struct _PrimaryKeyDiff<Record> {
     public var inserted: [Record]
     public var updated: [Record]
     public var deleted: [Record]
@@ -109,8 +110,11 @@ public struct PrimaryKeyDiff<Record> {
     }
 }
 
-extension PrimaryKeyDiff: Equatable where Record: Equatable { }
-extension PrimaryKeyDiff: Hashable where Record: Hashable { }
+@available(*, deprecated, message: "PrimaryKeyDiff is deprecated and no longer maintained")
+public typealias PrimaryKeyDiff<Record> = _PrimaryKeyDiff<Record>
+
+extension _PrimaryKeyDiff: Equatable where Record: Equatable { }
+extension _PrimaryKeyDiff: Hashable where Record: Hashable { }
 
 /// Given two sorted sequences (left and right), this function emits "merge steps"
 /// which tell whether elements are only found on the left, on the right, or on

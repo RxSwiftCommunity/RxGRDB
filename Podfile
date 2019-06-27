@@ -1,6 +1,8 @@
 use_frameworks!
 workspace 'RxGRDB.xcworkspace'
 
+# RxGRDB
+
 def common_pods
   pod 'RxSwift', '~> 5.0'
   pod 'GRDB.swift', '~> 4.1'
@@ -34,9 +36,19 @@ target 'RxGRDBmacOSTests' do
   test_pods
 end
 
+# Demo App
+
 target 'RxGRDBDemo' do
   project 'Documentation/RxGRDBDemo/RxGRDBDemo.xcodeproj'
   platform :ios, '9.0'
   pod 'RxDataSources'
+  pod 'Action'
   pod 'RxGRDB', :path => '.'
+end
+
+target 'RxGRDBDemoTests' do
+  project 'Documentation/RxGRDBDemo/RxGRDBDemo.xcodeproj'
+  platform :ios, '9.0'
+  pod 'RxGRDB', :path => '.'
+  pod 'RxBlocking'
 end
