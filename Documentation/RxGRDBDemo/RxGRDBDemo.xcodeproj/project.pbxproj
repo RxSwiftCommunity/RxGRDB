@@ -12,6 +12,10 @@
 		565BD7C722C3F97900BB9B5A /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E1F9951F81033200793BFA /* Player.swift */; };
 		565BD7C922C3FA8B00BB9B5A /* PlayersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565BD7C822C3FA8B00BB9B5A /* PlayersTests.swift */; };
 		565BD7CA22C3FAA700BB9B5A /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A322C3A9BC00A6FF66 /* Players.swift */; };
+		565BD7D022C49D2100BB9B5A /* PlayersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565BD7CF22C49D2100BB9B5A /* PlayersViewModelTests.swift */; };
+		565BD7D122C49D9800BB9B5A /* PlayersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */; };
+		565BD7D222C49E6600BB9B5A /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A122C3A7DC00A6FF66 /* World.swift */; };
+		565BD7D322C49EAA00BB9B5A /* Action+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515AA22C3CDAC00A6FF66 /* Action+App.swift */; };
 		567515A222C3A7DC00A6FF66 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A122C3A7DC00A6FF66 /* World.swift */; };
 		567515A422C3A9BC00A6FF66 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A322C3A9BC00A6FF66 /* Players.swift */; };
 		567515A822C3B1F100A6FF66 /* PlayersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */; };
@@ -57,6 +61,7 @@
 		565BD7BA22C3F84A00BB9B5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		565BD7C422C3F8D600BB9B5A /* AppDatabaseTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDatabaseTests.swift; sourceTree = "<group>"; };
 		565BD7C822C3FA8B00BB9B5A /* PlayersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersTests.swift; sourceTree = "<group>"; };
+		565BD7CF22C49D2100BB9B5A /* PlayersViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersViewModelTests.swift; sourceTree = "<group>"; };
 		567515A122C3A7DC00A6FF66 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
 		567515A322C3A9BC00A6FF66 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
 		567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersViewModel.swift; sourceTree = "<group>"; };
@@ -102,6 +107,7 @@
 				565BD7BA22C3F84A00BB9B5A /* Info.plist */,
 				565BD7C422C3F8D600BB9B5A /* AppDatabaseTests.swift */,
 				565BD7C822C3FA8B00BB9B5A /* PlayersTests.swift */,
+				565BD7CF22C49D2100BB9B5A /* PlayersViewModelTests.swift */,
 			);
 			path = RxGRDBDemoTests;
 			sourceTree = "<group>";
@@ -333,14 +339,20 @@
 				"${BUILT_PRODUCTS_DIR}/GRDB.swift-iOS/GRDB.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift-iOS/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/RxBlocking-iOS/RxBlocking.framework",
+				"${BUILT_PRODUCTS_DIR}/Action/Action.framework",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxGRDB/RxGRDB.framework",
+				"${BUILT_PRODUCTS_DIR}/RxRelay/RxRelay.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRDB.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxBlocking.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Action.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxGRDB.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxRelay.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -404,10 +416,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				565BD7D122C49D9800BB9B5A /* PlayersViewModel.swift in Sources */,
 				565BD7C922C3FA8B00BB9B5A /* PlayersTests.swift in Sources */,
 				565BD7CA22C3FAA700BB9B5A /* Players.swift in Sources */,
+				565BD7D322C49EAA00BB9B5A /* Action+App.swift in Sources */,
 				565BD7C622C3F92F00BB9B5A /* AppDatabase.swift in Sources */,
+				565BD7D022C49D2100BB9B5A /* PlayersViewModelTests.swift in Sources */,
 				565BD7C722C3F97900BB9B5A /* Player.swift in Sources */,
+				565BD7D222C49E6600BB9B5A /* World.swift in Sources */,
 				565BD7C522C3F8D600BB9B5A /* AppDatabaseTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
