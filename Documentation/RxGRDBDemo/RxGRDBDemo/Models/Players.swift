@@ -20,21 +20,17 @@ struct Players {
     }
     
     func deleteAll() -> Completable {
-        // Erase the database writer type in an AnyDatabaseWriter, so that we
-        // accept a DatabasePool in the app, a DatabaseQueue in tests, and also
-        // have access to the RxGRDB APIs with the `rx` joiner defined on the
-        // ReactiveCompatible protocol.
-        return AnyDatabaseWriter(database).rx.write(updates: _deleteAll)
+        return database.rx.write(updates: _deleteAll)
     }
     
     func deleteOne(_ player: Player) -> Completable {
-        return AnyDatabaseWriter(database).rx.write(updates: { db in
+        return database.rx.write(updates: { db in
             try self._deleteOne(db, player: player)
         })
     }
     
     func refresh() -> Completable {
-        return AnyDatabaseWriter(database).rx.write(updates: _refresh)
+        return database.rx.write(updates: _refresh)
     }
     
     func stressTest() -> Completable {
