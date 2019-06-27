@@ -1,3 +1,4 @@
+import Action
 import GRDB
 import RxBlocking
 import RxSwift
@@ -27,5 +28,13 @@ class PlayersViewModelTests: XCTestCase {
         let players = try viewModel.players.take(1).toBlocking(timeout: 1).single()
         XCTAssertEqual(orderingButtonTitle, "Score ⬇︎")
         XCTAssert(!players.isEmpty)
+    }
+    
+    func testToggleOrdering() throws {
+        try Current.players().populateIfEmpty()
+        let viewModel = PlayersViewModel()
+        _ = viewModel.toggleOrdering.execute().toBlocking(timeout: 1).materialize()
+        let orderingButtonTitle = try viewModel.orderingButtonTitle.take(1).toBlocking(timeout: 1).single()
+        XCTAssertEqual(orderingButtonTitle, "Name ⬆︎")
     }
 }
