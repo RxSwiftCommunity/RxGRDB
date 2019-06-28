@@ -5,7 +5,7 @@ import XCTest
 
 class PlayersTests: XCTestCase {
     
-    func testPlayersPopulateIfEmptyFromEmptyDatabase() throws {
+    func testPopulateIfEmptyFromEmptyDatabase() throws {
         let dbQueue = DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         let players = Players(database: dbQueue)
@@ -15,7 +15,7 @@ class PlayersTests: XCTestCase {
         try XCTAssertGreaterThan(dbQueue.read(Player.fetchCount), 0)
     }
     
-    func testPlayersPopulateIfEmptyFromNonEmptyDatabase() throws {
+    func testPopulateIfEmptyFromNonEmptyDatabase() throws {
         let dbQueue = DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         let players = Players(database: dbQueue)
@@ -29,7 +29,7 @@ class PlayersTests: XCTestCase {
         try XCTAssertEqual(dbQueue.read(Player.fetchAll), [player])
     }
     
-    func testPlayersDeleteAll() throws {
+    func testDeleteAll() throws {
         let dbQueue = DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         let players = Players(database: dbQueue)
@@ -39,11 +39,11 @@ class PlayersTests: XCTestCase {
             try player.insert(db)
         }
         
-        try XCTAssert(players.deleteAll().toBlocking(timeout: 1).toArray().isEmpty)
+        try XCTAssert(players.deleteAll().toBlocking().toArray().isEmpty)
         try XCTAssertEqual(dbQueue.read(Player.fetchCount), 0)
     }
     
-    func testPlayersDeleteOne() throws {
+    func testDeleteOne() throws {
         let dbQueue = DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         let players = Players(database: dbQueue)
@@ -55,21 +55,21 @@ class PlayersTests: XCTestCase {
             try player2.insert(db)
         }
         
-        try XCTAssert(players.deleteOne(player1).toBlocking(timeout: 1).toArray().isEmpty)
+        try XCTAssert(players.deleteOne(player1).toBlocking().toArray().isEmpty)
         try XCTAssertEqual(dbQueue.read(Player.fetchAll), [player2])
     }
     
-    func testPlayersRefreshPopulatesEmptyDatabase() throws {
+    func testRefreshPopulatesEmptyDatabase() throws {
         let dbQueue = DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         let players = Players(database: dbQueue)
         
         try XCTAssertEqual(dbQueue.read(Player.fetchCount), 0)
-        try XCTAssert(players.refresh().toBlocking(timeout: 1).toArray().isEmpty)
+        try XCTAssert(players.refresh().toBlocking().toArray().isEmpty)
         try XCTAssertGreaterThan(dbQueue.read(Player.fetchCount), 0)
     }
     
-    func testPlayersObserveAll() throws {
+    func testObserveAll() throws {
         let dbQueue = DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         let players = Players(database: dbQueue)
@@ -101,7 +101,7 @@ class PlayersTests: XCTestCase {
         try XCTAssertEqual(
             testSubject
                 .take(expectedElements.count)
-                .toBlocking(timeout: 1)
+                .toBlocking()
                 .toArray(),
             expectedElements)
     }
