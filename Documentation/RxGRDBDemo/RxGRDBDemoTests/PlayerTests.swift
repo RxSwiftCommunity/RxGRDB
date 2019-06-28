@@ -27,7 +27,6 @@ class PlayerTests: XCTestCase {
     func testOrderByScore() throws {
         let dbQueue = DatabaseQueue()
         try AppDatabase().setup(dbQueue)
-        
         var player1 = Player(id: 1, name: "Arthur", score: 100)
         var player2 = Player(id: 2, name: "Barbara", score: 200)
         var player3 = Player(id: 3, name: "Craig", score: 150)
@@ -39,8 +38,10 @@ class PlayerTests: XCTestCase {
             try player4.insert(db)
         }
         
+        let request = Player.all().orderByScore()
+        
         try XCTAssertEqual(
-            dbQueue.read(Player.all().orderByScore().fetchAll),
+            dbQueue.read(request.fetchAll),
             [player2, player3, player4, player1])
         
         try dbQueue.write { db in
@@ -48,14 +49,13 @@ class PlayerTests: XCTestCase {
         }
         
         try XCTAssertEqual(
-            dbQueue.read(Player.all().orderByScore().fetchAll),
+            dbQueue.read(request.fetchAll),
             [player1, player2, player3, player4])
     }
     
     func testOrderByName() throws {
         let dbQueue = DatabaseQueue()
         try AppDatabase().setup(dbQueue)
-        
         var player1 = Player(id: 1, name: "Arthur", score: 100)
         var player2 = Player(id: 2, name: "Barbara", score: 200)
         var player3 = Player(id: 3, name: "Craig", score: 150)
@@ -67,8 +67,10 @@ class PlayerTests: XCTestCase {
             try player4.insert(db)
         }
         
+        let request = Player.all().orderByName()
+        
         try XCTAssertEqual(
-            dbQueue.read(Player.all().orderByName().fetchAll),
+            dbQueue.read(request.fetchAll),
             [player1, player2, player3, player4])
         
         try dbQueue.write { db in
@@ -76,7 +78,7 @@ class PlayerTests: XCTestCase {
         }
         
         try XCTAssertEqual(
-            dbQueue.read(Player.all().orderByName().fetchAll),
+            dbQueue.read(request.fetchAll),
             [player2, player3, player1, player4])
     }
 }
