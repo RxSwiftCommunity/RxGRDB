@@ -49,6 +49,7 @@ end
 target 'RxGRDBDemoTests' do
   project 'Documentation/RxGRDBDemo/RxGRDBDemo.xcodeproj'
   platform :ios, '9.0'
+  pod 'Action'
   pod 'RxGRDB', :path => '.'
   pod 'RxBlocking'
 end

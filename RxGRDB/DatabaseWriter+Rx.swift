@@ -1,7 +1,19 @@
 import GRDB
 import RxSwift
 
-extension AnyDatabaseWriter: ReactiveCompatible { }
+/// We want the `rx` joiner on DatabaseWriter.
+/// Normally we'd use ReactiveCompatible. But ReactiveCompatible is unable to
+/// define `rx` on existentials as well:
+///
+///     let writer: DatabaseWriter
+///     writer.rx...
+///
+/// :nodoc:
+extension DatabaseWriter {
+    public var rx: Reactive<AnyDatabaseWriter> {
+        return Reactive(AnyDatabaseWriter(self))
+    }
+}
 
 extension Reactive where Base: DatabaseWriter {
     /// Returns an Observable that asynchronously writes into the database.

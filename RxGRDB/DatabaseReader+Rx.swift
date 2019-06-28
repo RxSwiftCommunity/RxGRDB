@@ -1,10 +1,19 @@
 import GRDB
 import RxSwift
 
-extension AnyDatabaseReader: ReactiveCompatible { }
-extension DatabasePool: ReactiveCompatible { }
-extension DatabaseQueue: ReactiveCompatible { }
-extension DatabaseSnapshot: ReactiveCompatible { }
+/// We want the `rx` joiner on DatabaseReader.
+/// Normally we'd use ReactiveCompatible. But ReactiveCompatible is unable to
+/// define `rx` on existentials as well:
+///
+///     let reader: DatabaseReader
+///     reader.rx...
+///
+/// :nodoc:
+extension DatabaseReader {
+    public var rx: Reactive<AnyDatabaseReader> {
+        return Reactive(AnyDatabaseReader(self))
+    }
+}
 
 extension Reactive where Base: DatabaseReader {
     /// Returns a Single that asynchronously emits the fetched value.
@@ -38,5 +47,12 @@ extension Reactive where Base: DatabaseReader {
                 return Disposables.create { }
             }
             .observeOn(scheduler)
+    }
+}
+
+/// :nodoc:
+extension DatabaseReader where Self: ReactiveCompatible {
+    public var rx: Reactive<Self> {
+        return Reactive(self)
     }
 }

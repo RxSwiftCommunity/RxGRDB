@@ -38,7 +38,7 @@ extension DerivableRequest where RowDecoder == Player {
     }
     
     func orderByName() -> Self {
-        return order(Player.Columns.name)
+        return order(Player.Columns.name, Player.Columns.score.desc)
     }
 }
 
