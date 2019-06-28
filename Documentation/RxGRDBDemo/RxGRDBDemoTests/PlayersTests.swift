@@ -5,74 +5,76 @@ import XCTest
 
 class PlayersTests: XCTestCase {
     
+    private func makeDatabase() throws -> DatabaseQueue {
+        // Players needs a database.
+        // Setup an in-memory database, for fast access.
+        let database = DatabaseQueue()
+        try AppDatabase().setup(database)
+        return database
+    }
+    
     func testPopulateIfEmptyFromEmptyDatabase() throws {
-        let dbQueue = DatabaseQueue()
-        try AppDatabase().setup(dbQueue)
-        let players = Players(database: dbQueue)
+        let database = try makeDatabase()
+        let players = Players(database: database)
         
-        try XCTAssertEqual(dbQueue.read(Player.fetchCount), 0)
+        try XCTAssertEqual(database.read(Player.fetchCount), 0)
         try XCTAssertTrue(players.populateIfEmpty())
-        try XCTAssertGreaterThan(dbQueue.read(Player.fetchCount), 0)
+        try XCTAssertGreaterThan(database.read(Player.fetchCount), 0)
     }
     
     func testPopulateIfEmptyFromNonEmptyDatabase() throws {
-        let dbQueue = DatabaseQueue()
-        try AppDatabase().setup(dbQueue)
-        let players = Players(database: dbQueue)
+        let database = try makeDatabase()
+        let players = Players(database: database)
         
         var player = Player(id: 1, name: "Arthur", score: 100)
-        try dbQueue.write { db in
+        try database.write { db in
             try player.insert(db)
         }
         
         try XCTAssertFalse(players.populateIfEmpty())
-        try XCTAssertEqual(dbQueue.read(Player.fetchAll), [player])
+        try XCTAssertEqual(database.read(Player.fetchAll), [player])
     }
     
     func testDeleteAll() throws {
-        let dbQueue = DatabaseQueue()
-        try AppDatabase().setup(dbQueue)
-        let players = Players(database: dbQueue)
+        let database = try makeDatabase()
+        let players = Players(database: database)
         
-        try dbQueue.write { db in
+        try database.write { db in
             var player = Player(id: 1, name: "Arthur", score: 100)
             try player.insert(db)
         }
         
-        try XCTAssert(players.deleteAll().toBlocking().toArray().isEmpty)
-        try XCTAssertEqual(dbQueue.read(Player.fetchCount), 0)
+        _ = players.deleteAll().toBlocking().materialize()
+        try XCTAssertEqual(database.read(Player.fetchCount), 0)
     }
     
     func testDeleteOne() throws {
-        let dbQueue = DatabaseQueue()
-        try AppDatabase().setup(dbQueue)
-        let players = Players(database: dbQueue)
+        let database = try makeDatabase()
+        let players = Players(database: database)
         
         var player1 = Player(id: 1, name: "Arthur", score: 100)
         var player2 = Player(id: 2, name: "Barbara", score: 200)
-        try dbQueue.write { db in
+        try database.write { db in
             try player1.insert(db)
             try player2.insert(db)
         }
         
-        try XCTAssert(players.deleteOne(player1).toBlocking().toArray().isEmpty)
-        try XCTAssertEqual(dbQueue.read(Player.fetchAll), [player2])
+        _ = players.deleteOne(player1).toBlocking().materialize()
+        try XCTAssertEqual(database.read(Player.fetchAll), [player2])
     }
     
     func testRefreshPopulatesEmptyDatabase() throws {
-        let dbQueue = DatabaseQueue()
-        try AppDatabase().setup(dbQueue)
-        let players = Players(database: dbQueue)
+        let database = try makeDatabase()
+        let players = Players(database: database)
         
-        try XCTAssertEqual(dbQueue.read(Player.fetchCount), 0)
-        try XCTAssert(players.refresh().toBlocking().toArray().isEmpty)
-        try XCTAssertGreaterThan(dbQueue.read(Player.fetchCount), 0)
+        try XCTAssertEqual(database.read(Player.fetchCount), 0)
+        _ = players.refresh().toBlocking().materialize()
+        try XCTAssertGreaterThan(database.read(Player.fetchCount), 0)
     }
     
     func testObserveAll() throws {
-        let dbQueue = DatabaseQueue()
-        try AppDatabase().setup(dbQueue)
-        let players = Players(database: dbQueue)
+        let database = try makeDatabase()
+        let players = Players(database: database)
         
         let disposeBag = DisposeBag()
         let testSubject = ReplaySubject<[Player]>.createUnbounded()
@@ -80,15 +82,15 @@ class PlayersTests: XCTestCase {
             .observeAll(Player.orderByPrimaryKey())
             .subscribe(testSubject)
             .disposed(by: disposeBag)
-
+        
         var player1 = Player(id: 1, name: "Arthur", score: 100)
         var player2 = Player(id: 2, name: "Barbara", score: 200)
         var player3 = Player(id: 3, name: "Craig", score: 300)
-        try dbQueue.write { db in
+        try database.write { db in
             try player1.insert(db)
             try player2.insert(db)
         }
-        try dbQueue.write { db in
+        try database.write { db in
             try player2.delete(db)
             try player3.insert(db)
         }

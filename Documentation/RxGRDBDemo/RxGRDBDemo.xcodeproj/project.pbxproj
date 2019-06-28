@@ -108,9 +108,9 @@
 			children = (
 				565BD7BA22C3F84A00BB9B5A /* Info.plist */,
 				565BD7C422C3F8D600BB9B5A /* AppDatabaseTests.swift */,
-				565BD7D822C5DEE800BB9B5A /* PlayerTests.swift */,
 				565BD7C822C3FA8B00BB9B5A /* PlayersTests.swift */,
 				565BD7CF22C49D2100BB9B5A /* PlayersViewModelTests.swift */,
+				565BD7D822C5DEE800BB9B5A /* PlayerTests.swift */,
 			);
 			path = RxGRDBDemoTests;
 			sourceTree = "<group>";
