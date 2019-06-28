@@ -1,9 +1,12 @@
 Release Notes
 =============
 
-## Next Release
+## 0.17.0
+
+Released June 28, 2019 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.16.0...v0.17.0)
 
 - [#58](https://github.com/RxSwiftCommunity/RxGRDB/pull/58): Expose `rx` joiner on database existentials
+
 
 ## 0.16.0
 
