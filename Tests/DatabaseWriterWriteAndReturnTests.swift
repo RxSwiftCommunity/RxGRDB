@@ -61,6 +61,35 @@ class DatabaseWriterWriteAndReturnTests : XCTestCase {
             .runAtPath { try setup(DatabasePool(path: $0)) }
     }
     
+    func testRxWriteAndReturnError() throws {
+        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+            try writer.write(Player.createTable)
+            return writer
+        }
+        
+        func test(writer: DatabaseWriter, disposeBag: DisposeBag) throws {
+            let single = writer.rx.writeAndReturn { db in
+                try Player(id: 1, name: "Arthur", score: 1000).insert(db)
+                try db.execute(sql: "THIS IS NOT SQL")
+            }
+            try XCTAssertEqual(writer.read(Player.fetchCount), 0)
+            do {
+                _ = try single.toBlocking(timeout: 1).single()
+                XCTFail("Expected Error")
+            } catch let error as DatabaseError {
+                XCTAssertEqual(error.resultCode, .SQLITE_ERROR)
+                XCTAssertEqual(error.sql, "THIS IS NOT SQL")
+            }
+            // Transaction has been rollbacked
+            try XCTAssertEqual(writer.read(Player.fetchCount), 0)
+        }
+        
+        try Test(test)
+            .run { try setup(DatabaseQueue()) }
+            .runAtPath { try setup(DatabaseQueue(path: $0)) }
+            .runAtPath { try setup(DatabasePool(path: $0)) }
+    }
+    
     func testRxWriteAndReturnScheduler() throws {
         if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
             func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {

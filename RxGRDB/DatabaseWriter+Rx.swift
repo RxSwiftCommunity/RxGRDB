@@ -85,12 +85,8 @@ extension Reactive where Base: DatabaseWriter {
         return flatMapWrite(
             observeOn: scheduler,
             updates: { db in
-                do {
-                    try updates(db)
-                    return .empty()
-                } catch {
-                    return .error(error)
-                }
+                try updates(db)
+                return .empty()
         })
             .asCompletable()
     }
@@ -115,13 +111,7 @@ extension Reactive where Base: DatabaseWriter {
     {
         return flatMapWrite(
             observeOn: scheduler,
-            updates: { db in
-                do {
-                    return try .just(updates(db))
-                } catch {
-                    return .error(error)
-                }
-        })
+            updates: { db in try .just(updates(db)) })
             .asSingle()
     }
     
