@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+## Next Version
+
+- [#60](https://github.com/RxSwiftCommunity/RxGRDB/pull/60) by [@sammygutierrez](https://github.com/sammygutierrez): Add SwiftPM support
+
+
 ## 0.17.0
 
 Released June 28, 2019 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.16.0...v0.17.0)
