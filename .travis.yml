@@ -23,35 +23,35 @@ git:
 jobs:
   include:
 
-    - stage: Test RxGRDB Xcode 11.2
+    - stage: Test Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode11.2
       env:
         - TID=RxGRDBOSX (Swift 5, macOS)
       script: make test_framework_RxGRDBmacOS_maxSwift
 
-    - stage: Test RxGRDB Xcode 11.2
+    - stage: Test Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode11.2
       env:
         - TID=RxGRDBiOS (Swift 5, iOS <MAX>)
       script: make test_framework_RxGRDBiOS_maxTarget_maxSwift
     
-    - stage: Test RxGRDB Xcode 11.2
+    - stage: Test Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode11.2
       env:
         - TID=RxGRDBiOS (Swift 5, iOS <MIN>)
       script: make test_framework_RxGRDBiOS_minTarget
     
-    - stage: Test SPM Xcode 11.2
+    - stage: Test Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode11.2
       env:
         - TID=RxGRDB [SPM] (macOS)
       script: make test_SPM
     
-    - stage: Test SPM Xcode 11.2
+    - stage: Test Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
       osx_image: xcode11.2
       env:
