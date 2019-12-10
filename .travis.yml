@@ -23,40 +23,37 @@ git:
 jobs:
   include:
 
-    ###########################################
-    ## Test RxGRDB Xcode 10.2
-
-    # Test RxGRDBmacOS (Xcode 10.2)
-    - stage: Test RxGRDB Xcode 10.2
+    - stage: Test RxGRDB Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode10.2
+      osx_image: xcode11.2
       env:
         - TID=RxGRDBOSX (Swift 5, macOS)
       script: make test_framework_RxGRDBmacOS_maxSwift
 
-    # Test RxGRDBiOS (iOS <MAXIMUM VERSION>))
-    - stage: Test RxGRDB Xcode 10.2
+    - stage: Test RxGRDB Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode10.2
+      osx_image: xcode11.2
       env:
         - TID=RxGRDBiOS (Swift 5, iOS <MAX>)
       script: make test_framework_RxGRDBiOS_maxTarget_maxSwift
-
-    # Test RxGRDBiOS (iOS <MINIMUM VERSION>))
-    - stage: Test RxGRDB Xcode 10.2
+    
+    - stage: Test RxGRDB Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode10.2
+      osx_image: xcode11.2
       env:
         - TID=RxGRDBiOS (Swift 5, iOS <MIN>)
       script: make test_framework_RxGRDBiOS_minTarget
-
-    ###########################################
-    ## Test Installation Methods
-
-    # CocoaPods Lint
-    - stage: Test Installation
+    
+    - stage: Test SPM Xcode 11.2
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode10.2
+      osx_image: xcode11.2
       env:
-        - TID=CocoaPods (Xcode 10.2)
+        - TID=RxGRDB [SPM] (macOS)
+      script: make test_SPM
+    
+    - stage: Test SPM Xcode 11.2
+      gemfile: .ci/gemfiles/Gemfile.travis
+      osx_image: xcode11.2
+      env:
+        - TID=CocoaPods Lint
       script: make test_CocoaPodsLint
