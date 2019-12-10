@@ -4,6 +4,7 @@ Release Notes
 ## Next Version
 
 - [#60](https://github.com/RxSwiftCommunity/RxGRDB/pull/60) by [@sammygutierrez](https://github.com/sammygutierrez): Add SwiftPM support
+- [#62](https://github.com/RxSwiftCommunity/RxGRDB/pull/62): Test Xcode 11.2 and SPM on Travis
 
 
 ## 0.17.0
