@@ -1,7 +1,9 @@
 Release Notes
 =============
 
-## Next Version
+## 0.18.0
+
+Released December 11, 2019 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.17.0...v0.18.0)
 
 - [#60](https://github.com/RxSwiftCommunity/RxGRDB/pull/60) by [@sammygutierrez](https://github.com/sammygutierrez): Add SwiftPM support
 - [#61](https://github.com/RxSwiftCommunity/RxGRDB/pull/61): Fix error handling of asynchronous writes
