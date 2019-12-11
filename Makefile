@@ -14,6 +14,7 @@ GIT := $(shell command -v git)
 POD := $(shell command -v pod)
 XCRUN := $(shell command -v xcrun)
 XCODEBUILD := set -o pipefail && $(shell command -v xcodebuild)
+SWIFT = $(shell $(XCRUN) --find swift 2> /dev/null)
 
 # Xcode Version Information
 XCODEVERSION_FULL := $(word 2, $(shell xcodebuild -version))
@@ -35,7 +36,15 @@ XCPRETTY_PATH := $(shell command -v xcpretty 2> /dev/null)
 TEST_ACTIONS = clean build build-for-testing test-without-building
 
 # When adding support for an Xcode version, look for available devices with `instruments -s devices`
-ifeq ($(XCODEVERSION),10.2)
+ifeq ($(XCODEVERSION),11.3)
+  MAX_SWIFT_VERSION = 5.1
+  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 11,OS=13.3"
+  MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 5,OS=10.3.1"
+else ifeq ($(XCODEVERSION),11.2)
+  MAX_SWIFT_VERSION = 5.1
+  MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 11,OS=13.2.2"
+  MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 5,OS=10.3.1"
+else ifeq ($(XCODEVERSION),10.2)
   MAX_SWIFT_VERSION = 5
   MAX_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone XS,OS=12.2"
   MIN_IOS_DESTINATION = "platform=iOS Simulator,name=iPhone 4s,OS=9.0"
@@ -61,12 +70,18 @@ ifeq ($(TRAVIS),true)
 endif
 
 # We test framework test suites, and if RxGRBD can be installed in an application:
-test: test_framework test_install
+test: test_SPM test_framework test_install
 
 test_framework: test_framework_RxGRDB
 test_framework_RxGRDB: test_framework_RxGRDBmacOS test_framework_RxGRDBiOS
 test_framework_RxGRDBiOS: test_framework_RxGRDBiOS_minTarget test_framework_RxGRDBiOS_maxTarget
 test_install: test_CocoaPodsLint
+
+test_SPM:
+	$(SWIFT) package clean
+	$(SWIFT) build
+	$(SWIFT) build -c release
+	set -o pipefail && $(SWIFT) test $(XCPRETTY)
 
 test_framework_RxGRDBmacOS: test_framework_RxGRDBmacOS_maxSwift test_framework_RxGRDBmacOS_minSwift
 
