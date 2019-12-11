@@ -98,18 +98,18 @@ Documentation
 
 ## Installation
 
-You can install RxGRDB with [CocoaPods](http://cocoapods.org/):
+#### CocoaPods
 
-1. Install cocoapods version 1.7.0 or higher
+[CocoaPods](http://cocoapods.org/) is a dependency manager for Xcode projects. To use RxGRDB with CocoaPods (version 1.7 or higher):
 
-2. Specify in your Podfile:
+1. Specify in your Podfile:
 
     ```ruby
     use_frameworks!
     pod 'RxGRDB'
     ```
 
-3. In your application files, import the modules you need:
+2. In your application files, import the modules you need:
     
     ```swift
     import RxSwift
@@ -119,22 +119,33 @@ You can install RxGRDB with [CocoaPods](http://cocoapods.org/):
 
 In order to use databases encrypted with [SQLCipher](https://www.zetetic.net/sqlcipher/), do instead:
 
-1. Install cocoapods version 1.1 or higher
-
-2. Specify in your Podfile:
+1. Specify in your Podfile:
 
     ```ruby
     use_frameworks!
     pod 'RxGRDB/SQLCipher'
     ```
 
-3. In your application files, import the modules you need:
+2. In your application files, import the modules you need:
     
     ```swift
     import RxSwift
     import RxGRDB
     import GRDB
     ```
+
+#### Swift Package Manager
+
+The [Swift Package Manager](https://swift.org/package-manager/) automates the distribution of Swift code. To use RxGRDB with SPM, add a dependency to your `Package.swift` file:
+
+```swift
+let package = Package(
+    dependencies: [
+        .package(url: "https://github.com/RxSwiftCommunity/RxGRDB.git", ...)
+    ]
+)
+```
+
 
 ## Demo Application
 
