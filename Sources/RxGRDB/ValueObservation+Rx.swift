@@ -91,7 +91,7 @@ extension Reactive where Base: _ValueObservationProtocol {
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         observeOn scheduler: ImmediateSchedulerType? = nil)
-        -> Observable<Base.Reducer.Value>
+        -> ValueObservationObservable<Base.Reducer.Value>
     { preconditionFailure() }
     
     @available(*, unavailable, message: "Use observe(in:) instead")
@@ -99,7 +99,7 @@ extension Reactive where Base: _ValueObservationProtocol {
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
-        -> Observable<Base.Reducer.Value>
+        -> ValueObservationObservable<Base.Reducer.Value>
     { preconditionFailure() }
 }
 

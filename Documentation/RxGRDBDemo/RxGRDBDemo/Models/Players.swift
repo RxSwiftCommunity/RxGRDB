@@ -16,32 +16,35 @@ struct Players {
     /// was empty.
     @discardableResult
     func populateIfEmpty() throws -> Bool {
-        return try database.write(_populateIfEmpty)
+        try database.write(_populateIfEmpty)
     }
     
     func deleteAll() -> Completable {
-        return database.rx.write(updates: _deleteAll)
+        database.rx.write(updates: _deleteAll)
     }
     
     func deleteOne(_ player: Player) -> Completable {
-        return database.rx.write(updates: { db in
+        database.rx.write(updates: { db in
             try self._deleteOne(db, player: player)
         })
     }
     
     func refresh() -> Completable {
-        return database.rx.write(updates: _refresh)
+        database.rx.write(updates: _refresh)
     }
     
     func stressTest() -> Completable {
-        return Completable.zip(repeatElement(refresh(), count: 50))
+        Completable.zip(repeatElement(refresh(), count: 50))
     }
     
     // MARK: - Access Players
     
     /// An observable that tracks changes in any request of players
     func observeAll(_ request: QueryInterfaceRequest<Player>) -> Observable<[Player]> {
-        return request.rx.observeAll(in: database)
+        ValueObservation
+            .tracking(request.fetchAll)
+            .rx.observe(in: database)
+            .asObservable()
     }
     
     // MARK: - Implementation
