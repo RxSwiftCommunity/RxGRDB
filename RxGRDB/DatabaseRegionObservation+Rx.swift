@@ -50,24 +50,10 @@ extension Reactive where Base == DatabaseRegionObservation {
     ///     }
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
-    /// - parameter startImmediately: When true (the default), the first
-    ///   element is emitted synchronously, on subscription.
-    public func changes(
-        in writer: DatabaseWriter,
-        startImmediately: Bool = true)
-        -> Observable<Database>
-    {
+    public func changes(in writer: DatabaseWriter) -> Observable<Database> {
         return Observable.create { observer -> Disposable in
             do {
-                let transactionObserver: TransactionObserver
-                if startImmediately {
-                    transactionObserver = try writer.unsafeReentrantWrite { db in
-                        defer { observer.onNext(db) }
-                        return try self.base.start(in: writer, onChange: observer.onNext)
-                    }
-                } else {
-                    transactionObserver = try self.base.start(in: writer, onChange: observer.onNext)
-                }
+                let transactionObserver = try self.base.start(in: writer, onChange: observer.onNext)
                 return Disposables.create {
                     writer.remove(transactionObserver: transactionObserver)
                 }

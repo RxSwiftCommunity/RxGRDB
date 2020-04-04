@@ -5,20 +5,54 @@ extension ValueObservation : ReactiveCompatible { }
 
 /// :nodoc:
 public protocol _ValueObservationProtocol: ReactiveCompatible {
-    associatedtype _Reducer: ValueReducer
-    var scheduling: ValueScheduling { get set }
+    associatedtype Reducer: _ValueReducer
     func start(
         in reader: DatabaseReader,
+        scheduling scheduler: ValueObservationScheduler,
         onError: @escaping (Error) -> Void,
-        onChange: @escaping (_Reducer.Value) -> Void) -> TransactionObserver
+        onChange: @escaping (Reducer.Value) -> Void) -> DatabaseCancellable
 }
 
 /// :nodoc:
-extension ValueObservation: _ValueObservationProtocol where Reducer: ValueReducer {
-    public typealias _Reducer = Reducer
-}
+extension ValueObservation: _ValueObservationProtocol { }
 
 extension Reactive where Base: _ValueObservationProtocol {
+    /// Creates an Observable which tracks changes in database values.
+    ///
+    /// For example:
+    ///
+    ///     let observation = ValueObservation.tracking { db in
+    ///         try Player.fetchAll(db)
+    ///     }
+    ///     let disposable = observation.rx
+    ///         .observe(in: dbQueue)
+    ///         .subscribe(
+    ///             onNext: { players: [Player] in
+    ///                 print("fresh players: \(players)")
+    ///             },
+    ///             onError: { error in ... })
+    ///
+    /// By default, fresh values are dispatched asynchronously on the
+    /// main queue. You can change this behavior by calling the `scheduling(_:)`
+    /// method on the returned observable.
+    ///
+    /// For example, `scheduling(.immediate)` notifies all values on the main
+    /// queue as well, and the first one is immediately notified when the
+    /// publisher is subscribed:
+    ///
+    ///     let disposable = observation.rx
+    ///         .observe(in: dbQueue)
+    ///         .scheduling(.immediate) // <-
+    ///         .subscribe(
+    ///             onNext: { players: [Player] in
+    ///                 print("fresh players: \(players)")
+    ///             },
+    ///             onError: { error in ... })
+    ///     // <- here "fresh players" is already printed.
+    ///
+    /// - parameter reader: A DatabaseReader.
+    /// - returns: A Combine publisher
+    ///
     /// Returns an Observable that emits the same values as a ValueObservation.
     ///
     ///     let observation = ValueObservation.trackingAll(Player.all())
@@ -47,67 +81,85 @@ extension Reactive where Base: _ValueObservationProtocol {
     ///     // <- here "Fresh players" has been printed
     ///
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
-    /// - parameter startImmediately: When true (the default), the first
-    ///   element is emitted right upon subscription.
-    /// - parameter scheduler: The eventual scheduler on which elements
     ///   are emitted.
+    public func observe(in reader: DatabaseReader) -> ValueObservationObservable<Base.Reducer.Value> {
+        return ValueObservationObservable(base, in: reader)
+    }
+    
+    @available(*, unavailable, message: "Use observe(in:) instead")
     public func observe(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         observeOn scheduler: ImmediateSchedulerType? = nil)
-        -> Observable<Base._Reducer.Value>
-    {
-        var observation = base
-        
-        if let scheduler = scheduler {
-            // Honor the scheduler parameter.
-            // Deal with unsafe GRDB scheduling: we can only
-            // guarantee correct ordering of values if observation
-            // starts on the same queue as the queue values are
-            // dispatched on.
-            observation.scheduling = .unsafe(startImmediately: startImmediately)
-            return observation
-                .makeObservable(in: reader)
-                .subscribeOn(scheduler)
-                .observeOn(scheduler)
-            
-        } else if case .mainQueue = observation.scheduling , startImmediately == false {
-            // Honor the startImmediately parameter
-            observation.scheduling = .async(onQueue: .main, startImmediately: false)
-            return observation.makeObservable(in: reader)
-            
-        } else {
-            // Honor observation scheduling
-            return observation.makeObservable(in: reader)
-        }
-    }
+        -> Observable<Base.Reducer.Value>
+    { preconditionFailure() }
     
-    @available(*, deprecated, renamed: "observe(in:startImmediately:observeOn:)")
+    @available(*, unavailable, message: "Use observe(in:) instead")
     public func fetch(
         in reader: DatabaseReader,
         startImmediately: Bool = true,
         scheduler: ImmediateSchedulerType? = nil)
-        -> Observable<Base._Reducer.Value>
+        -> Observable<Base.Reducer.Value>
+    { preconditionFailure() }
+}
+
+public struct ValueObservationObservable<Element>: ObservableType {
+    private let start: Start<Element>
+    private var scheduler = ValueObservationScheduler.async(onQueue: .main)
+    
+    init<Observation: _ValueObservationProtocol>(
+        _ observation: Observation,
+        in reader: DatabaseReader)
+        where Observation.Reducer.Value == Element
     {
-        return observe(in: reader, startImmediately: startImmediately, observeOn: scheduler)
+        start = { [weak reader] (scheduler, onError, onChange) in
+            guard let reader = reader else {
+                return AnyDatabaseCancellable(cancel: { })
+            }
+            return observation.start(in: reader, scheduling: scheduler, onError: onError, onChange: onChange)
+        }
+    }
+    
+    public func subscribe<Observer>(_ observer: Observer) -> Disposable
+        where Observer: ObserverType, Element == Observer.Element
+    {
+        asObservable().subscribe(observer)
+    }
+    
+    public func asObservable() -> Observable<Element> {
+        Observable.create { observer in
+            let cancellable = self.start(
+                self.scheduler,
+                observer.onError,
+                observer.onNext)
+            return Disposables.create(with: cancellable.cancel)
+        }
+    }
+
+    /// Returns an Observable which starts the observation with the given
+    /// ValueObservation scheduler.
+    ///
+    /// For example, `scheduling(.immediate)` notifies all values on the
+    /// main queue, and the first one is immediately notified when the
+    /// publisher is subscribed:
+    ///
+    ///     let disposable = observation.rx
+    ///         .observe(in: dbQueue)
+    ///         .scheduling(.immediate) // <-
+    ///         .subscribe(
+    ///             onNext: { players: [Player] in
+    ///                 print("fresh players: \(players)")
+    ///             },
+    ///             onError: { error in ... })
+    ///     // <- here "fresh players" is already printed.
+    public func scheduling(_ scheduler: ValueObservationScheduler) -> Self {
+        var observable = self
+        observable.scheduler = scheduler
+        return observable
     }
 }
 
-extension _ValueObservationProtocol {
-    fileprivate func makeObservable(in reader: DatabaseReader) -> Observable<_Reducer.Value> {
-        return Observable.create { observer -> Disposable in
-            var transactionObserver: TransactionObserver? = nil
-            // Avoid the "Variable 'transactionObserver' was written to, but never read" warning
-            _ = transactionObserver
-            
-            transactionObserver = self.start(
-                in: reader,
-                onError: observer.onError,
-                onChange: observer.onNext)
-            
-            return Disposables.create {
-                transactionObserver = nil
-            }
-        }
-    }
-}
+private typealias Start<T> = (
+    _ scheduler: ValueObservationScheduler,
+    _ onError: @escaping (Error) -> Void,
+    _ onChange: @escaping (T) -> Void) -> DatabaseCancellable

@@ -38,129 +38,185 @@ class DatabaseReaderReadTests : XCTestCase {
         }
     }
     
-    func testRxRead() throws {
-        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-            try writer.write { db in
-                try Player.createTable(db)
-                try Player(id: 1, name: "Arthur", score: 1000).insert(db)
-            }
+    // MARK: -
+    
+    func testReadObservable() throws {
+        func setUp<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+            try writer.write(Player.createTable)
             return writer
         }
         
-        func test(reader: DatabaseReader, disposeBag: DisposeBag) throws {
-            let single = reader.rx.read { db in try Player.fetchCount(db) }
-            let count = try single.toBlocking(timeout: 1).single()
-            XCTAssertEqual(count, 1)
+        func test(reader: DatabaseReader) throws {
+            let single = reader.rx.read(value: { db in
+                try Player.fetchCount(db)
+            })
+            let value = try single.toBlocking(timeout: 1).single()
+            XCTAssertEqual(value, 0)
         }
         
         try Test(test)
-            .run { try setup(DatabaseQueue()) }
-            .runAtPath { try setup(DatabaseQueue(path: $0)) }
-            .runAtPath { try setup(DatabasePool(path: $0)) }
-            .runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
+            .run { try setUp(DatabaseQueue()) }
+            .runAtTemporaryDatabasePath { try setUp(DatabaseQueue(path: $0)) }
+            .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)) }
+            .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)).makeSnapshot() }
     }
     
-    func testRxReadScheduler() throws {
-        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
-            func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-                try writer.write { db in
-                    try Player.createTable(db)
-                    try Player(id: 1, name: "Arthur", score: 1000).insert(db)
-                }
-                return writer
-            }
-            
-            func test(reader: DatabaseReader, disposeBag: DisposeBag) throws {
-                do {
-                    let single = reader.rx
-                        .read { db in try Player.fetchCount(db) }
-                        .do(onSuccess: { _ in
-                            dispatchPrecondition(condition: .onQueue(.main))
-                        })
-                    _ = try single.toBlocking(timeout: 1).toArray()
-                }
-                do {
-                    let queue = DispatchQueue(label: "test")
-                    let single = reader.rx
-                        .read(
-                            observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
-                            value: { db in try Player.fetchCount(db) })
-                        .do(onSuccess: { _ in
-                            dispatchPrecondition(condition: .onQueue(queue))
-                        })
-                    _ = try single.toBlocking(timeout: 1).toArray()
-                }
-            }
-            
-            try Test(test)
-                .run { try setup(DatabaseQueue()) }
-                .runAtPath { try setup(DatabaseQueue(path: $0)) }
-                .runAtPath { try setup(DatabasePool(path: $0)) }
-                .runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
-        }
-    }
+    // MARK: -
     
-    func testRxReadIsAsynchronous() throws {
-        func setup<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
-            try writer.write { db in
-                try Player.createTable(db)
-                try Player(id: 1, name: "Arthur", score: 1000).insert(db)
-            }
-            return writer
-        }
-        
-        func test(reader: DatabaseReader, disposeBag: DisposeBag) throws {
-            let semaphore = DispatchSemaphore(value: 0)
-            let single = reader.rx.read { db -> Int in
-                // Make sure this block executes asynchronously
-                semaphore.wait()
-                return try Player.fetchCount(db)
-            }
-            
-            let count = try single
-                .asObservable()
-                .do(onSubscribed: {
-                    semaphore.signal()
-                })
-                .toBlocking(timeout: 1)
-                .single()
-            XCTAssertEqual(count, 1)
-        }
-        
-        try Test(test)
-            .run { try setup(DatabaseQueue()) }
-            .runAtPath { try setup(DatabaseQueue(path: $0)) }
-            .runAtPath { try setup(DatabasePool(path: $0)) }
-            .runAtPath { try setup(DatabasePool(path: $0)).makeSnapshot() }
-    }
-    
-    func testRxReadIsReadonly() throws {
-        func test(reader: DatabaseReader, disposeBag: DisposeBag) throws {
-            let single = reader.rx.read { db in
-                try Player.createTable(db)
-            }
-            
-            let sequence = single
-                .asObservable()
-                .toBlocking(timeout: 1)
-                .materialize()
-            switch sequence {
-            case .completed:
+    func testReadObservableError() throws {
+        func test(reader: DatabaseReader) throws {
+            let single = reader.rx.read(value: { db in
+                try Row.fetchAll(db, sql: "THIS IS NOT SQL")
+            })
+            do {
+                _ = try single.toBlocking(timeout: 1).single()
                 XCTFail("Expected error")
-            case let .failed(elements: elements, error: error):
-                XCTAssertTrue(elements.isEmpty)
-                guard let dbError = error as? DatabaseError else {
-                    XCTFail("Unexpected error: \(error)")
-                    return
-                }
-                XCTAssertEqual(dbError.resultCode, .SQLITE_READONLY)
+            } catch let error as DatabaseError {
+                XCTAssertEqual(error.resultCode, .SQLITE_ERROR)
+                XCTAssertEqual(error.sql, "THIS IS NOT SQL")
             }
         }
         
         try Test(test)
             .run { DatabaseQueue() }
-            .runAtPath { try DatabaseQueue(path: $0) }
-            .runAtPath { try DatabasePool(path: $0) }
-            .runAtPath { try DatabasePool(path: $0).makeSnapshot() }
+            .runAtTemporaryDatabasePath { try DatabaseQueue(path: $0) }
+            .runAtTemporaryDatabasePath { try DatabasePool(path: $0) }
+            .runAtTemporaryDatabasePath { try DatabasePool(path: $0).makeSnapshot() }
+    }
+    
+    // MARK: -
+    
+    func testReadObservableIsAsynchronous() throws {
+        func setUp<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+            try writer.write(Player.createTable)
+            return writer
+        }
+        
+        func test(reader: DatabaseReader) throws {
+            let disposeBag = DisposeBag()
+            withExtendedLifetime(disposeBag) {
+                let expectation = self.expectation(description: "")
+                let semaphore = DispatchSemaphore(value: 0)
+                reader.rx
+                    .read(value: { db in
+                        try Player.fetchCount(db)
+                    })
+                    .subscribe(
+                        onSuccess: { _ in
+                            semaphore.wait()
+                            expectation.fulfill()
+                    },
+                        onError: { error in XCTFail("Unexpected error \(error)") })
+                    .disposed(by: disposeBag)
+                
+                semaphore.signal()
+                waitForExpectations(timeout: 1, handler: nil)
+            }
+        }
+        
+        try Test(test)
+            .run { try setUp(DatabaseQueue()) }
+            .runAtTemporaryDatabasePath { try setUp(DatabaseQueue(path: $0)) }
+            .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)) }
+            .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)).makeSnapshot() }
+    }
+    
+    // MARK: -
+    
+    func testReadObservableDefaultScheduler() throws {
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setUp<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+                try writer.write(Player.createTable)
+                return writer
+            }
+            
+            func test(reader: DatabaseReader) {
+                let disposeBag = DisposeBag()
+                withExtendedLifetime(disposeBag) {
+                    let expectation = self.expectation(description: "")
+                    reader.rx
+                        .read(value: { db in
+                            try Player.fetchCount(db)
+                        })
+                        .subscribe(
+                            onSuccess: { _ in
+                                dispatchPrecondition(condition: .onQueue(.main))
+                                expectation.fulfill()
+                        },
+                            onError: { error in XCTFail("Unexpected error \(error)") })
+                        .disposed(by: disposeBag)
+                    
+                    waitForExpectations(timeout: 1, handler: nil)
+                }
+            }
+            
+            try Test(test)
+                .run { try setUp(DatabaseQueue()) }
+                .runAtTemporaryDatabasePath { try setUp(DatabaseQueue(path: $0)) }
+                .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)) }
+                .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)).makeSnapshot() }
+        }
+    }
+    
+    // MARK: -
+    
+    func testReadObservableCustomScheduler() throws {
+        if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
+            func setUp<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+                try writer.write(Player.createTable)
+                return writer
+            }
+            
+            func test(reader: DatabaseReader) {
+                let disposeBag = DisposeBag()
+                withExtendedLifetime(disposeBag) {
+                    let queue = DispatchQueue(label: "test")
+                    let expectation = self.expectation(description: "")
+                    reader.rx
+                        .read(
+                            observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
+                            value: { db in
+                                try Player.fetchCount(db)
+                        })
+                        .subscribe(
+                            onSuccess: { _ in
+                                dispatchPrecondition(condition: .onQueue(queue))
+                                expectation.fulfill()
+                        },
+                            onError: { error in XCTFail("Unexpected error \(error)") })
+                        .disposed(by: disposeBag)
+                    
+                    waitForExpectations(timeout: 1, handler: nil)
+                }
+            }
+            
+            try Test(test)
+                .run { try setUp(DatabaseQueue()) }
+                .runAtTemporaryDatabasePath { try setUp(DatabaseQueue(path: $0)) }
+                .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)) }
+                .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)).makeSnapshot() }
+        }
+    }
+    
+    // MARK: -
+    
+    func testReadObservableIsReadonly() throws {
+        func test(reader: DatabaseReader) throws {
+            let single = reader.rx.read(value: { db in
+                try Player.createTable(db)
+            })
+            do {
+                _ = try single.toBlocking(timeout: 1).single()
+                XCTFail("Expected error")
+            } catch let error as DatabaseError {
+                XCTAssertEqual(error.resultCode, .SQLITE_READONLY)
+            }
+        }
+        
+        try Test(test)
+            .run { DatabaseQueue() }
+            .runAtTemporaryDatabasePath { try DatabaseQueue(path: $0) }
+            .runAtTemporaryDatabasePath { try DatabasePool(path: $0) }
+            .runAtTemporaryDatabasePath { try DatabasePool(path: $0).makeSnapshot() }
     }
 }

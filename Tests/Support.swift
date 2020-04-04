@@ -3,41 +3,43 @@ import RxSwift
 import GRDB
 
 final class Test<Context> {
-    private let test: (Context, DisposeBag) throws -> ()
+    // Raise the repeatCount in order to help spotting flaky tests.
+    private let repeatCount = 1
+    private let test: (Context) throws -> ()
     
-    init(_ test: @escaping (Context, DisposeBag) throws -> ()) {
+    init(_ test: @escaping (Context) throws -> ()) {
         self.test = test
     }
     
     @discardableResult
-    func run(_ makeContext: () throws -> Context) throws -> Self {
-        try executeTest(makeContext())
+    func run(context: () throws -> Context) throws -> Self {
+        for _ in 1...repeatCount {
+            try test(context())
+        }
         return self
     }
     
     @discardableResult
-    func runAtPath(_ makeContext: (_ path: String) throws -> Context) throws -> Self {
-        // Create temp directory
-        let fm = FileManager.default
-        let directoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("RxGRDBTests", isDirectory: true)
-            .appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString, isDirectory: true)
-        try fm.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
-        
-        do {
-            // Run test inside temp directory
-            let databasePath = directoryURL.appendingPathComponent("db.sqlite").path
-            let context = try makeContext(databasePath)
-            try executeTest(context)
+    func runInTemporaryDirectory(context: (_ directoryURL: URL) throws -> Context) throws -> Self {
+        for _ in 1...repeatCount {
+            let directoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
+                .appendingPathComponent("GRDBCombine", isDirectory: true)
+                .appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString, isDirectory: true)
+            
+            try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
+            defer {
+                try! FileManager.default.removeItem(at: directoryURL)
+            }
+            
+            try test(context(directoryURL))
         }
-        
-        // Destroy temp directory
-        try! FileManager.default.removeItem(at: directoryURL)
         return self
     }
     
-    private func executeTest(_ context: Context) throws {
-        let bag = DisposeBag()
-        try test(context, bag)
+    @discardableResult
+    func runAtTemporaryDatabasePath(context: (_ path: String) throws -> Context) throws -> Self {
+        try runInTemporaryDirectory { url in
+            try context(url.appendingPathComponent("db.sqlite").path)
+        }
     }
 }
