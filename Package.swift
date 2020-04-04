@@ -8,7 +8,7 @@ let package = Package(
         .library(name: "RxGRDB", targets: ["RxGRDB"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/groue/GRDB.swift.git", .upToNextMajor(from: "4.1.0")),
+        .package(name: "GRDB", url: "https://github.com/groue/GRDB.swift.git", .branch("GRDB5")),
         .package(url: "https://github.com/ReactiveX/RxSwift.git", .upToNextMajor(from: "5.0.1"))
     ],
     targets: [
