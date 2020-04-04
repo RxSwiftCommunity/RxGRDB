@@ -23,7 +23,7 @@ RxGRDB [![Swift 5](https://img.shields.io/badge/swift-5.2-orange.svg?style=flat)
 
 ## Usage
 
-To connect to the database, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports GRDBCombine.
+To connect to the database, please refer to [GRDB](https://github.com/groue/GRDB.swift), the database library that supports RxGRDB.
 
 <details>
   <summary><strong>Asynchronously read from the database</strong></summary>
@@ -163,7 +163,7 @@ pod 'RxGRDB/SQLCipher'
 
 # Asynchronous Database Access
 
-GRDBCombine provide observables that perform asynchronous database accesses.
+RxGRDB provide observables that perform asynchronous database accesses.
 
 - [`rx.read(observeOn:value:)`]
 - [`rx.write(observeOn:updates:)`]
@@ -263,7 +263,7 @@ It completes on the main queue, unless you provide a specific [scheduler] to the
 
 # Database Observation
 
-Database Observation observables are based on GRDB's [ValueObservation] and [DatabaseRegionObservation]. Please refer to their documentation for more information. If your application needs change notifications that are not built in GRDBCombine, check the general [Database Changes Observation] chapter.
+Database Observation observables are based on GRDB's [ValueObservation] and [DatabaseRegionObservation]. Please refer to their documentation for more information. If your application needs change notifications that are not built in RxGRDB, check the general [Database Changes Observation] chapter.
 
 - [`ValueObservation.rx.observe(in:)`]
 - [`DatabaseRegionObservation.rx.changes(in:)`]
