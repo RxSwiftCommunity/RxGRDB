@@ -4,7 +4,7 @@ import RxSwift
 
 extension AdaptedFetchRequest: ReactiveCompatible { }
 extension AnyFetchRequest: ReactiveCompatible { }
-extension QueryInterfaceRequest: ReactiveCompatible { }
+extension Request: ReactiveCompatible { }
 extension SQLRequest: ReactiveCompatible { }
 
 extension Reactive where Base: FetchRequest {

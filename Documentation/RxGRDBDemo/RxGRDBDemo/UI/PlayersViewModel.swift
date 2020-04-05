@@ -35,7 +35,7 @@ class PlayersViewModel {
         // Values Displayed on Screen
         players = ordering
             .distinctUntilChanged()
-            .map { ordering -> QueryInterfaceRequest<Player> in
+            .map { ordering -> Request<Player> in
                 switch ordering {
                 case .byScore:
                     return Player.all().orderByScore()
