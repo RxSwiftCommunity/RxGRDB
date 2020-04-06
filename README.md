@@ -51,19 +51,19 @@ players.subscribe(
 Those observables complete after the database has been updated.
 
 ```swift
-// Completable
+// Single<Void>
 let write = dbQueue.rx.write { db in 
     try Player(...).insert(db)
 }
 
 write.subscribe(
-    onCompleted: {
+    onSuccess: { _ in
         print("Updates completed")
     },
     onError: { error in ... })
 
 // Single<Int>
-let newPlayerCount = dbQueue.rx.writeAndReturn { db -> Int in
+let newPlayerCount = dbQueue.rx.write { db -> Int in
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
@@ -71,6 +71,17 @@ let newPlayerCount = dbQueue.rx.writeAndReturn { db -> Int in
 newPlayerCount.subscribe(
     onSuccess: { (playerCount: Int) in
         print("New players count: \(playerCount)")
+    },
+    onError: { error in ... })
+
+// Completable
+let write = dbQueue.rx
+    .write { db in try Player(...).insert(db) }
+    .asCompletable()
+
+write.subscribe(
+    onCompleted: {
+        print("Updates completed")
     },
     onError: { error in ... })
 ```
@@ -174,7 +185,6 @@ RxGRDB provide observables that perform asynchronous database accesses.
 
 - [`rx.read(observeOn:value:)`]
 - [`rx.write(observeOn:updates:)`]
-- [`rx.writeAndReturn(observeOn:updates:)`]
 - [`rx.write(observeOn:updates:thenRead:)`]
 
 
@@ -202,27 +212,16 @@ The fetched value is published on the main queue, unless you provide a specific 
 
 #### `DatabaseWriter.rx.write(observeOn:updates:)`
 
-This method returns a [Completable] that completes after database updates have been successfully executed inside a database transaction.
-
-```swift
-// Completable
-let write = dbQueue.rx.write { db in
-    try Player(...).insert(db)
-}
-```
-
-This observable can be subscribed from any thread. A new database access starts on every subscription.
-
-It completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
-
-
-#### `DatabaseWriter.rx.writeAndReturn(observeOn:updates:)`
-
 This method returns a [Single] that completes after database updates have been successfully executed inside a database transaction.
 
 ```swift
+// Single<Void>
+let write = dbQueue.rx.write { db -> Int in
+    try Player(...).insert(db)
+}
+
 // Single<Int>
-let newPlayerCount = dbQueue.rx.writesAndReturn { db -> Int in
+let newPlayerCount = dbQueue.rx.write { db -> Int in
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
@@ -231,6 +230,15 @@ let newPlayerCount = dbQueue.rx.writesAndReturn { db -> Int in
 This observable can be subscribed from any thread. A new database access starts on every subscription.
 
 It completes on the main queue, unless you provide a specific [scheduler] to the `observeOn` argument.
+
+You can ignore its value and turn it into a [Completable] with the `asCompletable` operator:
+
+```swift
+// Completable
+let write = dbQueue.rx
+    .write { db -> Int in try Player(...).insert(db) }
+    .asCompletable()
+```
 
 When you use a [database pool], and your app executes some database updates followed by some slow fetches, you may profit from optimized scheduling with [`rx.write(observeOn:updates:thenRead:)`]. See below.
 
@@ -247,11 +255,11 @@ let newPlayerCount = dbQueue.rx.write(
 }
 ```
 
-It publishes exactly the same values as [`rx.writeAndReturn(observeOn:updates:)`]:
+It publishes exactly the same values as [`rx.write(observeOn:updates:)`]:
 
 ```swift
 // Single<Int>
-let newPlayerCount = dbQueue.rx.writeAndReturn { db -> Int in
+let newPlayerCount = dbQueue.rx.write { db -> Int in
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
@@ -407,7 +415,6 @@ See [DatabaseRegionObservation] for more information.
 [`ValueObservation.rx.observe(in:)`]: #valueobservationrxobservein
 [`rx.read(observeOn:value:)`]: #databasereaderrxreadobserveonvalue
 [`rx.write(observeOn:updates:)`]: #databasewriterrxwriteobserveonupdates
-[`rx.writeAndReturn(observeOn:updates:)`]: #databasewriterrxwriteandreturnobserveonupdates
 [`rx.write(observeOn:updates:thenRead:)`]: #databasewriterrxwriteobserveonupdatesthenread
 [configured]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#databasepool-configuration
 [database pool]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#database-pools

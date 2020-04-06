@@ -64,36 +64,9 @@ extension Reactive where Base: DatabaseWriter {
             .observeOn(scheduler)
     }
     
-    /// Returns a Completable that asynchronously writes into the database.
-    ///
-    ///     let dbQueue = DatabaseQueue()
-    ///     let completable: Completable = dbQueue.rx.write { db in
-    ///         try Player(...).insert(db)
-    ///     }
-    ///
-    /// By default, the completable completes on the main dispatch queue. If
-    /// you give a *scheduler*, is completes on that scheduler.
-    ///
-    /// - parameter scheduler: The scheduler on which the completable completes.
-    ///   Defaults to MainScheduler.instance.
-    /// - parameter updates: A closure which writes in the database.
-    public func write(
-        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
-        updates: @escaping (Database) throws -> Void)
-        -> Completable
-    {
-        return flatMapWrite(
-            observeOn: scheduler,
-            updates: { db in
-                try updates(db)
-                return .empty()
-        })
-            .asCompletable()
-    }
-    
     /// Returns a Single that asynchronously writes into the database.
     ///
-    ///     let newPlayerCount: Single<Int> = dbQueue.rx.writeAndReturn { db in
+    ///     let newPlayerCount: Single<Int> = dbQueue.rx.write { db in
     ///         try Player(...).insert(db)
     ///         return try Player.fetchCount(db)
     ///     }
@@ -104,7 +77,7 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter scheduler: The scheduler on which the observable completes.
     ///   Defaults to MainScheduler.instance.
     /// - parameter updates: A closure which writes in the database.
-    public func writeAndReturn<T>(
+    public func write<T>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         updates: @escaping (Database) throws -> T)
         -> Single<T>
