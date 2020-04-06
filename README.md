@@ -205,7 +205,7 @@ This method returns a [Single] that completes after database updates have been s
 
 ```swift
 // Single<Void>
-let write = dbQueue.rx.write { db -> Int in
+let write = dbQueue.rx.write { db in
     try Player(...).insert(db)
 }
 
@@ -225,7 +225,7 @@ You can ignore its value and turn it into a [Completable] with the `asCompletabl
 ```swift
 // Completable
 let write = dbQueue.rx
-    .write { db -> Int in try Player(...).insert(db) }
+    .write { db in try Player(...).insert(db) }
     .asCompletable()
 ```
 
