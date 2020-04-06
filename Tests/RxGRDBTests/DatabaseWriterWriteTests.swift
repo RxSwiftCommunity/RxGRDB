@@ -30,10 +30,10 @@ class DatabaseWriterWritePublisherTests : XCTestCase {
         
         func test(writer: DatabaseWriter) throws {
             try XCTAssertEqual(writer.read(Player.fetchCount), 0)
-            let single = writer.rx.write(updates: { db in
+            let completable = writer.rx.write(updates: { db in
                 try Player(id: 1, name: "Arthur", score: 1000).insert(db)
             })
-            _ = try single.toBlocking(timeout: 1).last()
+            _ = try completable.toBlocking(timeout: 1).last()
             try XCTAssertEqual(writer.read(Player.fetchCount), 1)
         }
         
@@ -47,11 +47,11 @@ class DatabaseWriterWritePublisherTests : XCTestCase {
     
     func testWriteObservableError() throws {
         func test(writer: DatabaseWriter) throws {
-            let single = writer.rx.write(updates: { db in
+            let completable = writer.rx.write(updates: { db in
                 try db.execute(sql: "THIS IS NOT SQL")
             })
             do {
-                _ = try single.toBlocking(timeout: 1).last()
+                _ = try completable.toBlocking(timeout: 1).last()
                 XCTFail("Expected error")
             } catch let error as DatabaseError {
                 XCTAssertEqual(error.resultCode, .SQLITE_ERROR)
@@ -72,12 +72,12 @@ class DatabaseWriterWritePublisherTests : XCTestCase {
         }
         
         func test(writer: DatabaseWriter) throws {
-            let single = writer.rx.write(updates: { db in
+            let completable = writer.rx.write(updates: { db in
                 try Player(id: 1, name: "Arthur", score: 1000).insert(db)
                 try db.execute(sql: "THIS IS NOT SQL")
             })
             do {
-                _ = try single.toBlocking(timeout: 1).last()
+                _ = try completable.toBlocking(timeout: 1).last()
                 XCTFail("Expected error")
             } catch let error as DatabaseError {
                 XCTAssertEqual(error.resultCode, .SQLITE_ERROR)
@@ -229,6 +229,30 @@ class DatabaseWriterWritePublisherTests : XCTestCase {
     
     // MARK: -
     
+    func testWriteAndReturnObservableAsCompletable() throws {
+        func setUp<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+            try writer.write(Player.createTable)
+            return writer
+        }
+        
+        func test(writer: DatabaseWriter) throws {
+            let completable = writer.rx
+                .writeAndReturn(updates: { db -> Int in
+                    try Player(id: 1, name: "Arthur", score: 1000).insert(db)
+                    return try Player.fetchCount(db)
+                })
+                .asCompletable()
+            _ = try completable.toBlocking(timeout: 1).last()
+        }
+        
+        try Test(test)
+            .run { try setUp(DatabaseQueue()) }
+            .runAtTemporaryDatabasePath { try setUp(DatabaseQueue(path: $0)) }
+            .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)) }
+    }
+    
+    // MARK: -
+    
     func testWriteAndReturnObservableError() throws {
         func test(writer: DatabaseWriter) throws {
             let single = writer.rx.writeAndReturn(updates: { db in
@@ -278,6 +302,40 @@ class DatabaseWriterWritePublisherTests : XCTestCase {
     }
     
     // MARK: -
+    
+    func testWriteAndReturnObservableIsAsynchronous() throws {
+        func setUp<Writer: DatabaseWriter>(_ writer: Writer) throws -> Writer {
+            try writer.write(Player.createTable)
+            return writer
+        }
+        
+        func test(writer: DatabaseWriter) throws {
+            let disposeBag = DisposeBag()
+            withExtendedLifetime(disposeBag) {
+                let expectation = self.expectation(description: "")
+                let semaphore = DispatchSemaphore(value: 0)
+                writer.rx
+                    .writeAndReturn(updates: { db in
+                        try Player(id: 1, name: "Arthur", score: 1000).insert(db)
+                    })
+                    .subscribe(
+                        onSuccess: {
+                            semaphore.wait()
+                            expectation.fulfill()
+                    },
+                        onError: { error in XCTFail("Unexpected error \(error)") })
+                    .disposed(by: disposeBag)
+                
+                semaphore.signal()
+                waitForExpectations(timeout: 1, handler: nil)
+            }
+        }
+        
+        try Test(test)
+            .run { try setUp(DatabaseQueue()) }
+            .runAtTemporaryDatabasePath { try setUp(DatabaseQueue(path: $0)) }
+            .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)) }
+    }
     
     func testWriteAndReturnObservableDefaultScheduler() throws {
         if #available(OSX 10.12, iOS 10.0, watchOS 3.0, *) {
