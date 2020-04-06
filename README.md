@@ -314,7 +314,7 @@ When you compose ValueObservation observables together with the [combineLatest](
 
 Instead, compose requests or value observations together before building one **single** value observable.
 
-For example, fetch all requested values in a single observation (this is the technique used in the [Demo Application]):
+For example, fetch all requested values in a single observation:
 
 ```swift
 // DATA CONSISTENCY GUARANTEED
