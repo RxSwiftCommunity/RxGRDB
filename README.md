@@ -35,6 +35,7 @@ This observable reads a single value and delivers it.
 let players = dbQueue.rx.read { db in
     try Player.fetchAll(db)
 }
+
 players.subscribe(
     onSuccess: { (players: [Player]) in
         print("Players: \(players)")
@@ -54,6 +55,7 @@ Those observables complete after the database has been updated.
 let write = dbQueue.rx.write { db in 
     try Player(...).insert(db)
 }
+
 write.subscribe(
     onCompleted: {
         print("Updates completed")
@@ -65,6 +67,7 @@ let newPlayerCount = dbQueue.rx.writeAndReturn { db -> Int in
     try Player(...).insert(db)
     return try Player.fetchCount(db)
 }
+
 newPlayerCount.subscribe(
     onSuccess: { (playerCount: Int) in
         print("New players count: \(playerCount)")
@@ -84,6 +87,7 @@ This observable delivers fresh values whenever the database changes:
 let observable = ValueObservation
     .tracking { db in try Player.fetchAll(db) }
     .rx.observe(in: dbQueue)
+
 observable.subscribe(
     onNext: { (players: [Player]) in
         print("Fresh players: \(players)")
@@ -94,6 +98,7 @@ observable.subscribe(
 let observable = ValueObservation
     .tracking { db in try Int.fetchOne(db, sql: "SELECT MAX(score) FROM player") }
     .rx.observe(in: dbQueue)
+
 observable.subscribe(
     onNext: { (maxScore: Int?) in
         print("Fresh maximum score: \(maxScore)")
@@ -113,6 +118,7 @@ This observable delivers database connections whenever a database transaction ha
 let observable = DatabaseRegionObservation
     .tracking(Player.all())
     .rx.changes(in: dbQueue)
+
 observable.subscribe(
     onNext: { (db: Database) in
         print("Exclusive write access to the database after players have been impacted")
@@ -123,6 +129,7 @@ observable.subscribe(
 let observable = DatabaseRegionObservation
     .tracking(SQLRequest<Int>(sql: "SELECT MAX(score) FROM player"))
     .rx.changes(in: dbQueue)
+
 observable.subscribe(
     onNext: { (db: Database) in
         print("Exclusive write access to the database after maximum score has been impacted")
