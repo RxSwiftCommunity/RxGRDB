@@ -48,7 +48,7 @@ players.subscribe(
 <details>
   <summary><strong>Asynchronously write in the database</strong></summary>
 
-Those observables complete after the database has been updated.
+This observable completes after the database has been updated.
 
 ```swift
 // Single<Void>
