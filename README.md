@@ -73,17 +73,6 @@ newPlayerCount.subscribe(
         print("New players count: \(playerCount)")
     },
     onError: { error in ... })
-
-// Completable
-let write = dbQueue.rx
-    .write { db in try Player(...).insert(db) }
-    .asCompletable()
-
-write.subscribe(
-    onCompleted: {
-        print("Updates completed")
-    },
-    onError: { error in ... })
 ```
 
 </details>
