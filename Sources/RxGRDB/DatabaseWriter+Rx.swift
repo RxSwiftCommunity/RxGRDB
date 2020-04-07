@@ -11,7 +11,7 @@ import RxSwift
 /// :nodoc:
 extension DatabaseWriter {
     public var rx: Reactive<AnyDatabaseWriter> {
-        return Reactive(AnyDatabaseWriter(self))
+        Reactive(AnyDatabaseWriter(self))
     }
 }
 
@@ -37,30 +37,29 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter updates: A closure which writes in the database.
     func flatMapWrite<T>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
-        updates: @escaping (Database) throws -> Observable<T>)
-        -> Observable<T>
+        updates: @escaping (Database) throws -> Single<T>)
+        -> Single<T>
     {
-        let writer = base
-        return Observable
-            .create { observer in
+        Single
+            .create(subscribe: { observer in
                 var disposable: Disposable?
-                writer.asyncWriteWithoutTransaction { db in
-                    var observable: Observable<T>?
+                self.base.asyncWriteWithoutTransaction { db in
+                    var single: Single<T>?
                     do {
                         try db.inTransaction {
-                            observable = try updates(db)
+                            single = try updates(db)
                             return .commit
                         }
                         // Subscribe after transaction
-                        disposable = observable!.subscribe(observer)
+                        disposable = single!.subscribe(observer)
                     } catch {
-                        observer.onError(error)
+                        observer(.error(error))
                     }
                 }
                 return Disposables.create {
                     disposable?.dispose()
                 }
-            }
+            })
             .observeOn(scheduler)
     }
     
@@ -82,10 +81,9 @@ extension Reactive where Base: DatabaseWriter {
         updates: @escaping (Database) throws -> T)
         -> Single<T>
     {
-        return flatMapWrite(
+        flatMapWrite(
             observeOn: scheduler,
             updates: { db in try .just(updates(db)) })
-            .asSingle()
     }
     
     /// Returns a Single that asynchronously writes into the database.
@@ -107,22 +105,20 @@ extension Reactive where Base: DatabaseWriter {
         thenRead value: @escaping (Database, T) throws -> U)
         -> Single<U>
     {
-        return flatMapWrite(
+        flatMapWrite(
             observeOn: scheduler,
             updates: { db in
                 let updatesValue = try updates(db)
-                return Observable.create { observer in
+                return Single.create { observer in
                     self.base.spawnConcurrentRead { db in
                         do {
-                            try observer.onNext(value(db.get(), updatesValue))
-                            observer.onCompleted()
+                            try observer(.success(value(db.get(), updatesValue)))
                         } catch {
-                            observer.onError(error)
+                            observer(.error(error))
                         }
                     }
                     return Disposables.create { }
                 }
         })
-            .asSingle()
     }
 }

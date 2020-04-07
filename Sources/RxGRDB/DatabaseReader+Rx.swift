@@ -11,7 +11,7 @@ import RxSwift
 /// :nodoc:
 extension DatabaseReader {
     public var rx: Reactive<AnyDatabaseReader> {
-        return Reactive(AnyDatabaseReader(self))
+        Reactive(AnyDatabaseReader(self))
     }
 }
 
@@ -34,10 +34,9 @@ extension Reactive where Base: DatabaseReader {
         value: @escaping (Database) throws -> T)
         -> Single<T>
     {
-        let reader = base
-        return Single
-            .create { observer in
-                reader.asyncRead { db in
+        Single
+            .create(subscribe: { observer in
+                self.base.asyncRead { db in
                     do {
                         try observer(.success(value(db.get())))
                     } catch {
@@ -45,14 +44,7 @@ extension Reactive where Base: DatabaseReader {
                     }
                 }
                 return Disposables.create { }
-            }
+            })
             .observeOn(scheduler)
-    }
-}
-
-/// :nodoc:
-extension DatabaseReader where Self: ReactiveCompatible {
-    public var rx: Reactive<Self> {
-        return Reactive(self)
     }
 }

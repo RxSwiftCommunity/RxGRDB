@@ -51,7 +51,7 @@ extension Reactive where Base == DatabaseRegionObservation {
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     public func changes(in writer: DatabaseWriter) -> Observable<Database> {
-        return Observable.create { observer -> Disposable in
+        Observable.create { observer -> Disposable in
             do {
                 let transactionObserver = try self.base.start(in: writer, onChange: observer.onNext)
                 return Disposables.create {

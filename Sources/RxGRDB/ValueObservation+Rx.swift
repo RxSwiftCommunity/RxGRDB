@@ -1,7 +1,7 @@
 import GRDB
 import RxSwift
 
-extension ValueObservation : ReactiveCompatible { }
+extension ValueObservation: ReactiveCompatible { }
 
 /// :nodoc:
 public protocol _ValueObservationProtocol: ReactiveCompatible {
@@ -83,7 +83,7 @@ extension Reactive where Base: _ValueObservationProtocol {
     /// - parameter reader: A DatabaseReader (DatabaseQueue or DatabasePool).
     ///   are emitted.
     public func observe(in reader: DatabaseReader) -> ValueObservationObservable<Base.Reducer.Value> {
-        return ValueObservationObservable(base, in: reader)
+        ValueObservationObservable(base, in: reader)
     }
     
     @available(*, unavailable, message: "Use observe(in:) instead")
