@@ -16,53 +16,6 @@ extension DatabaseWriter {
 }
 
 extension Reactive where Base: DatabaseWriter {
-    /// Returns an Observable that asynchronously writes into the database.
-    ///
-    /// For example:
-    ///
-    ///     // Observable<Int>
-    ///     let newPlayerCount = dbQueue.rx.flatMapWrite { db in
-    ///         try Player(...).insert(db)
-    ///         let newPlayerCount = try Player.fetchAll(db)
-    ///         return Observable.just(newPlayerCount)
-    ///     }
-    ///
-    /// The database updates are executed inside a database transaction. If the
-    /// transaction completes successfully, the observable returned from the
-    /// closure is subscribed, from a database protected dispatch queue,
-    /// immediately after the transaction has been committed.
-    ///
-    /// - parameter scheduler: The scheduler on which the observable completes.
-    ///   Defaults to MainScheduler.instance.
-    /// - parameter updates: A closure which writes in the database.
-    func flatMapWrite<T>(
-        observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
-        updates: @escaping (Database) throws -> Single<T>)
-        -> Single<T>
-    {
-        Single
-            .create(subscribe: { observer in
-                var disposable: Disposable?
-                self.base.asyncWriteWithoutTransaction { db in
-                    var single: Single<T>?
-                    do {
-                        try db.inTransaction {
-                            single = try updates(db)
-                            return .commit
-                        }
-                        // Subscribe after transaction
-                        disposable = single!.subscribe(observer)
-                    } catch {
-                        observer(.error(error))
-                    }
-                }
-                return Disposables.create {
-                    disposable?.dispose()
-                }
-            })
-            .observeOn(scheduler)
-    }
-    
     /// Returns a Single that asynchronously writes into the database.
     ///
     ///     let newPlayerCount: Single<Int> = dbQueue.rx.write { db in
@@ -81,9 +34,25 @@ extension Reactive where Base: DatabaseWriter {
         updates: @escaping (Database) throws -> T)
         -> Single<T>
     {
-        flatMapWrite(
-            observeOn: scheduler,
-            updates: { db in try .just(updates(db)) })
+        Single
+            .create(subscribe: { observer in
+                self.base.asyncWriteWithoutTransaction { db in
+                    do {
+                        var result: T?
+                        try db.inTransaction {
+                            result = try updates(db)
+                            return .commit
+                        }
+                        observer(.success(result!))
+                    } catch {
+                        observer(.error(error))
+                    }
+                }
+                return Disposables.create()
+            })
+            // We don't want users to process emitted values on a
+            // database dispatch queue.
+            .observeOn(scheduler)
     }
     
     /// Returns a Single that asynchronously writes into the database.
@@ -105,20 +74,31 @@ extension Reactive where Base: DatabaseWriter {
         thenRead value: @escaping (Database, T) throws -> U)
         -> Single<U>
     {
-        flatMapWrite(
-            observeOn: scheduler,
-            updates: { db in
-                let updatesValue = try updates(db)
-                return Single.create { observer in
+        Single
+            .create(subscribe: { observer in
+                self.base.asyncWriteWithoutTransaction { db in
+                    var updatesResult: T?
+                    do {
+                        try db.inTransaction {
+                            updatesResult = try updates(db)
+                            return .commit
+                        }
+                    } catch {
+                        observer(.error(error))
+                        return
+                    }
                     self.base.spawnConcurrentRead { db in
                         do {
-                            try observer(.success(value(db.get(), updatesValue)))
+                            try observer(.success(value(db.get(), updatesResult!)))
                         } catch {
                             observer(.error(error))
                         }
                     }
-                    return Disposables.create { }
                 }
-        })
+                return Disposables.create()
+            })
+            // We don't want users to process emitted values on a
+            // database dispatch queue.
+            .observeOn(scheduler)
     }
 }
