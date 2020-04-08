@@ -68,7 +68,7 @@ class PlayersViewModel {
         }
         
         deleteOne = CompletableAction { player in
-            Current.players().deleteOne(player)
+            Current.players().deleteOne(player).asCompletable()
         }
         
         refresh = CocoaAction {
@@ -79,14 +79,14 @@ class PlayersViewModel {
             Current.players().stressTest()
         }
         
-        toggleOrdering = CocoaAction { _ -> Completable in
+        toggleOrdering = CocoaAction {
             switch ordering.value {
             case .byName:
                 ordering.accept(.byScore)
             case .byScore:
                 ordering.accept(.byName)
             }
-            return .empty()
+            return Observable.just(())
         }
     }
 }

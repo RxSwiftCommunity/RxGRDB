@@ -19,22 +19,20 @@ struct Players {
         try database.write(_populateIfEmpty)
     }
     
-    func deleteAll() -> Completable {
+    func deleteAll() -> Single<Void> {
         database.rx.write(updates: _deleteAll)
     }
     
-    func deleteOne(_ player: Player) -> Completable {
-        database.rx.write(updates: { db in
-            try self._deleteOne(db, player: player)
-        })
+    func deleteOne(_ player: Player) -> Single<Void> {
+        database.rx.write(updates: { db in try self._deleteOne(db, player: player) })
     }
     
-    func refresh() -> Completable {
+    func refresh() -> Single<Void> {
         database.rx.write(updates: _refresh)
     }
     
-    func stressTest() -> Completable {
-        Completable.zip(repeatElement(refresh(), count: 50))
+    func stressTest() -> Single<Void> {
+        Single.zip(repeatElement(refresh(), count: 50)).map { _ in }
     }
     
     // MARK: - Access Players

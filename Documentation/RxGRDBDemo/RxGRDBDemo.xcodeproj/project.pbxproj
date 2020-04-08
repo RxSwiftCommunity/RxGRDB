@@ -15,12 +15,10 @@
 		565BD7D022C49D2100BB9B5A /* PlayersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565BD7CF22C49D2100BB9B5A /* PlayersViewModelTests.swift */; };
 		565BD7D122C49D9800BB9B5A /* PlayersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */; };
 		565BD7D222C49E6600BB9B5A /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A122C3A7DC00A6FF66 /* World.swift */; };
-		565BD7D322C49EAA00BB9B5A /* Action+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515AA22C3CDAC00A6FF66 /* Action+App.swift */; };
 		565BD7D922C5DEE800BB9B5A /* PlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565BD7D822C5DEE800BB9B5A /* PlayerTests.swift */; };
 		567515A222C3A7DC00A6FF66 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A122C3A7DC00A6FF66 /* World.swift */; };
 		567515A422C3A9BC00A6FF66 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A322C3A9BC00A6FF66 /* Players.swift */; };
 		567515A822C3B1F100A6FF66 /* PlayersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */; };
-		567515AB22C3CDAC00A6FF66 /* Action+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515AA22C3CDAC00A6FF66 /* Action+App.swift */; };
 		567E66D02438A6F80091B5D8 /* RxGRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 567E66CF2438A6F80091B5D8 /* RxGRDB */; };
 		56D6EA2F2438AB77000D55EF /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 56D6EA2E2438AB77000D55EF /* RxSwift */; };
 		56D6EA322438ABAE000D55EF /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 56D6EA312438ABAE000D55EF /* RxDataSources */; };
@@ -73,7 +71,6 @@
 		567515A122C3A7DC00A6FF66 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
 		567515A322C3A9BC00A6FF66 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
 		567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayersViewModel.swift; sourceTree = "<group>"; };
-		567515AA22C3CDAC00A6FF66 /* Action+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action+App.swift"; sourceTree = "<group>"; };
 		567E66CD2438A6730091B5D8 /* RxGRDB */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RxGRDB; path = ../..; sourceTree = "<group>"; };
 		56E1F9791F8101EE00793BFA /* RxGRDBDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxGRDBDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		56E1F97C1F8101EE00793BFA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -154,14 +151,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		567515A922C3CD9B00A6FF66 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				567515AA22C3CDAC00A6FF66 /* Action+App.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
 		567E66CE2438A6F80091B5D8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -198,7 +187,6 @@
 				567515A122C3A7DC00A6FF66 /* World.swift */,
 				5675159E22C3A77800A6FF66 /* Models */,
 				5675159F22C3A7AE00A6FF66 /* UI */,
-				567515A922C3CD9B00A6FF66 /* Utils */,
 				567515A022C3A7BA00A6FF66 /* Resources */,
 			);
 			path = RxGRDBDemo;
@@ -332,7 +320,6 @@
 				565BD7D122C49D9800BB9B5A /* PlayersViewModel.swift in Sources */,
 				565BD7C922C3FA8B00BB9B5A /* PlayersTests.swift in Sources */,
 				565BD7CA22C3FAA700BB9B5A /* Players.swift in Sources */,
-				565BD7D322C49EAA00BB9B5A /* Action+App.swift in Sources */,
 				565BD7C622C3F92F00BB9B5A /* AppDatabase.swift in Sources */,
 				565BD7D022C49D2100BB9B5A /* PlayersViewModelTests.swift in Sources */,
 				565BD7C722C3F97900BB9B5A /* Player.swift in Sources */,
@@ -351,7 +338,6 @@
 				567515A822C3B1F100A6FF66 /* PlayersViewModel.swift in Sources */,
 				56E1F97F1F8101EE00793BFA /* PlayersViewController.swift in Sources */,
 				56E1F97D1F8101EE00793BFA /* AppDelegate.swift in Sources */,
-				567515AB22C3CDAC00A6FF66 /* Action+App.swift in Sources */,
 				567515A222C3A7DC00A6FF66 /* World.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
