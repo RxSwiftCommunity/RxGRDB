@@ -312,9 +312,7 @@ See [ValueObservation Scheduling](https://github.com/groue/GRDB.swift/blob/GRDB5
 
 When you compose ValueObservation observables together with the [combineLatest](http://reactivex.io/documentation/operators/combinelatest.html) operator, you lose all guarantees of [data consistency](https://en.wikipedia.org/wiki/Consistency_(database_systems)).
 
-Instead, compose requests or value observations together before building one **single** value observable.
-
-For example, fetch all requested values in a single observation:
+Instead, compose requests together into **one single** ValueObservation, as below:
 
 ```swift
 // DATA CONSISTENCY GUARANTEED
@@ -325,24 +323,6 @@ let hallOfFameObservable = ValueObservation
         return HallOfFame(playerCount:playerCount, bestPlayers:bestPlayers)
     }
     .rx.observe(in: dbQueue)
-```
-
-Or combine observations together:
-
-```swift
-// DATA CONSISTENCY GUARANTEED
-let playerCountObservation = ValueObservation
-    .tracking(value: Player.fetchCount)
-
-let bestPlayersObservation = ValueObservation
-    .tracking(value: Player.limit(10).orderedByScore().fetchAll)
-
-let hallOfFameObservation = ValueObservation.combine(
-    playerCountObservation,
-    bestPlayersObservation)
-    .map(HallOfFame.init(playerCount:bestPlayers:))
-
-let hallOfFameObservable = hallOfFameObservation.rx.observe(in: dbQueue)
 ```
 
 See [ValueObservation] for more information.
