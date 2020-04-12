@@ -12,6 +12,7 @@ Pod::Spec.new do |s|
   s.swift_versions = ['5.2']
   s.ios.deployment_target = '9.0'
   s.osx.deployment_target = '10.10'
+  s.tvos.deployment_target = '9.0'
   s.watchos.deployment_target = '3.0'
   
   s.dependency "RxSwift", "~> 5.0"
@@ -19,12 +20,12 @@ Pod::Spec.new do |s|
   
   s.subspec 'default' do |ss|
     ss.source_files = 'Sources/RxGRDB/**/*.{swift}'
-    ss.dependency "GRDB.swift", "~> 4.1"
+    ss.dependency "GRDB.swift", "~> 5.0"
   end
   
   s.subspec 'SQLCipher' do |ss|
     ss.source_files = 'Sources/RxGRDB/**/*.{swift}'
-    ss.dependency "GRDB.swift/SQLCipher", "~> 4.1"
+    ss.dependency "GRDB.swift/SQLCipher", "~> 5.0"
     ss.xcconfig = {
       'OTHER_SWIFT_FLAGS' => '$(inherited) -DSQLITE_HAS_CODEC -DUSING_SQLCIPHER',
       'OTHER_CFLAGS' => '$(inherited) -DSQLITE_HAS_CODEC -DUSING_SQLCIPHER',
