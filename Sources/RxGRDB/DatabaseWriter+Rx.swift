@@ -36,18 +36,14 @@ extension Reactive where Base: DatabaseWriter {
     {
         Single
             .create(subscribe: { observer in
-                self.base.asyncWriteWithoutTransaction { db in
-                    do {
-                        var result: T?
-                        try db.inTransaction {
-                            result = try updates(db)
-                            return .commit
-                        }
-                        observer(.success(result!))
-                    } catch {
+                self.base.asyncWrite(updates, completion: { _, result in
+                    switch result {
+                    case let .success(value):
+                        observer(.success(value))
+                    case let .failure(error):
                         observer(.error(error))
                     }
-                }
+                })
                 return Disposables.create()
             })
             // We don't want users to process emitted values on a
@@ -77,19 +73,19 @@ extension Reactive where Base: DatabaseWriter {
         Single
             .create(subscribe: { observer in
                 self.base.asyncWriteWithoutTransaction { db in
-                    var updatesResult: T?
+                    var updatesValue: T?
                     do {
                         try db.inTransaction {
-                            updatesResult = try updates(db)
+                            updatesValue = try updates(db)
                             return .commit
                         }
                     } catch {
                         observer(.error(error))
                         return
                     }
-                    self.base.spawnConcurrentRead { db in
+                    self.base.spawnConcurrentRead { dbResult in
                         do {
-                            try observer(.success(value(db.get(), updatesResult!)))
+                            try observer(.success(value(dbResult.get(), updatesValue!)))
                         } catch {
                             observer(.error(error))
                         }

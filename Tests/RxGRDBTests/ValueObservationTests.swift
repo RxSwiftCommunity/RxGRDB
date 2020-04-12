@@ -99,6 +99,26 @@ class ValueObservationTests : XCTestCase {
             .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)) }
     }
     
+    func testDefaultSchedulerError() throws {
+        func test(writer: DatabaseWriter) throws {
+            let observable = ValueObservation
+                .tracking { try $0.execute(sql: "THIS IS NOT SQL") }
+                .rx.observe(in: writer)
+            let result = observable.toBlocking().materialize()
+            switch result {
+            case .completed:
+                XCTFail("Expected error")
+            case let .failed(elements: _, error: error):
+                XCTAssertNotNil(error as? DatabaseError)
+            }
+        }
+        
+        try Test(test)
+            .run { DatabaseQueue() }
+            .runAtTemporaryDatabasePath { try DatabaseQueue(path: $0) }
+            .runAtTemporaryDatabasePath { try DatabasePool(path: $0) }
+    }
+    
     // MARK: - Immediate Scheduler
     
     func testImmediateSchedulerChangesNotifications() throws {
@@ -176,6 +196,27 @@ class ValueObservationTests : XCTestCase {
             .run { try setUp(DatabaseQueue()) }
             .runAtTemporaryDatabasePath { try setUp(DatabaseQueue(path: $0)) }
             .runAtTemporaryDatabasePath { try setUp(DatabasePool(path: $0)) }
+    }
+    
+    func testImmediateSchedulerError() throws {
+        func test(writer: DatabaseWriter) throws {
+            let observable = ValueObservation
+                .tracking { try $0.execute(sql: "THIS IS NOT SQL") }
+                .rx.observe(in: writer)
+                .scheduling(.immediate)
+            let result = observable.toBlocking().materialize()
+            switch result {
+            case .completed:
+                XCTFail("Expected error")
+            case let .failed(elements: _, error: error):
+                XCTAssertNotNil(error as? DatabaseError)
+            }
+        }
+        
+        try Test(test)
+            .run { DatabaseQueue() }
+            .runAtTemporaryDatabasePath { try DatabaseQueue(path: $0) }
+            .runAtTemporaryDatabasePath { try DatabasePool(path: $0) }
     }
     
     // MARK: - Utils
