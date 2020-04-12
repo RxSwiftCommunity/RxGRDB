@@ -5,7 +5,7 @@ RxGRDB [![Swift 5](https://img.shields.io/badge/swift-5.2-orange.svg?style=flat)
 
 **Latest release**: [GRDB5 branch](https://github.com/RxSwiftCommunity/RxGRDB/tree/GRDB5) &bull; [Release Notes]
 
-**Requirements**: iOS 9.0+ / OSX 10.10+ / watchOS 2.0+ &bull; Swift 5.2+ / Xcode 11.4+
+**Requirements**: iOS 9.0+ / OSX 10.10+ / tvOS 9.0+ / watchOS 2.0+ &bull; Swift 5.2+ / Xcode 11.4+
 
 | Swift version | RxGRDB version                                                    |
 | ------------- | ----------------------------------------------------------------- |
