@@ -70,7 +70,6 @@ playground.xcworkspace
 # Packages/
 # Package.pins
 .build/
-.swiftpm/
 Package.resolved
 
 ##
