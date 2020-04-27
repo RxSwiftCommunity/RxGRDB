@@ -76,9 +76,11 @@ RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [
     let observable = observation.rx.observe(in: dbQueue)
     ```
     
-    The `observe(in:)` method no longer returns an `Observable`, but a `DatabaseObservables.Value` which allows you to further control of the dispatching of fresh values (see [`ValueObservation.rx.observe(in:)`]). `DatabaseObservables.Value` can be turned into a regular `Observable` with its `asObservable()` method.
+    The `observe(in:)` method no longer returns an `Observable`, but a `DatabaseObservables.Value` which allows you to further control of the dispatching of fresh values (see [`ValueObservation.rx.observe(in:)`]).
     
-    The `observe(in:)` method used to return an Observable that immediately emits its initial value right on subscription. This is no longer the case: now the initial value is emitted asynchronously. To restore the previous behavior, use `.scheduling(.immediate)`:
+    `DatabaseObservables.Value` can be turned into a regular `Observable` with its `asObservable()` method.
+    
+    The `observe(in:)` method used to immediately emit an initial value right on subscription. This is no longer the case: now the initial value is emitted asynchronously. To restore the previous behavior, use `.scheduling(.immediate)`:
     
     ```swift
     // Immediate notification of the initial value
