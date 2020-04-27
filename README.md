@@ -318,9 +318,14 @@ let observable = observation.rx
     For example, the `.immediate` scheduler makes sure the initial value is notified immediately when the observable is subcribed. It can help your application update the user interface without having to wait for any asynchronous notifications:
     
     ```swift
-    let observable = observation
-        .rx.observe(in: dbQueue)
-        .scheduling(.immediate)
+    // Immediate notification of the initial value
+    let disposable = observation.rx
+        .observe(in: dbQueue)
+        .scheduling(.immediate) // <-
+        .subscribe(
+            onNext: { players: [Player] in print("fresh players: \(players)") },
+            onError: { error in ... })
+    // <- here "fresh players" is already printed.
     ```
     
     Note that the `.immediate` scheduler requires that the observable is subscribed from the main thread. It raises a fatal error otherwise.
