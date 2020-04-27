@@ -72,11 +72,18 @@ RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [
         try Player.fetchAll(db)
     }
 
-    // Observable<[Player]>
+    // DatabaseObservables.Value<[Player]>
     let observable = observation.rx.observe(in: dbQueue)
     ```
     
-    Former ways to observe the database are no longer available:
+    The `observe(in:)` method no longer returns an `Observable`, but a `DatabaseObservables.Value` which allows you to further control of the dispatching of fresh values (see [`ValueObservation.rx.observe(in:)`]). `DatabaseObservables.Value` can be turned into a regular `Observable` with its `asObservable()` method.
+    
+    The `observe(in:startImmediately:observeOn:)` method no longer exists:
+    
+    - Instead of `startImmediately: false`, use the `skip(1)` RxSwift operator as a replacement.
+    - Instead of `observeOn`, use the `scheduling(_:)` operator (see [`ValueObservation.rx.observe(in:)`]), or the `observeOn(_:)` RxSwift operator.
+    
+    Other former ways to observe the database are no longer available:
     
     ```swift
     // BEFORE: RxGRDB 0.x
@@ -87,9 +94,9 @@ RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [
     request.rx.changes(in: dbQueue)      // Observable<Database>
     
     // NEW: RxGRDB 1.0
-    ValueObservation.tracking(request.fetchCount).rx.observe(in: dbQueue) // ValueObservationObservable<Int>
-    ValueObservation.tracking(request.fetchOne).rx.observe(in: dbQueue)   // ValueObservationObservable<Player?>
-    ValueObservation.tracking(request.fetchAll).rx.observe(in: dbQueue)   // ValueObservationObservable<[Player]>
+    ValueObservation.tracking(request.fetchCount).rx.observe(in: dbQueue) // DatabaseObservables.Value<Int>
+    ValueObservation.tracking(request.fetchOne).rx.observe(in: dbQueue)   // DatabaseObservables.Value<Player?>
+    ValueObservation.tracking(request.fetchAll).rx.observe(in: dbQueue)   // DatabaseObservables.Value<[Player]>
     DatabaseRegionObservation(tracking: request).rx.observe(in: dbQueue)  // Observable<Database>
     ```
 
@@ -100,3 +107,4 @@ RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [
 [Migrating From GRDB 4 to GRDB 5]: https://github.com/groue/GRDB.swift/blob/GRDB5/Documentation/GRDB5MigrationGuide.md
 [Single]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md#single
 [Completable]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md#completable
+[`ValueObservation.rx.observe(in:)`]: ../README.md#valueobservationrxobservein

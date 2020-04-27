@@ -83,7 +83,7 @@ newPlayerCount.subscribe(
 This observable delivers fresh values whenever the database changes:
 
 ```swift
-// Observable<[Player]>
+// DatabaseObservables.Value<[Player]>
 let observable = ValueObservation
     .tracking { db in try Player.fetchAll(db) }
     .rx.observe(in: dbQueue)
@@ -94,7 +94,7 @@ observable.subscribe(
     },
     onError: { error in ... })
 
-// Observable<Int?>
+// DatabaseObservables.Value<Int?>
 let observable = ValueObservation
     .tracking { db in try Int.fetchOne(db, sql: "SELECT MAX(score) FROM player") }
     .rx.observe(in: dbQueue)
@@ -282,11 +282,30 @@ let observation = ValueObservation.tracking { db in
     try Player.fetchAll(db)
 }
 
-// Observable<[Player]>
+// DatabaseObservables.Value<[Player]>
 let observable = observation.rx.observe(in: dbQueue)
 ```
+The `DatabaseObservables.Value` observable can be used like all RxSwift observables. For example:
 
-This observable has the same behavior as ValueObservation:
+```swift
+let disposable = observation.rx
+    .observe(in: dbQueue)
+    .distinctUntilChanged()
+    .subscribe(
+        onNext: { players: [Player] in print("fresh players: \(players)") },
+        onError: { error in ... })
+```
+
+You can turn it into a regular RxSwift `Observable` with the `asObservable()` method:
+
+```swift
+// Observable<[Player]>
+let observable = observation.rx
+    .observe(in: dbQueue)
+    .asObservable()
+```
+
+`DatabaseObservables.Value` has the same behavior as ValueObservation:
 
 - It notifies an initial value before the eventual changes.
 - It may coalesce subsequent changes into a single notification.
