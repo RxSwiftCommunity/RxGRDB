@@ -65,7 +65,7 @@ RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [
 
 4. **Database Observation**
     
-    RxGRDB 1.0 has a single way to start observing the database. First create a [ValueObservation], and then turn it into an RxSwift observable:
+    RxGRDB 1.0 has a single way to start observing database values. First create a [ValueObservation], and then turn it into an RxSwift observable:
     
     ```swift
     let observation = ValueObservation.tracking { db in
