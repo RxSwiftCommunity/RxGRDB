@@ -195,3 +195,21 @@ extension Reactive where Base: DatabaseRegionConvertible {
         -> Observable<Database>
     { preconditionFailure() }
 }
+
+extension Reactive where Base: _ValueObservationProtocol {    
+    @available(*, unavailable, message: "Use observe(in:) instead")
+    public func observe(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        observeOn scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Base.Reducer.Value>
+    { preconditionFailure() }
+    
+    @available(*, unavailable, message: "Use observe(in:) instead")
+    public func fetch(
+        in reader: DatabaseReader,
+        startImmediately: Bool = true,
+        scheduler: ImmediateSchedulerType? = nil)
+        -> Observable<Base.Reducer.Value>
+    { preconditionFailure() }
+}
