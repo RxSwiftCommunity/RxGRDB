@@ -35,7 +35,7 @@ class PlayersViewModel {
         // Values Displayed on Screen
         players = ordering
             .distinctUntilChanged()
-            .map { ordering -> Request<Player> in
+            .map { ordering -> QueryInterfaceRequest<Player> in
                 switch ordering {
                 case .byScore:
                     return Player.all().orderByScore()
@@ -43,7 +43,7 @@ class PlayersViewModel {
                     return Player.all().orderByName()
                 }
             }
-            .flatMapLatest { request -> Observable<[Player]> in
+            .flatMapLatest { request in
                 Current.players().observeAll(request)
             }
             .share(replay: 1)

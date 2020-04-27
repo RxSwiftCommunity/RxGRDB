@@ -38,11 +38,10 @@ struct Players {
     // MARK: - Access Players
     
     /// An observable that tracks changes in any request of players
-    func observeAll(_ request: Request<Player>) -> Observable<[Player]> {
+    func observeAll(_ request: QueryInterfaceRequest<Player>) -> DatabaseObservables.Value<[Player]> {
         ValueObservation
             .tracking(request.fetchAll)
             .rx.observe(in: database)
-            .asObservable()
     }
     
     // MARK: - Implementation
