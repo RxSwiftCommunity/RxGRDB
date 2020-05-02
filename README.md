@@ -3,13 +3,13 @@ RxGRDB [![Swift 5](https://img.shields.io/badge/swift-5.2-orange.svg?style=flat)
 
 ### A set of extensions for [SQLite], [GRDB.swift], and [RxSwift]
 
-**Latest release**: [GRDB5 branch](https://github.com/RxSwiftCommunity/RxGRDB/tree/GRDB5) • [Release Notes] • [Migrating From RxGRDB 0.x to RxGRDB 1.0](Documentation/RxGRDB1MigrationGuide.md)
+**Latest release**: May 2, 2020 • version 1.0.0-beta • [Release Notes] • [Migrating From RxGRDB 0.x to RxGRDB 1.0](Documentation/RxGRDB1MigrationGuide.md)
 
 **Requirements**: iOS 9.0+ / OSX 10.10+ / tvOS 9.0+ / watchOS 2.0+ &bull; Swift 5.2+ / Xcode 11.4+
 
 | Swift version | RxGRDB version                                                    |
 | ------------- | ----------------------------------------------------------------- |
-| **Swift 5.2** | [GRDB5 branch](http://github.com/RxSwiftCommunity/RxGRDB/tree/GRDB5) |
+| **Swift 5.2** | **v1.0.0-beta**, [v0.18.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.18.0) |
 | Swift 5.1     | [v0.18.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.18.0) |
 | Swift 5.0     | [v0.18.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.18.0) |
 | Swift 4.2     | [v0.13.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.13.0) |
@@ -256,7 +256,7 @@ let newPlayerCount = dbQueue.rx.write { db -> Int in
 
 The difference is that the last fetches are performed in the `thenRead` function. This function accepts two arguments: a readonly database connection, and the result of the `updates` function. This allows you to pass information from a function to the other (it is ignored in the sample code above).
 
-When you use a [database pool], this method applies a scheduling optimization: the `thenRead` function sees the database in the state left by the `updates` function, and yet does not block any concurrent writes. This can reduce database write contention. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#advanced-databasepool) for more information.
+When you use a [database pool], this method applies a scheduling optimization: the `thenRead` function sees the database in the state left by the `updates` function, and yet does not block any concurrent writes. This can reduce database write contention. See [Advanced DatabasePool](https://github.com/groue/GRDB.swift/blob/master/README.md#advanced-databasepool) for more information.
 
 When you use a [database queue], the results are guaranteed to be identical, but no scheduling optimization is applied.
 
@@ -309,11 +309,11 @@ let observable = observation.rx
 
 - It notifies an initial value before the eventual changes.
 - It may coalesce subsequent changes into a single notification.
-- It may notify consecutive identical values. You can filter out the undesired duplicates with the `distinctUntilChanged()` RxSwift operator, but we suggest you have a look at the [removeDuplicates()](https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#valueobservationremoveduplicates) GRDB operator also.
+- It may notify consecutive identical values. You can filter out the undesired duplicates with the `distinctUntilChanged()` RxSwift operator, but we suggest you have a look at the [removeDuplicates()](https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservationremoveduplicates) GRDB operator also.
 - It stops emitting any value after the database connection is closed. But it never completes.
 - By default, it notifies the initial value, as well as eventual changes and errors, on the main thread, asynchronously.
     
-    This can be configured with the `scheduling(_:)` method. It does not accept an RxSwift scheduler, but a [GRDB scheduler](https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#valueobservation-scheduling).
+    This can be configured with the `scheduling(_:)` method. It does not accept an RxSwift scheduler, but a [GRDB scheduler](https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation-scheduling).
     
     For example, the `.immediate` scheduler makes sure the initial value is notified immediately when the observable is subcribed. It can help your application update the user interface without having to wait for any asynchronous notifications:
     
@@ -330,7 +330,7 @@ let observable = observation.rx
     
     Note that the `.immediate` scheduler requires that the observable is subscribed from the main thread. It raises a fatal error otherwise.
 
-See [ValueObservation Scheduling](https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#valueobservation-scheduling) for more information.
+See [ValueObservation Scheduling](https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation-scheduling) for more information.
 
 :warning: **ValueObservation and Data Consistency**
 
@@ -394,25 +394,25 @@ See [DatabaseRegionObservation] for more information.
 
 [Asynchronous Database Access]: #asynchronous-database-access
 [RxSwift]: https://github.com/ReactiveX/RxSwift
-[Database Changes Observation]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#database-changes-observation
+[Database Changes Observation]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-changes-observation
 [Database Observation]: #database-observation
-[DatabaseRegionObservation]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#databaseregionobservation
+[DatabaseRegionObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#databaseregionobservation
 [Demo Application]: Documentation/RxGRDBDemo/README.md
 [GRDB.swift]: https://github.com/groue/GRDB.swift
 [Installation]: #installation
 [Release Notes]: CHANGELOG.md
 [SQLite]: http://sqlite.org
 [Swift Package Manager]: https://swift.org/package-manager/
-[ValueObservation]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#valueobservation
+[ValueObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation
 [`DatabaseRegionObservation.rx.changes(in:)`]: #databaseregionobservationrxchangesin
 [`ValueObservation.rx.observe(in:)`]: #valueobservationrxobservein
 [`rx.read(observeOn:value:)`]: #databasereaderrxreadobserveonvalue
 [`rx.write(observeOn:updates:)`]: #databasewriterrxwriteobserveonupdates
 [`rx.write(observeOn:updates:thenRead:)`]: #databasewriterrxwriteobserveonupdatesthenread
-[configured]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#databasepool-configuration
-[database pool]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#database-pools
-[database queue]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#database-queues
-[database snapshot]: https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#database-snapshots
+[configured]: https://github.com/groue/GRDB.swift/blob/master/README.md#databasepool-configuration
+[database pool]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-pools
+[database queue]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-queues
+[database snapshot]: https://github.com/groue/GRDB.swift/blob/master/README.md#database-snapshots
 [scheduler]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Schedulers.md
 [Single]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md#single
 [Completable]: https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md#completable

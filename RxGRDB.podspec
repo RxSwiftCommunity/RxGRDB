@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name     = 'RxGRDB'
-  s.version  = '0.18.0'
+  s.version  = '1.0.0-beta'
   
   s.license  = { :type => 'MIT', :file => 'LICENSE' }
   s.summary  = 'Reactive extensions for GRDB.swift.'
@@ -20,12 +20,12 @@ Pod::Spec.new do |s|
   
   s.subspec 'default' do |ss|
     ss.source_files = 'Sources/RxGRDB/**/*.{swift}'
-    ss.dependency "GRDB.swift", "~> 5.0"
+    ss.dependency "GRDB.swift", "~> 5.0-beta"
   end
   
   s.subspec 'SQLCipher' do |ss|
     ss.source_files = 'Sources/RxGRDB/**/*.{swift}'
-    ss.dependency "GRDB.swift/SQLCipher", "~> 5.0"
+    ss.dependency "GRDB.swift/SQLCipher", "~> 5.0-beta"
     ss.xcconfig = {
       'OTHER_SWIFT_FLAGS' => '$(inherited) -DSQLITE_HAS_CODEC -DUSING_SQLCIPHER',
       'OTHER_CFLAGS' => '$(inherited) -DSQLITE_HAS_CODEC -DUSING_SQLCIPHER',
