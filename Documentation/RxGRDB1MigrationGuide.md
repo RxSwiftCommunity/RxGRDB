@@ -5,7 +5,7 @@ Migrating From RxGRDB 0.x to RxGRDB 1.0
 
 RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [GRDBCombine], and [RxGRDB], offer a consistent behavior. This greatly helps choosing or switching your preferred database API. In previous versions, the three companion libraries used to have subtle differences that were just opportunities for bugs.
 
-1. RxGRDB requirements have been bumped:
+1. **RxGRDB requirements have been bumped**
     
     - **Swift 5.2+** (was Swift 5.0+)
     - **Xcode 11.4+** (was Xcode 11.0+)
@@ -15,7 +15,7 @@ RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [
     - watchOS 2.0+ (unchanged)
     - **GRDB 5.0+** (was GRDB 4.1+)
 
-2. RxGRDB 1.0 requires GRDB 5, which comes with changes in the runtime behavior of [ValueObservation], and directly impacts its derived RxGRDB observable. So please check [Migrating From GRDB 4 to GRDB 5] first.
+2. **RxGRDB 1.0 requires GRDB 5**, which comes with changes in the runtime behavior of [ValueObservation], and directly impacts its derived RxGRDB observable. So please check [Migrating From GRDB 4 to GRDB 5] first.
 
 3. **Asynchronous write in the database**
     
