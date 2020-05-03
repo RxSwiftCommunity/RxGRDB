@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+## 1.0.0-beta
+
+Released May 3, 2020 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.18.0...v1.0.0-beta)
+
+Check out the [Migration Guide](Documentation/RxGRDB1MigrationGuide.md).
+
+- [#63](https://github.com/RxSwiftCommunity/RxGRDB/pull/63): RxGRDB 1.0
+
+
 ## 0.18.0
 
 Released December 11, 2019 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.17.0...v0.18.0)

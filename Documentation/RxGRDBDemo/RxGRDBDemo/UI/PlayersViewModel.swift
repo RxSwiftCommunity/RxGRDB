@@ -1,6 +1,8 @@
 import Action
+import Foundation
 import GRDB
 import RxCocoa
+import RxGRDB
 import RxSwift
 
 /// An MVVM ViewModel for PlayersViewController
@@ -41,7 +43,7 @@ class PlayersViewModel {
                     return Player.all().orderByName()
                 }
             }
-            .flatMapLatest { request -> Observable<[Player]> in
+            .flatMapLatest { request in
                 Current.players().observeAll(request)
             }
             .share(replay: 1)
@@ -66,7 +68,7 @@ class PlayersViewModel {
         }
         
         deleteOne = CompletableAction { player in
-            Current.players().deleteOne(player)
+            Current.players().deleteOne(player).asCompletable()
         }
         
         refresh = CocoaAction {
@@ -77,14 +79,14 @@ class PlayersViewModel {
             Current.players().stressTest()
         }
         
-        toggleOrdering = CocoaAction { _ -> Completable in
+        toggleOrdering = CocoaAction {
             switch ordering.value {
             case .byName:
                 ordering.accept(.byScore)
             case .byScore:
                 ordering.accept(.byName)
             }
-            return .empty()
+            return Observable.just(())
         }
     }
 }

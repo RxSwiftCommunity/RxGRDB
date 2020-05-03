@@ -24,10 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             .appendingPathComponent("db.sqlite")
         let dbPool = try DatabasePool(path: databaseURL.path)
         
-        // Be a nice iOS citizen, and don't consume too much memory
-        // See https://github.com/groue/GRDB.swift/blob/master/README.md#memory-management
-        dbPool.setupMemoryManagement(in: application)
-        
         // Setup the database
         try AppDatabase().setup(dbPool)
         
