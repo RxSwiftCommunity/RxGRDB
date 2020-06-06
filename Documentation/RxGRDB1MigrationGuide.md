@@ -9,7 +9,7 @@ RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [
     
     - **Swift 5.2+** (was Swift 5.0+)
     - **Xcode 11.4+** (was Xcode 11.0+)
-    - iOS 9.0+ (unchanged)
+    - **iOS 10.0+** (was iOS 9.0+)
     - **macOS 10.10+** (was macOS 10.9+)
     - tvOS 9.0+ (unchanged)
     - watchOS 2.0+ (unchanged)
