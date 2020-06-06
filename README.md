@@ -83,7 +83,7 @@ newPlayerCount.subscribe(
 This observable delivers fresh values whenever the database changes:
 
 ```swift
-// DatabaseObservables.Value<[Player]>
+// Observable<[Player]>
 let observable = ValueObservation
     .tracking { db in try Player.fetchAll(db) }
     .rx.observe(in: dbQueue)
@@ -94,7 +94,7 @@ observable.subscribe(
     },
     onError: { error in ... })
 
-// DatabaseObservables.Value<Int?>
+// Observable<Int?>
 let observable = ValueObservation
     .tracking { db in try Int.fetchOne(db, sql: "SELECT MAX(score) FROM player") }
     .rx.observe(in: dbQueue)
@@ -269,11 +269,11 @@ It completes on the main queue, unless you provide a specific [scheduler] to the
 
 Database Observation observables are based on GRDB's [ValueObservation] and [DatabaseRegionObservation]. Please refer to their documentation for more information. If your application needs change notifications that are not built in RxGRDB, check the general [Database Changes Observation] chapter.
 
-- [`ValueObservation.rx.observe(in:)`]
+- [`ValueObservation.rx.observe(in:scheduling:)`]
 - [`DatabaseRegionObservation.rx.changes(in:)`]
 
 
-#### `ValueObservation.rx.observe(in:)`
+#### `ValueObservation.rx.observe(in:scheduling:)`
 
 GRDB's [ValueObservation] tracks changes in database values. You can turn it into an RxSwift observable:
 
@@ -282,30 +282,11 @@ let observation = ValueObservation.tracking { db in
     try Player.fetchAll(db)
 }
 
-// DatabaseObservables.Value<[Player]>
+// Observable<[Player]>
 let observable = observation.rx.observe(in: dbQueue)
 ```
-The `DatabaseObservables.Value` observable can be used like all RxSwift observables. For example:
 
-```swift
-let disposable = observation.rx
-    .observe(in: dbQueue)
-    .distinctUntilChanged()
-    .subscribe(
-        onNext: { players: [Player] in print("fresh players: \(players)") },
-        onError: { error in ... })
-```
-
-You can turn it into a regular RxSwift `Observable` with the `asObservable()` method:
-
-```swift
-// Observable<[Player]>
-let observable = observation.rx
-    .observe(in: dbQueue)
-    .asObservable()
-```
-
-`DatabaseObservables.Value` has the same behavior as ValueObservation:
+This observable has the same behavior as ValueObservation:
 
 - It notifies an initial value before the eventual changes.
 - It may coalesce subsequent changes into a single notification.
@@ -313,15 +294,16 @@ let observable = observation.rx
 - It stops emitting any value after the database connection is closed. But it never completes.
 - By default, it notifies the initial value, as well as eventual changes and errors, on the main thread, asynchronously.
     
-    This can be configured with the `scheduling(_:)` method. It does not accept an RxSwift scheduler, but a [GRDB scheduler](https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation-scheduling).
+    This can be configured with the `scheduling` argument. It does not accept an RxSwift scheduler, but a [GRDB scheduler](https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#valueobservation-scheduling).
     
-    For example, the `.immediate` scheduler makes sure the initial value is notified immediately when the observable is subcribed. It can help your application update the user interface without having to wait for any asynchronous notifications:
+    For example, the `.immediate` scheduler makes sure the initial value is notified immediately when the observable is subscribed. It can help your application update the user interface without having to wait for any asynchronous notifications:
     
     ```swift
     // Immediate notification of the initial value
     let disposable = observation.rx
-        .observe(in: dbQueue)
-        .scheduling(.immediate) // <-
+        .observe(
+            in: dbQueue,
+            scheduling: .immediate) // <-
         .subscribe(
             onNext: { players: [Player] in print("fresh players: \(players)") },
             onError: { error in ... })
@@ -405,7 +387,7 @@ See [DatabaseRegionObservation] for more information.
 [Swift Package Manager]: https://swift.org/package-manager/
 [ValueObservation]: https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation
 [`DatabaseRegionObservation.rx.changes(in:)`]: #databaseregionobservationrxchangesin
-[`ValueObservation.rx.observe(in:)`]: #valueobservationrxobservein
+[`ValueObservation.rx.observe(in:scheduling:)`]: #valueobservationrxobserveinscheduling
 [`rx.read(observeOn:value:)`]: #databasereaderrxreadobserveonvalue
 [`rx.write(observeOn:updates:)`]: #databasewriterrxwriteobserveonupdates
 [`rx.write(observeOn:updates:thenRead:)`]: #databasewriterrxwriteobserveonupdatesthenread
