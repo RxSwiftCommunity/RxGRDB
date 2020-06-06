@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+## 1.0.0-beta.2
+
+Released June 6, 2020 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v1.0.0-beta...v1.0.0-beta.2)
+
+- **Breaking**: The ValueObservation scheduler is now an argument of the `rx.observe(in:scheduler:)` method, which returns a regular Observable.
+
+
 ## 1.0.0-beta
 
 Released May 3, 2020 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v0.18.0...v1.0.0-beta)
