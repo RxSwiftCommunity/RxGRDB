@@ -18,7 +18,7 @@ private struct Player: Codable, FetchableRecord, PersistableRecord {
     }
 }
 
-class DatabaseWriterWritePublisherTests : XCTestCase {
+class DatabaseWriterWriteTests : XCTestCase {
     func testRxJoiner() {
         // Make sure `rx` joiner is available in various contexts
         func f1(_ writer: DatabasePool) {

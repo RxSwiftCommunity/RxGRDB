@@ -133,8 +133,7 @@ class ValueObservationTests : XCTestCase {
                 let testSubject = ReplaySubject<Int>.createUnbounded()
                 ValueObservation
                     .tracking(Player.fetchCount)
-                    .rx.observe(in: writer)
-                    .scheduling(.immediate)
+                    .rx.observe(in: writer, scheduling: .immediate)
                     .subscribe(testSubject)
                     .disposed(by: disposeBag)
                 
@@ -181,8 +180,7 @@ class ValueObservationTests : XCTestCase {
                 let semaphore = DispatchSemaphore(value: 0)
                 ValueObservation
                     .tracking(Player.fetchCount)
-                    .rx.observe(in: writer)
-                    .scheduling(.immediate)
+                    .rx.observe(in: writer, scheduling: .immediate)
                     .subscribe(onNext: { _ in
                         semaphore.signal()
                     })
@@ -202,8 +200,7 @@ class ValueObservationTests : XCTestCase {
         func test(writer: DatabaseWriter) throws {
             let observable = ValueObservation
                 .tracking { try $0.execute(sql: "THIS IS NOT SQL") }
-                .rx.observe(in: writer)
-                .scheduling(.immediate)
+                .rx.observe(in: writer, scheduling: .immediate)
             let result = observable.toBlocking().materialize()
             switch result {
             case .completed:
@@ -217,6 +214,31 @@ class ValueObservationTests : XCTestCase {
             .run { DatabaseQueue() }
             .runAtTemporaryDatabasePath { try DatabaseQueue(path: $0) }
             .runAtTemporaryDatabasePath { try DatabasePool(path: $0) }
+    }
+    
+    func testIssue780() throws {
+        func test(dbPool: DatabasePool) throws {
+            struct Entity: Codable, FetchableRecord, PersistableRecord, Equatable {
+                var id: Int64
+                var name: String
+            }
+            try dbPool.write { db in
+                try db.create(table: "entity") { t in
+                    t.autoIncrementedPrimaryKey("id")
+                    t.column("name", .text)
+                }
+            }
+            let observation = ValueObservation.tracking(Entity.fetchAll)
+            let entities = try dbPool.rx
+                .write { db in try Entity(id: 1, name: "foo").insert(db) }
+                .asCompletable()
+                .andThen(observation.rx.observe(in: dbPool, scheduling: .immediate))
+                .take(1)
+                .toBlocking(timeout: 1)
+                .single()
+            XCTAssertEqual(entities, [Entity(id: 1, name: "foo")])
+        }
+        try Test(test).runAtTemporaryDatabasePath { try DatabasePool(path: $0) }
     }
     
     // MARK: - Utils
