@@ -294,7 +294,7 @@ This observable has the same behavior as ValueObservation:
 - It stops emitting any value after the database connection is closed. But it never completes.
 - By default, it notifies the initial value, as well as eventual changes and errors, on the main thread, asynchronously.
     
-    This can be configured with the `scheduling` argument. It does not accept an RxSwift scheduler, but a [GRDB scheduler](https://github.com/groue/GRDB.swift/blob/GRDB5/README.md#valueobservation-scheduling).
+    This can be configured with the `scheduling` argument. It does not accept an RxSwift scheduler, but a [GRDB scheduler](https://github.com/groue/GRDB.swift/blob/master/README.md#valueobservation-scheduling).
     
     For example, the `.immediate` scheduler makes sure the initial value is notified immediately when the observable is subscribed. It can help your application update the user interface without having to wait for any asynchronous notifications:
     
