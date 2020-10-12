@@ -100,8 +100,9 @@ RxGRDB 1.0 comes with breaking changes. Those changes have the vanilla [GRDB], [
     Other former ways to observe the database are no longer available:
     
     ```swift
-    // BEFORE: RxGRDB 0.x
     let request = Player.all()
+
+    // BEFORE: RxGRDB 0.x
     request.rx.observeCount(in: dbQueue) // Observable<Int>
     request.rx.observeFirst(in: dbQueue) // Observable<Player?>
     request.rx.observeAll(in: dbQueue)   // Observable<[Player]>
