@@ -64,7 +64,7 @@ extension GRDBReactive where Base: _ValueObservationProtocol {
     public func observe(
         in reader: DatabaseReader,
         scheduling scheduler: ValueObservationScheduler = .async(onQueue: .main))
-        -> Observable<Base.Reducer.Value>
+    -> Observable<Base.Reducer.Value>
     {
         Observable.create { [weak reader] observer in
             guard let reader = reader else {

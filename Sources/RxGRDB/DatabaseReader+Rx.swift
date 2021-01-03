@@ -31,7 +31,7 @@ extension Reactive where Base: DatabaseReader {
     public func read<T>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         value: @escaping (Database) throws -> T)
-        -> Single<T>
+    -> Single<T>
     {
         Single
             .create(subscribe: { observer in

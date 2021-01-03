@@ -177,7 +177,7 @@ class DatabaseReaderReadTests : XCTestCase {
                             observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
                             value: { db in
                                 try Player.fetchCount(db)
-                        })
+                            })
                         .subscribe(
                             onSuccess: { _ in
                                 dispatchPrecondition(condition: .onQueue(queue))

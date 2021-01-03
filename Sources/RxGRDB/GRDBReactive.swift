@@ -3,7 +3,7 @@
 public struct GRDBReactive<Base> {
     /// Base object to extend.
     let base: Base
-
+    
     /// Creates extensions with base object.
     ///
     /// - parameter base: Base object.

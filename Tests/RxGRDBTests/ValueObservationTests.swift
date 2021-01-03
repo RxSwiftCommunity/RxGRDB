@@ -274,7 +274,7 @@ class ValueObservationTests : XCTestCase {
         _ message: @autoclosure () -> String = "",
         file: StaticString = #file,
         line: UInt = #line)
-        where Value: Equatable
+    where Value: Equatable
     {
         _assertValueObservationRecordingMatch(
             recorded: recordedValues,
@@ -291,7 +291,7 @@ class ValueObservationTests : XCTestCase {
         _ message: @autoclosure () -> String = "",
         file: StaticString = #file,
         line: UInt = #line)
-        where
+    where
         R: BidirectionalCollection,
         E: BidirectionalCollection,
         R.Element == E.Element,
