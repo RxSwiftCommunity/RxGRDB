@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+## 2.0.0
+
+Released January 3, 2021 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v1.0.0...v2.0.0)
+
+- **New**:: Support for RxSwift 6 
+
 ## 1.0.0
 
 Released September 20, 2020 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v1.0.0-beta.3...v1.0.0)

@@ -3,13 +3,13 @@ RxGRDB [![Swift 5.2](https://img.shields.io/badge/swift-5.2-orange.svg?style=fla
 
 ### A set of extensions for [SQLite], [GRDB.swift], and [RxSwift]
 
-**Latest release**: September 20, 2020 • version 1.0.0 • [Release Notes] • [Migrating From RxGRDB 0.x to RxGRDB 1.0](Documentation/RxGRDB1MigrationGuide.md)
+**Latest release**: January 3, 2021 • version 2.0.0 • [Release Notes]
 
 **Requirements**: iOS 10.0+ / OSX 10.10+ / tvOS 9.0+ / watchOS 2.0+ &bull; Swift 5.2+ / Xcode 11.4+
 
 | Swift version  | RxGRDB version                                                    |
 | -------------- | ----------------------------------------------------------------- |
-| **Swift 5.2+** | **v1.0.0-beta.3**, [v0.18.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.18.0) |
+| **Swift 5.2+** | **v2.0.0**, [v2.0.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v2.0.0) |
 | Swift 5.1      | [v0.18.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.18.0) |
 | Swift 5.0      | [v0.18.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.18.0) |
 | Swift 4.2      | [v0.13.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.13.0) |
