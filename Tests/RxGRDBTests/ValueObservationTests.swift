@@ -55,7 +55,7 @@ class ValueObservationTests : XCTestCase {
                     XCTAssertEqual(elements, expectedElements)
                 } else {
                     let elements = try testSubject
-                        .takeUntil(.inclusive, predicate: { $0 == expectedElements.last })
+                        .take(until: { $0 == expectedElements.last }, behavior: .inclusive)
                         .toBlocking(timeout: 1).toArray()
                     assertValueObservationRecordingMatch(recorded: elements, expected: expectedElements)
                 }
@@ -155,7 +155,7 @@ class ValueObservationTests : XCTestCase {
                     XCTAssertEqual(elements, expectedElements)
                 } else {
                     let elements = try testSubject
-                        .takeUntil(.inclusive, predicate: { $0 == expectedElements.last })
+                        .take(until: { $0 == expectedElements.last }, behavior: .inclusive)
                         .toBlocking(timeout: 1).toArray()
                     assertValueObservationRecordingMatch(recorded: elements, expected: expectedElements)
                 }

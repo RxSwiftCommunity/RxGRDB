@@ -1,9 +1,12 @@
 import GRDB
 import RxSwift
 
-extension DatabaseRegionObservation : ReactiveCompatible { }
+extension DatabaseRegionObservation {
+    /// Reactive extensions.
+    public var rx: GRDBReactive<Self> { GRDBReactive(self) }
+}
 
-extension Reactive where Base == DatabaseRegionObservation {
+extension GRDBReactive where Base == DatabaseRegionObservation {
     /// Returns an Observable that emits the same elements as
     /// a DatabaseRegionObservation.
     ///

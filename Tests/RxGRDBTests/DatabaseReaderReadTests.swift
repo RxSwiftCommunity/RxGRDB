@@ -105,8 +105,8 @@ class DatabaseReaderReadTests : XCTestCase {
                         onSuccess: { _ in
                             semaphore.wait()
                             expectation.fulfill()
-                    },
-                        onError: { error in XCTFail("Unexpected error \(error)") })
+                        },
+                        onFailure: { error in XCTFail("Unexpected error \(error)") })
                     .disposed(by: disposeBag)
                 
                 semaphore.signal()
@@ -142,8 +142,8 @@ class DatabaseReaderReadTests : XCTestCase {
                             onSuccess: { _ in
                                 dispatchPrecondition(condition: .onQueue(.main))
                                 expectation.fulfill()
-                        },
-                            onError: { error in XCTFail("Unexpected error \(error)") })
+                            },
+                            onFailure: { error in XCTFail("Unexpected error \(error)") })
                         .disposed(by: disposeBag)
                     
                     waitForExpectations(timeout: 1, handler: nil)
@@ -182,8 +182,8 @@ class DatabaseReaderReadTests : XCTestCase {
                             onSuccess: { _ in
                                 dispatchPrecondition(condition: .onQueue(queue))
                                 expectation.fulfill()
-                        },
-                            onError: { error in XCTFail("Unexpected error \(error)") })
+                            },
+                            onFailure: { error in XCTFail("Unexpected error \(error)") })
                         .disposed(by: disposeBag)
                     
                     waitForExpectations(timeout: 1, handler: nil)
