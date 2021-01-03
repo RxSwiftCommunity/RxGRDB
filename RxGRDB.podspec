@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name     = 'RxGRDB'
-  s.version  = '1.0.0'
+  s.version  = '2.0.0'
   
   s.license  = { :type => 'MIT', :file => 'LICENSE' }
   s.summary  = 'Reactive extensions for GRDB.swift.'
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = '9.0'
   s.watchos.deployment_target = '3.0'
   
-  s.dependency "RxSwift", "~> 5.0"
+  s.dependency "RxSwift", "~> 6.0"
   s.default_subspec = 'default'
   
   s.subspec 'default' do |ss|

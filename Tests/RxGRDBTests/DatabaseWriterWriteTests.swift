@@ -153,8 +153,8 @@ class DatabaseWriterWriteTests : XCTestCase {
                         onSuccess: {
                             semaphore.wait()
                             expectation.fulfill()
-                    },
-                        onError: { error in XCTFail("Unexpected error \(error)") })
+                        },
+                        onFailure: { error in XCTFail("Unexpected error \(error)") })
                     .disposed(by: disposeBag)
                 
                 semaphore.signal()
@@ -187,8 +187,8 @@ class DatabaseWriterWriteTests : XCTestCase {
                             onSuccess: { _ in
                                 dispatchPrecondition(condition: .onQueue(.main))
                                 expectation.fulfill()
-                        },
-                            onError: { error in XCTFail("Unexpected error \(error)") })
+                            },
+                            onFailure: { error in XCTFail("Unexpected error \(error)") })
                         .disposed(by: disposeBag)
                     
                     waitForExpectations(timeout: 1, handler: nil)
@@ -221,13 +221,13 @@ class DatabaseWriterWriteTests : XCTestCase {
                             observeOn: SerialDispatchQueueScheduler(queue: queue, internalSerialQueueName: "test"),
                             updates: { db in
                                 try Player(id: 1, name: "Arthur", score: 1000).insert(db)
-                        })
+                            })
                         .subscribe(
                             onSuccess: { _ in
                                 dispatchPrecondition(condition: .onQueue(queue))
                                 expectation.fulfill()
-                        },
-                            onError: { error in XCTFail("Unexpected error \(error)") })
+                            },
+                            onFailure: { error in XCTFail("Unexpected error \(error)") })
                         .disposed(by: disposeBag)
                     
                     waitForExpectations(timeout: 1, handler: nil)
@@ -317,7 +317,7 @@ class DatabaseWriterWriteTests : XCTestCase {
                 updates: { db in
                     try Player(id: 1, name: "Arthur", score: 1000).insert(db)
                     try db.execute(sql: "THIS IS NOT SQL")
-            },
+                },
                 thenRead: { _, _ in })
             do {
                 _ = try single.toBlocking(timeout: 1).single()
@@ -379,8 +379,8 @@ class DatabaseWriterWriteTests : XCTestCase {
                             onSuccess: { _ in
                                 dispatchPrecondition(condition: .onQueue(.main))
                                 expectation.fulfill()
-                        },
-                            onError: { error in XCTFail("Unexpected error \(error)") })
+                            },
+                            onFailure: { error in XCTFail("Unexpected error \(error)") })
                         .disposed(by: disposeBag)
                     
                     waitForExpectations(timeout: 1, handler: nil)
@@ -417,8 +417,8 @@ class DatabaseWriterWriteTests : XCTestCase {
                             onSuccess: { _ in
                                 dispatchPrecondition(condition: .onQueue(queue))
                                 expectation.fulfill()
-                        },
-                            onError: { error in XCTFail("Unexpected error \(error)") })
+                            },
+                            onFailure: { error in XCTFail("Unexpected error \(error)") })
                         .disposed(by: disposeBag)
                     
                     waitForExpectations(timeout: 1, handler: nil)

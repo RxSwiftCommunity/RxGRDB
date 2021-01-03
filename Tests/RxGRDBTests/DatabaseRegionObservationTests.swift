@@ -85,8 +85,8 @@ class DatabaseRegionObservationTests : XCTestCase {
                         onSuccess: { value in
                             XCTAssertEqual(value, [0, 1, 3])
                             expectation.fulfill()
-                    },
-                        onError: { error in XCTFail("Unexpected error \(error)") })
+                        },
+                        onFailure: { error in XCTFail("Unexpected error \(error)") })
                     .disposed(by: disposeBag)
                 
                 try writer

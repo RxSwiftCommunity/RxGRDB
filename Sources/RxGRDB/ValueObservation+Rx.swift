@@ -1,10 +1,13 @@
 import GRDB
 import RxSwift
 
-extension ValueObservation: ReactiveCompatible { }
+extension ValueObservation {
+    /// Reactive extensions.
+    public var rx: GRDBReactive<Self> { GRDBReactive(self) }
+}
 
 /// :nodoc:
-public protocol _ValueObservationProtocol: ReactiveCompatible {
+public protocol _ValueObservationProtocol {
     associatedtype Reducer: _ValueReducer
     func start(
         in reader: DatabaseReader,
@@ -16,7 +19,7 @@ public protocol _ValueObservationProtocol: ReactiveCompatible {
 /// :nodoc:
 extension ValueObservation: _ValueObservationProtocol { }
 
-extension Reactive where Base: _ValueObservationProtocol {
+extension GRDBReactive where Base: _ValueObservationProtocol {
     /// Creates an Observable which tracks changes in database values.
     ///
     /// For example:
@@ -61,7 +64,7 @@ extension Reactive where Base: _ValueObservationProtocol {
     public func observe(
         in reader: DatabaseReader,
         scheduling scheduler: ValueObservationScheduler = .async(onQueue: .main))
-        -> Observable<Base.Reducer.Value>
+    -> Observable<Base.Reducer.Value>
     {
         Observable.create { [weak reader] observer in
             guard let reader = reader else {

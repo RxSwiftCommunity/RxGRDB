@@ -10,6 +10,7 @@ import RxSwift
 ///
 /// :nodoc:
 extension DatabaseWriter {
+    /// Reactive extensions.
     public var rx: Reactive<AnyDatabaseWriter> {
         Reactive(AnyDatabaseWriter(self))
     }
@@ -32,7 +33,7 @@ extension Reactive where Base: DatabaseWriter {
     public func write<T>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         updates: @escaping (Database) throws -> T)
-        -> Single<T>
+    -> Single<T>
     {
         Single
             .create(subscribe: { observer in
@@ -41,14 +42,14 @@ extension Reactive where Base: DatabaseWriter {
                     case let .success(value):
                         observer(.success(value))
                     case let .failure(error):
-                        observer(.error(error))
+                        observer(.failure(error))
                     }
                 })
                 return Disposables.create()
             })
             // We don't want users to process emitted values on a
             // database dispatch queue.
-            .observeOn(scheduler)
+            .observe(on: scheduler)
     }
     
     /// Returns a Single that asynchronously writes into the database.
@@ -68,7 +69,7 @@ extension Reactive where Base: DatabaseWriter {
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
         updates: @escaping (Database) throws -> T,
         thenRead value: @escaping (Database, T) throws -> U)
-        -> Single<U>
+    -> Single<U>
     {
         Single
             .create(subscribe: { observer in
@@ -80,14 +81,14 @@ extension Reactive where Base: DatabaseWriter {
                             return .commit
                         }
                     } catch {
-                        observer(.error(error))
+                        observer(.failure(error))
                         return
                     }
                     self.base.spawnConcurrentRead { dbResult in
                         do {
                             try observer(.success(value(dbResult.get(), updatesValue!)))
                         } catch {
-                            observer(.error(error))
+                            observer(.failure(error))
                         }
                     }
                 }
@@ -95,6 +96,6 @@ extension Reactive where Base: DatabaseWriter {
             })
             // We don't want users to process emitted values on a
             // database dispatch queue.
-            .observeOn(scheduler)
+            .observe(on: scheduler)
     }
 }
