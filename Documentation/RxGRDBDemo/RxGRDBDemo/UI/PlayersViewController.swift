@@ -30,19 +30,19 @@ class PlayersViewController: UIViewController {
             return
         }
         
-        var barButtonItem = UIBarButtonItem(title: title, style: .plain, target: nil, action: nil)
+        let barButtonItem = UIBarButtonItem(title: title, style: .plain, target: nil, action: nil)
         barButtonItem.rx.action = viewModel.toggleOrdering
         navigationItem.rightBarButtonItem = barButtonItem
     }
     
     private func setupToolbar() {
-        var deleteAllButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
+        let deleteAllButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
         deleteAllButtonItem.rx.action = viewModel.deleteAll
         
-        var refreshButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: nil, action: nil)
+        let refreshButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: nil, action: nil)
         refreshButtonItem.rx.action = viewModel.refresh
         
-        var stressTestButtonItem = UIBarButtonItem(title: "💣", style: .plain, target: nil, action: nil)
+        let stressTestButtonItem = UIBarButtonItem(title: "💣", style: .plain, target: nil, action: nil)
         stressTestButtonItem.rx.action = viewModel.stressTest
         
         toolbarItems = [
