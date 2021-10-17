@@ -1,7 +1,9 @@
 Release Notes
 =============
 
-## Next Release
+## 2.1.0
+
+Released October 17, 2021 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v2.0.0...v2.1.0)
 
 - **Breaking Change**: Minimum iOS version is now iOS 11.0, and 32-bits devices are no longer supported. This brings compatibility with GRDB v5.12.0 and Xcode 13.
 - **Breaking Change**: Minimum Swift version is now Swift 5.3.

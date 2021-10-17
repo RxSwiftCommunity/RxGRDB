@@ -3,7 +3,7 @@ RxGRDB [![Swift 5.2](https://img.shields.io/badge/swift-5.2-orange.svg?style=fla
 
 ### A set of extensions for [SQLite], [GRDB.swift], and [RxSwift]
 
-**Latest release**: January 3, 2021 • version 2.0.0 • [Release Notes]
+**Latest release**: October 17, 2021 • version 2.1.0 • [Release Notes]
 
 **Requirements**: iOS 11.0+ / OSX 10.10+ / tvOS 9.0+ / watchOS 2.0+ &bull; Swift 5.2+ / Xcode 11.4+
 
