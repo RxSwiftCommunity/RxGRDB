@@ -22,16 +22,16 @@ git:
 jobs:
   include:
 
-    - stage: Test Xcode 11.4
+    - stage: Test Xcode 13.1
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode11.4
+      osx_image: xcode13.1
       env:
         - TID=RxGRDB [SPM] (macOS)
       script: make test_SPM
     
-    - stage: Test Xcode 11.4
+    - stage: Test Xcode 13.1
       gemfile: .ci/gemfiles/Gemfile.travis
-      osx_image: xcode11.4
+      osx_image: xcode13.1
       env:
         - TID=CocoaPods Lint
       script: make test_CocoaPodsLint
