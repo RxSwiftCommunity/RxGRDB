@@ -1,7 +1,9 @@
 Release Notes
 =============
 
-## Next Release
+## 3.0.0
+
+Released September 9, 2022 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v2.1.0...v3.0.0)
 
 - **New**: Support for GRDB 6
 - **Breaking Change**: Swift 5.7+ and Xcode 14+ are required.
