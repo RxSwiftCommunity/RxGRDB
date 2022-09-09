@@ -4,7 +4,7 @@ import GRDB
 class PlayerTests: XCTestCase {
     
     func testInsert() throws {
-        let dbQueue = DatabaseQueue()
+        let dbQueue = try DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         try dbQueue.write { db in
             var player = Player(id: nil, name: "Arthur", score: 100)
@@ -14,7 +14,7 @@ class PlayerTests: XCTestCase {
     }
     
     func testRoundtrip() throws {
-        let dbQueue = DatabaseQueue()
+        let dbQueue = try DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         try dbQueue.write { db in
             var insertedPlayer = Player(id: 1, name: "Arthur", score: 100)
@@ -25,7 +25,7 @@ class PlayerTests: XCTestCase {
     }
     
     func testOrderByScore() throws {
-        let dbQueue = DatabaseQueue()
+        let dbQueue = try DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         var player1 = Player(id: 1, name: "Arthur", score: 100)
         var player2 = Player(id: 2, name: "Barbara", score: 200)
@@ -54,7 +54,7 @@ class PlayerTests: XCTestCase {
     }
     
     func testOrderByName() throws {
-        let dbQueue = DatabaseQueue()
+        let dbQueue = try DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         var player1 = Player(id: 1, name: "Arthur", score: 100)
         var player2 = Player(id: 2, name: "Barbara", score: 200)

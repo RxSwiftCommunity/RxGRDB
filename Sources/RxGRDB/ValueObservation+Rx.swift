@@ -9,15 +9,20 @@ extension ValueObservation {
 /// :nodoc:
 public protocol _ValueObservationProtocol {
     associatedtype Reducer: _ValueReducer
-    func start(
-        in reader: DatabaseReader,
-        scheduling scheduler: ValueObservationScheduler,
+    func _start(
+        in reader: GRDB.DatabaseReader,
+        scheduling scheduler: GRDB.ValueObservationScheduler,
         onError: @escaping (Error) -> Void,
-        onChange: @escaping (Reducer.Value) -> Void) -> DatabaseCancellable
+        onChange: @escaping (Reducer.Value) -> Void)
+    -> GRDB.DatabaseCancellable
 }
 
 /// :nodoc:
-extension ValueObservation: _ValueObservationProtocol { }
+extension ValueObservation: _ValueObservationProtocol where Reducer: ValueReducer {
+    public func _start(in reader: GRDB.DatabaseReader, scheduling scheduler: GRDB.ValueObservationScheduler, onError: @escaping (Error) -> Void, onChange: @escaping (Reducer.Value) -> Void) -> GRDB.DatabaseCancellable {
+        start(in: reader, scheduling: scheduler, onError: onError, onChange: onChange)
+    }
+}
 
 extension GRDBReactive where Base: _ValueObservationProtocol {
     /// Creates an Observable which tracks changes in database values.
@@ -66,12 +71,8 @@ extension GRDBReactive where Base: _ValueObservationProtocol {
         scheduling scheduler: ValueObservationScheduler = .async(onQueue: .main))
     -> Observable<Base.Reducer.Value>
     {
-        Observable.create { [weak reader] observer in
-            guard let reader = reader else {
-                return Disposables.create()
-            }
-            
-            let cancellable = self.base.start(
+        Observable.create { observer in
+            let cancellable = self.base._start(
                 in: reader,
                 scheduling: scheduler,
                 onError: observer.onError,

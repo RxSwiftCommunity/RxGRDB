@@ -4,7 +4,7 @@ import GRDB
 class AppDatabaseTests: XCTestCase {
     
     func testDatabaseSchemaContainsPlayerTable() throws {
-        let dbQueue = DatabaseQueue()
+        let dbQueue = try DatabaseQueue()
         try AppDatabase().setup(dbQueue)
         try dbQueue.read { db in
             try XCTAssert(db.tableExists("player"))

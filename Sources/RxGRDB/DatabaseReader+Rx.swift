@@ -17,7 +17,7 @@ extension DatabaseReader {
 extension Reactive where Base: DatabaseReader {
     /// Returns a Single that asynchronously emits the fetched value.
     ///
-    ///     let dbQueue = DatabaseQueue()
+    ///     let dbQueue = try DatabaseQueue()
     ///     let players: Single<[Player]> = dbQueue.rx.read { db in
     ///         try Player.fetchAll(db)
     ///     }

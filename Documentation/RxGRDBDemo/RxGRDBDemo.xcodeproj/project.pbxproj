@@ -19,6 +19,7 @@
 		567515A222C3A7DC00A6FF66 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A122C3A7DC00A6FF66 /* World.swift */; };
 		567515A422C3A9BC00A6FF66 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A322C3A9BC00A6FF66 /* Players.swift */; };
 		567515A822C3B1F100A6FF66 /* PlayersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567515A722C3B1F100A6FF66 /* PlayersViewModel.swift */; };
+		567CE94228CB747200A95C34 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 567CE94128CB747200A95C34 /* RxCocoa */; };
 		567E66D02438A6F80091B5D8 /* RxGRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 567E66CF2438A6F80091B5D8 /* RxGRDB */; };
 		56D6EA2F2438AB77000D55EF /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 56D6EA2E2438AB77000D55EF /* RxSwift */; };
 		56D6EA322438ABAE000D55EF /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 56D6EA312438ABAE000D55EF /* RxDataSources */; };
@@ -100,6 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				567CE94228CB747200A95C34 /* RxCocoa in Frameworks */,
 				56D6EA352438ABD7000D55EF /* Action in Frameworks */,
 				56D6EA442438AF90000D55EF /* GRDB in Frameworks */,
 				56D6EA322438ABAE000D55EF /* RxDataSources in Frameworks */,
@@ -240,6 +242,7 @@
 				56D6EA312438ABAE000D55EF /* RxDataSources */,
 				56D6EA342438ABD7000D55EF /* Action */,
 				56D6EA432438AF90000D55EF /* GRDB */,
+				567CE94128CB747200A95C34 /* RxCocoa */,
 			);
 			productName = RxGRDBDemo;
 			productReference = 56E1F9791F8101EE00793BFA /* RxGRDBDemo.app */;
@@ -629,12 +632,17 @@
 			repositoryURL = "https://github.com/groue/GRDB.swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
+				minimumVersion = 6.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		567CE94128CB747200A95C34 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56D6EA2D2438AB77000D55EF /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
 		567E66CF2438A6F80091B5D8 /* RxGRDB */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RxGRDB;

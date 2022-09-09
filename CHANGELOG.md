@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+## Next Release
+
+- **New**: Support for GRDB 6
+- **Breaking Change**: Swift 5.7+ and Xcode 14+ are required.
+- **Breaking Change**: iOS 11.0+ / macOS 10.13+ / tvOS 11.0+ / watchOS 4.0+
+
 ## 2.1.0
 
 Released October 17, 2021 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v2.0.0...v2.1.0)
@@ -12,7 +18,7 @@ Released October 17, 2021 &bull; [diff](https://github.com/RxSwiftCommunity/RxGR
 
 Released January 3, 2021 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v1.0.0...v2.0.0)
 
-- **New**:: Support for RxSwift 6 
+- **New**: Support for RxSwift 6 
 
 ## 1.0.0
 
