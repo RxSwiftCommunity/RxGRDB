@@ -16,7 +16,7 @@ extension GRDBReactive where Base == DatabaseRegionObservation {
     /// upon subscription. See [GRDB Concurrency Guide](https://github.com/groue/GRDB.swift/blob/master/README.md#concurrency)
     /// for more information.
     ///
-    ///     let dbQueue = DatabaseQueue()
+    ///     let dbQueue = try DatabaseQueue()
     ///     try dbQueue.write { db in
     ///         try db.create(table: "player") { t in
     ///             t.column("id", .integer).primaryKey()
@@ -54,16 +54,12 @@ extension GRDBReactive where Base == DatabaseRegionObservation {
     ///
     /// - parameter writer: A DatabaseWriter (DatabaseQueue or DatabasePool).
     public func changes(in writer: DatabaseWriter) -> Observable<Database> {
-        Observable.create { observer -> Disposable in
-            do {
-                let transactionObserver = try self.base.start(in: writer, onChange: observer.onNext)
-                return Disposables.create {
-                    writer.remove(transactionObserver: transactionObserver)
-                }
-            } catch {
-                observer.onError(error)
-                return Disposables.create()
-            }
+        Observable.create { observer in
+            let cancellable = self.base.start(
+                in: writer,
+                onError: observer.onError,
+                onChange: observer.onNext)
+            return Disposables.create(with: cancellable.cancel)
         }
     }
 }

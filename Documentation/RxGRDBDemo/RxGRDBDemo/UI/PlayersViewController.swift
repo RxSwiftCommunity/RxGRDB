@@ -1,6 +1,7 @@
 import UIKit
 import RxDataSources
 import RxSwift
+import RxCocoa
 
 /// An MVVM ViewController that displays PlayersViewModel
 class PlayersViewController: UIViewController {
@@ -30,19 +31,19 @@ class PlayersViewController: UIViewController {
             return
         }
         
-        let barButtonItem = UIBarButtonItem(title: title, style: .plain, target: nil, action: nil)
+        var barButtonItem = UIBarButtonItem(title: title, style: .plain, target: nil, action: nil)
         barButtonItem.rx.action = viewModel.toggleOrdering
         navigationItem.rightBarButtonItem = barButtonItem
     }
     
     private func setupToolbar() {
-        let deleteAllButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
+        var deleteAllButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
         deleteAllButtonItem.rx.action = viewModel.deleteAll
         
-        let refreshButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: nil, action: nil)
+        var refreshButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: nil, action: nil)
         refreshButtonItem.rx.action = viewModel.refresh
         
-        let stressTestButtonItem = UIBarButtonItem(title: "💣", style: .plain, target: nil, action: nil)
+        var stressTestButtonItem = UIBarButtonItem(title: "💣", style: .plain, target: nil, action: nil)
         stressTestButtonItem.rx.action = viewModel.stressTest
         
         toolbarItems = [

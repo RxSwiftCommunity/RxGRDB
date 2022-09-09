@@ -8,7 +8,7 @@ class PlayersViewModelTests: XCTestCase {
     override func setUp() {
         // PlayerViewModel needs a Current World.
         // Setup one with an in-memory database, for fast access.
-        let dbQueue = DatabaseQueue()
+        let dbQueue = try! DatabaseQueue()
         try! AppDatabase().setup(dbQueue)
         Current = World(database: { dbQueue })
     }

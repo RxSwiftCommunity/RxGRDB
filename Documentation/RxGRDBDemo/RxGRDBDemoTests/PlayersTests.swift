@@ -8,7 +8,7 @@ class PlayersTests: XCTestCase {
     private func makeDatabase() throws -> DatabaseQueue {
         // Players needs a database.
         // Setup an in-memory database, for fast access.
-        let database = DatabaseQueue()
+        let database = try DatabaseQueue()
         try AppDatabase().setup(database)
         return database
     }
