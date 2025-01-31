@@ -32,7 +32,7 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter updates: A closure which writes in the database.
     public func write<T>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
-        updates: @escaping (Database) throws -> T)
+        updates: @escaping @Sendable (Database) throws -> T)
     -> Single<T>
     {
         Single
@@ -67,8 +67,8 @@ extension Reactive where Base: DatabaseWriter {
     /// - parameter value: A closure which reads from the database.
     public func write<T, U>(
         observeOn scheduler: ImmediateSchedulerType = MainScheduler.instance,
-        updates: @escaping (Database) throws -> T,
-        thenRead value: @escaping (Database, T) throws -> U)
+        updates: @escaping @Sendable (Database) throws -> T,
+        thenRead value: @escaping @Sendable (Database, T) throws -> U)
     -> Single<U>
     {
         Single
@@ -84,9 +84,12 @@ extension Reactive where Base: DatabaseWriter {
                         observer(.failure(error))
                         return
                     }
+                    
+                    // Non-mutable copy so that compiler does not raise any warning.
+                    let updatesValue2 = updatesValue
                     self.base.spawnConcurrentRead { dbResult in
                         do {
-                            try observer(.success(value(dbResult.get(), updatesValue!)))
+                            try observer(.success(value(dbResult.get(), updatesValue2!)))
                         } catch {
                             observer(.failure(error))
                         }
