@@ -1,25 +1,11 @@
-RxGRDB [![Swift 5.7](https://img.shields.io/badge/swift-5.7-orange.svg?style=flat)](https://developer.apple.com/swift/) [![Platforms](https://img.shields.io/cocoapods/p/RxGRDB.svg)](https://developer.apple.com/swift/) [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE) [![Build Status](https://travis-ci.org/RxSwiftCommunity/RxGRDB.svg?branch=master)](https://travis-ci.org/RxSwiftCommunity/RxGRDB)
+RxGRDB [![Swift 6](https://img.shields.io/badge/swift-6-orange.svg?style=flat)](https://developer.apple.com/swift/)  [![License](https://img.shields.io/github/license/RxSwiftCommunity/RxGRDB.svg?maxAge=2592000)](/LICENSE)
 ======
 
 ### A set of extensions for [SQLite], [GRDB.swift], and [RxSwift]
 
-**Latest release**: September 9, 2022 • [version 3.0.0](https://github.com/RxSwiftCommunity/RxGRDB/tree/v3.0.0) • [Release Notes]
+**Latest release**: March 25, 2025 • [version 4.0.0](https://github.com/RxSwiftCommunity/RxGRDB/tree/v4.0.0) • [Release Notes]
 
-**Requirements**: iOS 11.0+ / macOS 10.13+ / tvOS 11.0+ / watchOS 4.0+ • Swift 5.7+ / Xcode 14+
-
-| Swift version  | RxGRDB version                                                    |
-| -------------- | ----------------------------------------------------------------- |
-| **Swift 5.7**  | **[v3.0.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v3.0.0)** |
-| Swift 5.3      | [v2.1.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v2.1.0)   |
-| Swift 5.2      | [v2.0.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v2.0.0)   |
-| Swift 5.1      | [v0.18.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.18.0) |
-| Swift 5.0      | [v0.18.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.18.0) |
-| Swift 4.2      | [v0.13.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.13.0) |
-| Swift 4.1      | [v0.11.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.11.0) |
-| Swift 4        | [v0.10.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.10.0) |
-| Swift 3.2      | [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0)   |
-| Swift 3.1      | [v0.6.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.6.0)   |
-| Swift 3        | [v0.3.0](http://github.com/RxSwiftCommunity/RxGRDB/tree/v0.3.0)   |
+**Requirements**: iOS 11.0+ / macOS 10.13+ / tvOS 11.0+ / watchOS 4.0+ • Swift 6+ / Xcode 16+
 
 ---
 
