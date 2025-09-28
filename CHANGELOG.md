@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+## 4.0.1
+
+Released September 28, 2025
+
+- Replace deprecated API methods by [@1Consumption](https://github.com/1Consumption)
+
 ## 4.0.0
 
 Released March 15, 2025 &bull; [diff](https://github.com/RxSwiftCommunity/RxGRDB/compare/v3.0.0...v4.0.0)

@@ -3,7 +3,7 @@ RxGRDB [![Swift 6](https://img.shields.io/badge/swift-6-orange.svg?style=flat)](
 
 ### A set of extensions for [SQLite], [GRDB.swift], and [RxSwift]
 
-**Latest release**: March 25, 2025 • [version 4.0.0](https://github.com/RxSwiftCommunity/RxGRDB/tree/v4.0.0) • [Release Notes]
+**Latest release**: September 28, 2025 • [version 4.0.1](https://github.com/RxSwiftCommunity/RxGRDB/tree/v4.0.1) • [Release Notes]
 
 **Requirements**: iOS 11.0+ / macOS 10.13+ / tvOS 11.0+ / watchOS 4.0+ • Swift 6+ / Xcode 16+
 
