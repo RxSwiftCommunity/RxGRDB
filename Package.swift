@@ -32,5 +32,5 @@ let package = Package(
                 .product(name: "RxBlocking", package: "RxSwift"),
             ])
     ],
-    swiftLanguageVersions: [.v5]
+    swiftLanguageModes: [.v5]
 )
