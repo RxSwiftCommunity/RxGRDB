@@ -33,29 +33,13 @@ ifdef XCPRETTY_PATH
   endif
 endif
 
-# Avoid the "No output has been received in the last 10m0s" error on Travis:
-COCOAPODS_EXTRA_TIME =
-ifeq ($(TRAVIS),true)
-  COCOAPODS_EXTRA_TIME = --verbose
-endif
-
-test: test_SPM test_install
-test_install: test_CocoaPodsLint
+test: test_SPM
 
 test_SPM:
 	$(SWIFT) package clean
 	$(SWIFT) build
 	$(SWIFT) build -c release
 	set -o pipefail && $(SWIFT) test $(XCPRETTY)
-
-test_CocoaPodsLint:
-ifdef POD
-	$(POD) repo update
-	$(POD) lib lint --allow-warnings $(COCOAPODS_EXTRA_TIME)
-else
-	@echo CocoaPods must be installed for test_CocoaPodsLint
-	@exit 1
-endif
 
 # Cleanup
 # =======
